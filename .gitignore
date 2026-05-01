@@ -1,0 +1,9 @@
+# Home Manager / Nix build outputs
+/result
+/result-*
+
+# Local editor and OS files
+.DS_Store
+*.swp
+*.swo
+*~
