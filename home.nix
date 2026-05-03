@@ -37,7 +37,12 @@
     # (pkgs.writeShellScriptBin "my-hello" ''
     #   echo "Hello, ${config.home.username}!"
     # '')
+    pkgs.coreutils
+    pkgs.emacs
+    pkgs.fd
+    pkgs.git
     pkgs.opencode
+    pkgs.ripgrep
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
@@ -53,6 +58,7 @@
     #   org.gradle.console=verbose
     #   org.gradle.daemon.idletimeout=3600000
     # '';
+    ".config/doom".source = ./doom;
   };
 
   # Home Manager can also manage your environment variables through
@@ -76,6 +82,7 @@
   };
 
   home.sessionPath = [
+    "$HOME/.emacs.d/bin"
     "$HOME/.nix-profile/bin"
   ];
 
@@ -94,6 +101,10 @@
   # Let Home Manager manage the shell
   programs.bash.enable = true;
   programs.bash.initExtra = ''
+    if [[ ":$PATH:" != *":$HOME/.emacs.d/bin:"* ]]; then
+      export PATH="$HOME/.emacs.d/bin:$PATH"
+    fi
+
     if [[ ":$PATH:" != *":$HOME/.nix-profile/bin:"* ]]; then
       export PATH="$HOME/.nix-profile/bin:$PATH"
     fi
@@ -105,4 +116,10 @@
     enable = true;
     package = config.lib.nixGL.wrap pkgs.ghostty;
   };
+
+  home.activation.installDoomEmacs = config.lib.dag.entryAfter [ "writeBoundary" ] ''
+    if [ ! -e "$HOME/.emacs.d" ]; then
+      ${pkgs.git}/bin/git clone --depth 1 https://github.com/doomemacs/doomemacs "$HOME/.emacs.d"
+    fi
+  '';
 }
