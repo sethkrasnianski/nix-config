@@ -72,6 +72,10 @@
     # EDITOR = "emacs";
   };
 
+  home.sessionPath = [
+    "$HOME/.nix-profile/bin"
+  ];
+
   home.shellAliases = {
     # General shortcuts
     ll = "ls -l";
