@@ -37,6 +37,7 @@
     # (pkgs.writeShellScriptBin "my-hello" ''
     #   echo "Hello, ${config.home.username}!"
     # '')
+    pkgs.xclip
     pkgs.coreutils
     pkgs.emacs
     pkgs.fd
