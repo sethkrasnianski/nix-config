@@ -86,4 +86,11 @@
   programs.home-manager.enable = true;
   # Let Home Manager manage the shell
   programs.bash.enable = true;
+  programs.bash.initExtra = ''
+    if [[ ":$PATH:" != *":$HOME/.nix-profile/bin:"* ]]; then
+      export PATH="$HOME/.nix-profile/bin:$PATH"
+    fi
+
+    PS1='\[\e[38;2;159;226;191m\]\h\[\e[0m\]:\w\$ '
+  '';
 }
