@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, nixGL, pkgs, ... }:
 
 {
   # Home Manager needs a bit of information about you and the paths it should
@@ -14,6 +14,9 @@
   # want to update the value, then make sure to first check the Home Manager
   # release notes.
   home.stateVersion = "25.11"; # Please read the comment before changing.
+
+  targets.genericLinux.enable = true;
+  targets.genericLinux.nixGL.packages = nixGL.packages;
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
@@ -97,4 +100,9 @@
 
     PS1='\[\e[38;2;159;226;191m\]\h\[\e[0m\]:\w\$ '
   '';
+
+  programs.ghostty = {
+    enable = true;
+    package = config.lib.nixGL.wrap pkgs.ghostty;
+  };
 }
