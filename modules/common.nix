@@ -9,6 +9,7 @@
   imports = [
     ./neovim.nix
     ./emacs.nix
+    ./ssh.nix
   ];
 
   nix.settings.experimental-features = [
