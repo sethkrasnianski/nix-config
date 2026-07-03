@@ -24,6 +24,7 @@
   # User-facing apps. Base CLI tools stay in modules/common.nix.
   home.packages = with pkgs; [
     ghostty
+    opencode
 
     # unfree (allowed in modules/common.nix; useGlobalPkgs makes it apply here)
     claude-code

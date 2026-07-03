@@ -1,6 +1,7 @@
 # WSL-specific configuration. Only imported by the WSL host; the nixos-wsl
 # module itself (which provides the `wsl.*` options) is added in flake.nix.
-{ lib, ... }:
+# nixpkgs-stable comes from flake.nix via specialArgs.
+{ lib, nixpkgs-stable, ... }:
 
 let
   flakePath = "/home/nixos/personal/nixos-config";
@@ -9,6 +10,16 @@ in
   wsl.enable = true;
   wsl.defaultUser = "nixos";
   # wsl.wslg.enable = true;
+
+  # opencode from nixos-unstable segfaults at startup under WSL2 — the crash
+  # is in glibc's ld.so while it loads the Bun-compiled binary
+  # (https://github.com/anomalyco/opencode/issues/26846). The nixos-25.11
+  # build works, so swap it in here until unstable is fixed.
+  nixpkgs.overlays = [
+    (final: prev: {
+      opencode = nixpkgs-stable.legacyPackages.${prev.stdenv.hostPlatform.system}.opencode;
+    })
+  ];
 
   # GNOME pulls in NetworkManager, whose module unconditionally enables the
   # wpa_supplicant service for its wifi backend. WSL has no wifi hardware and
