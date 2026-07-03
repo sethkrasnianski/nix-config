@@ -6,28 +6,28 @@
 # first use, so the passphrase is typed once per boot, not per connection.
 #
 # Future: keys/known hosts shared across machines can be checked in as an
-# `ssh/` dir of *public* keys (wired via users.users.<name>.openssh
-# .authorizedKeys.keyFiles or programs.ssh.knownHosts); shared *private*
-# keys would need agenix/sops-nix first.
+# `ssh/` dir of *public* keys, wired via matchBlocks/IdentityFile here (or
+# users.users.<name>.openssh.authorizedKeys.keyFiles on the server side);
+# shared *private* keys would need agenix/sops-nix first.
+#
+# The GNOME/gcr agent that would fight over SSH_AUTH_SOCK is disabled at the
+# system level (modules/desktop.nix).
 { pkgs, ... }:
 
 {
-  # Classic ssh-agent as a systemd user service, on every variant.
-  programs.ssh.startAgent = true;
+  # ssh-agent as a systemd user service.
+  services.ssh-agent.enable = true;
 
-  # GNOME enables gcr's ssh-agent by default, which hard-conflicts (nixpkgs
-  # assertion) with startAgent. On WSL there's no GNOME login session to
-  # unlock the keyring anyway, so use the classic agent everywhere.
-  services.gnome.gcr-ssh-agent.enable = false;
-
-  # Cache the key in the agent the first time it's used.
-  programs.ssh.extraConfig = ''
-    AddKeysToAgent yes
-  '';
+  # ~/.ssh/config. matchBlocks is the place for per-system keys later.
+  programs.ssh = {
+    enable = true;
+    # Cache the key in the agent the first time it's used.
+    addKeysToAgent = "yes";
+  };
 
   # One-time, per-machine key generation. Interactive (prompts for a
   # passphrase); refuses to overwrite an existing key.
-  environment.systemPackages = [
+  home.packages = [
     (pkgs.writeShellScriptBin "generate-ssh-key" ''
       set -euo pipefail
       key="$HOME/.ssh/id_ed25519"

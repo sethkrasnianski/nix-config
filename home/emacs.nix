@@ -6,13 +6,14 @@
 #   doom install
 #
 # The private Doom config (init.el / config.el / packages.el) lives in doom/
-# at this repo's root; the WSL host symlinks ~/.config/doom to it
-# (hosts/nixos-wsl.nix) so Doom picks up exactly those files. Doom's external
-# tools (git, ripgrep, fd) are already provided by common.nix.
+# at this repo's root; ~/.config/doom is symlinked to it in home/default.nix
+# so Doom picks up exactly those files. Doom's external tools are ripgrep/fd
+# from modules/common.nix and git from home/git.nix. The icon font Doom's UI
+# needs stays system-level (modules/common.nix).
 { pkgs, ... }:
 
 {
-  environment.systemPackages = with pkgs; [
+  home.packages = with pkgs; [
     # `emacs` tracks the newest release in nixpkgs (30.2 as of this writing),
     # unlike a version-pinned attribute such as `emacs30`.
     emacs
@@ -24,12 +25,7 @@
     nil # :lang nix (+lsp) language server; formatting uses nixfmt (common.nix)
   ];
 
-  # Icon font used by Doom's UI (modeline, treemacs, dashboard).
-  fonts.packages = [ pkgs.nerd-fonts.symbols-only ];
-
   # Doom's CLI (`doom sync`, `doom doctor`, ...) lives inside the framework
-  # checkout, which isn't a Nix package — put it on PATH for all shells.
-  environment.shellInit = ''
-    export PATH="$HOME/.config/emacs/bin:$PATH"
-  '';
+  # checkout, which isn't a Nix package — put it on PATH.
+  home.sessionPath = [ "$HOME/.config/emacs/bin" ];
 }

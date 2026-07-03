@@ -22,6 +22,11 @@ in
     services.displayManager.gdm.enable = true;
     services.desktopManager.gnome.enable = true;
 
+    # GNOME enables gcr's ssh-agent by default, which would fight with the
+    # ssh-agent from home/ssh.nix over SSH_AUTH_SOCK. On WSL there's no GNOME
+    # login session to unlock the keyring anyway, so keep gcr's agent off.
+    services.gnome.gcr-ssh-agent.enable = false;
+
     # Keyboard layout for X.
     services.xserver.xkb.layout = "us";
   };

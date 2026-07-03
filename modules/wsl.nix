@@ -10,12 +10,6 @@ in
   wsl.defaultUser = "nixos";
   # wsl.wslg.enable = true;
 
-  # Terminals used with this host (Windows Terminal, Ghostty) support 24-bit
-  # color but do not all advertise it. COLORTERM makes TUI apps (e.g.
-  # `emacs -nw`) render truecolor instead of approximating the theme with
-  # the 256-color palette.
-  environment.variables.COLORTERM = "truecolor";
-
   # GNOME pulls in NetworkManager, whose module unconditionally enables the
   # wpa_supplicant service for its wifi backend. WSL has no wifi hardware and
   # the unit fails at startup (226/NAMESPACE), so force it off here.

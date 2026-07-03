@@ -6,18 +6,13 @@
 }:
 
 {
-  imports = [
-    ./neovim.nix
-    ./emacs.nix
-    ./ssh.nix
-  ];
-
   nix.settings.experimental-features = [
     "nix-command"
     "flakes"
   ];
 
   # Tell NixOS it's ok to install these packages despite unfree license.
+  # home-manager.useGlobalPkgs below makes this cover home.packages too.
   nixpkgs.config.allowUnfreePredicate =
     pkg:
     builtins.elem (lib.getName pkg) [
@@ -28,23 +23,35 @@
   # NOTE: system.stateVersion is intentionally NOT set here — it is per-host
   # (the release each machine was first installed with). See hosts/*.nix.
 
+  # home-manager runs as part of `nixos-rebuild switch`; per-user config lives
+  # in home/ at the repo root and is wired up per-host (hosts/*.nix), since
+  # usernames are host-specific.
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    # If a file home-manager wants to manage already exists, rename it aside
+    # instead of failing the activation.
+    backupFileExtension = "hm-bak";
+  };
+
   # Zsh, enabled properly (completion + environment integration) rather than
-  # just dropping the binary into systemPackages.
+  # just dropping the binary into systemPackages. User-level shell config is
+  # in home/shell.nix; this system-level enable is what registers zsh as a
+  # valid login shell.
   programs.zsh.enable = true;
 
-  # System-wide packages. (neovim comes from ./neovim.nix, emacs from ./emacs.nix)
+  # Icon font used by Doom Emacs' UI (modeline, treemacs, dashboard). Fonts
+  # stay system-level so fontconfig (and GNOME/GDM) sees them.
+  fonts.packages = [ pkgs.nerd-fonts.symbols-only ];
+
+  # Base CLI tools, kept system-wide so root and system scripts have them too.
+  # User-facing apps (editors, terminals, claude-code, ...) live in home/.
   environment.systemPackages = with pkgs; [
     nixfmt
     wget
-    git
     fd
     jq
     tree
     ripgrep
-    ghostty
-
-    # unfree
-    claude-code
-    ngrok
   ];
 }
