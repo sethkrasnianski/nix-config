@@ -33,9 +33,20 @@ hardware without any WSL assumptions.
 
 ## Rebuild (this WSL machine)
 
+Graphical (GNOME desktop) — the default:
+
 ```sh
 sudo nixos-rebuild switch --flake ~/personal/nixos-config#nixos
 ```
+
+Headless (no desktop; GUI apps like Ghostty still work via WSLg):
+
+```sh
+sudo nixos-rebuild switch --flake ~/personal/nixos-config#nixos-headless
+```
+
+Switch between them on demand by rebuilding with the other attribute — both are
+the same host, differing only in `local.graphical.enable`.
 
 ## Use on a non-WSL machine
 
@@ -49,7 +60,10 @@ sudo nixos-rebuild switch --flake ~/personal/nixos-config#nixos
 
 ## Desktop
 
-`modules/desktop.nix` provides GNOME (with GDM), shared by both hosts.
+`modules/desktop.nix` provides GNOME (with GDM), gated behind the
+`local.graphical.enable` option (default `true`). Set it to `false` for a
+headless host. The WSL box exposes both as flake outputs (`#nixos` /
+`#nixos-headless`); `#nixos-default` is graphical by default.
 
 ### Running GNOME on the WSL host
 
