@@ -137,13 +137,13 @@ selection, e.g. `@server.py#L20-35'.  A single-line selection yields `@file#L20'
        :desc "Scratch buffer" "e" #'doom/open-scratch-buffer))
 
 
-;;; Sync the kill ring with the macOS system clipboard.
-;; A GUI frame already talks to the pasteboard, but a terminal frame
+;;; Sync the kill ring with the system clipboard (macOS and WSL).
+;; A GUI frame already talks to the system clipboard, but a terminal frame
 ;; (`emacs -nw' / `emacsclient -t') has no clipboard access on its own. Routing
-;; the kill ring through pbcopy/pbpaste covers both -- and a daemon serving a mix
-;; of GUI and tty frames -- since pbcopy/pbpaste behave the same regardless of
-;; frame type. With this, every Evil yank/delete (and Emacs kill) lands on the
-;; system clipboard, and a yank/paste pulls in whatever you last copied elsewhere.
+;; the kill ring through an external clipboard tool covers both -- and a daemon
+;; serving a mix of GUI and tty frames -- since the tool behaves the same
+;; regardless of frame type. With this, every Evil yank/delete (and Emacs kill)
+;; lands on the system clipboard.
 (setq select-enable-clipboard t)
 ;; Don't overwrite the clipboard/register when pasting over a visual selection.
 (after! evil
@@ -160,6 +160,22 @@ selection, e.g. `@server.py#L20-35'.  A single-line selection yields `@file#L20'
     (shell-command-to-string "pbpaste"))
   (setq interprogram-cut-function #'+pbcopy
         interprogram-paste-function #'+pbpaste))
+
+;; Same idea on WSL: route kills to the Windows clipboard via clip.exe (on
+;; PATH through WSL interop), covering GUI (WSLg) and tty frames alike --
+;; WSLg's own clipboard bridge is unreliable. clip.exe accepts UTF-8 as-is
+;; on this setup (UTF-16 is what garbles, tested), so no re-encoding. Only
+;; the cut direction is routed: paste already works via WSLg in GUI frames
+;; and the terminal's paste in tty frames, and an interprogram-paste-function
+;; would have to spawn powershell.exe on every yank, which is slow.
+(when (and (getenv "WSL_DISTRO_NAME") (executable-find "clip.exe"))
+  (defun +wsl-clip (text &optional _push)
+    "Send TEXT to the Windows clipboard via clip.exe."
+    (let ((process-connection-type nil))
+      (let ((proc (start-process "clip" nil "clip.exe")))
+        (process-send-string proc text)
+        (process-send-eof proc))))
+  (setq interprogram-cut-function #'+wsl-clip))
 
 
 ;;; agent-shell -- AI coding agents in Emacs over ACP, set up for Claude Code.
