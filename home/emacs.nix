@@ -23,6 +23,7 @@
     shellcheck # :lang sh linting
     claude-agent-acp # Claude ACP adapter for agent-shell (see doom/config.el)
     nil # :lang nix (+lsp) language server; formatting uses nixfmt (common.nix)
+    yaml-language-server # :lang yaml (+lsp) language server
   ];
 
   # Doom's CLI (`doom sync`, `doom doctor`, ...) lives inside the framework
