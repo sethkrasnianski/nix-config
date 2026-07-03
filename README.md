@@ -21,7 +21,9 @@ Flake-based NixOS configuration with two hosts:
 │   ├── nixos-wsl.nix               # WSL host  = common + desktop + wsl
 │   ├── nixos-default.nix           # non-WSL host = common + desktop + nixos-default-hardware
 │   └── nixos-default-hardware.nix  # PLACEHOLDER — replace via nixos-generate-config
-└── doom/                           # private Doom Emacs config (~/.config/doom links here)
+├── doom/                           # private Doom Emacs config (~/.config/doom links here)
+└── claude/
+    └── settings.json               # global Claude Code settings (~/.claude/settings.json links here)
 ```
 
 (The WSL host has no `hardware-configuration.nix` — `nixos-wsl` provides the
@@ -123,6 +125,16 @@ doom install        # ~/.config/emacs/bin is already on PATH (new shell)
 
 Day-to-day: edit files in `doom/`; run `doom sync` after changing
 `init.el` or `packages.el` (plain `config.el` changes don't need it).
+
+## Claude Code
+
+Global Claude Code settings are tracked in `claude/settings.json`; the WSL
+host symlinks `~/.claude/settings.json` to it (a tmpfiles rule in
+`hosts/nixos-wsl.nix`). Only `settings.json` is linked — the rest of `~/.claude`
+is mutable state. Commit/PR attribution is disabled there. Edit settings in
+the repo file: changes made through `/config` write through the symlink, but
+if a rewrite replaces the link with a plain file, the tmpfiles rule restores
+it (discarding those changes) on the next rebuild.
 
 ## Update pinned inputs
 

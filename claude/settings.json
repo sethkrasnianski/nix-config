@@ -1,0 +1,9 @@
+{
+  "tui": "fullscreen",
+  "theme": "dark",
+  "model": "claude-opus-4-8",
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  }
+}

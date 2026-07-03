@@ -20,6 +20,7 @@
   nixpkgs.config.allowUnfreePredicate =
     pkg:
     builtins.elem (lib.getName pkg) [
+      "claude-code"
       "ngrok"
     ];
 
@@ -42,6 +43,7 @@
     ghostty
 
     # unfree
+    claude-code
     ngrok
   ];
 }
