@@ -21,6 +21,7 @@
     nodejs # :tools lsp server auto-install
     shellcheck # :lang sh linting
     claude-agent-acp # Claude ACP adapter for agent-shell (see doom/config.el)
+    nil # :lang nix (+lsp) language server; formatting uses nixfmt (common.nix)
   ];
 
   # Icon font used by Doom's UI (modeline, treemacs, dashboard).
