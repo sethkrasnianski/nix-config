@@ -8,6 +8,7 @@
 {
   imports = [
     ./neovim.nix
+    ./emacs.nix
   ];
 
   nix.settings.experimental-features = [
@@ -29,7 +30,7 @@
   # just dropping the binary into systemPackages.
   programs.zsh.enable = true;
 
-  # System-wide packages. (neovim comes from ./neovim.nix)
+  # System-wide packages. (neovim comes from ./neovim.nix, emacs from ./emacs.nix)
   environment.systemPackages = with pkgs; [
     nixfmt
     wget

@@ -15,11 +15,13 @@ Flake-based NixOS configuration with two hosts:
 │   ├── common.nix                  # shared: nix settings, packages, unfree, zsh, + neovim
 │   ├── desktop.nix                 # GNOME (shared by both hosts)
 │   ├── wsl.nix                     # WSL-only: wsl.enable, DISPLAY hack (imported by the nixos host)
-│   └── neovim.nix                  # editor config (enabled via common.nix)
+│   ├── neovim.nix                  # editor config (enabled via common.nix)
+│   └── emacs.nix                   # latest Emacs + Doom CLI on PATH (enabled via common.nix)
 ├── hosts/
 │   ├── nixos-wsl.nix               # WSL host  = common + desktop + wsl
 │   ├── nixos-default.nix           # non-WSL host = common + desktop + nixos-default-hardware
 │   └── nixos-default-hardware.nix  # PLACEHOLDER — replace via nixos-generate-config
+└── doom/                           # private Doom Emacs config (~/.config/doom links here)
 ```
 
 (The WSL host has no `hardware-configuration.nix` — `nixos-wsl` provides the
@@ -102,6 +104,25 @@ dbus-run-session -- gnome-shell --devkit --no-x11
 GNOME's own Xwayland can't start — only Wayland-native apps run *inside* this
 session (launch them with `WAYLAND_DISPLAY=wayland-1 <app>` from another
 terminal). X11 apps still work directly on WSLg as usual.
+
+## Emacs (Doom)
+
+`modules/emacs.nix` installs the latest Emacs from nixpkgs and puts Doom's CLI
+(`~/.config/emacs/bin`) on PATH. The private Doom config
+(`init.el` / `config.el` / `packages.el`) lives in `doom/` in this repo, and
+the WSL host symlinks `~/.config/doom` to it (a tmpfiles rule in
+`hosts/nixos-wsl.nix`), so those files are the single source of truth.
+
+Doom itself manages its own packages, so the framework is bootstrapped
+**once**, imperatively, after the first rebuild:
+
+```sh
+git clone --depth 1 https://github.com/doomemacs/doomemacs ~/.config/emacs
+doom install        # ~/.config/emacs/bin is already on PATH (new shell)
+```
+
+Day-to-day: edit files in `doom/`; run `doom sync` after changing
+`init.el` or `packages.el` (plain `config.el` changes don't need it).
 
 ## Update pinned inputs
 
