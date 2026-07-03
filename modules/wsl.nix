@@ -2,6 +2,9 @@
 # module itself (which provides the `wsl.*` options) is added in flake.nix.
 { ... }:
 
+let
+  flakePath = "/home/nixos/personal/nixos-config";
+in
 {
   wsl.enable = true;
   wsl.defaultUser = "nixos";
@@ -17,4 +20,11 @@
   # (/tmp/.X11-unix/X0, DISPLAY=:0) and GUI apps like Ghostty use it directly.
   # The old `DISPLAY = "<host-ip>:0.0"` pattern is for a Windows-side X server
   # (VcXsrv) and breaks WSLg apps when none is running.
+
+  # Shortcuts to rebuild this WSL host in either mode. Both aliases exist in
+  # both builds, so you can always flip back (e.g. run `rebuild` while headless).
+  environment.shellAliases = {
+    rebuild = "sudo nixos-rebuild switch --flake ${flakePath}#nixos";
+    rebuild-headless = "sudo nixos-rebuild switch --flake ${flakePath}#nixos-headless";
+  };
 }

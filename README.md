@@ -48,6 +48,29 @@ sudo nixos-rebuild switch --flake ~/personal/nixos-config#nixos-headless
 Switch between them on demand by rebuilding with the other attribute — both are
 the same host, differing only in `local.graphical.enable`.
 
+### Aliases
+
+The WSL host defines shell aliases (in `modules/wsl.nix`) so you don't type the
+full flake path:
+
+| Alias              | Runs                                              |
+| ------------------ | ------------------------------------------------- |
+| `rebuild`          | `nixos-rebuild switch --flake …#nixos` (graphical) |
+| `rebuild-headless` | `nixos-rebuild switch --flake …#nixos-headless`    |
+
+Both aliases are present in either mode, so `rebuild` will take you back to
+graphical while headless (and vice versa).
+
+**First-time bootstrap:** the aliases don't exist on a system that hasn't been
+built from this config yet (including right now). Run the full command once to
+install them:
+
+```sh
+sudo nixos-rebuild switch --flake ~/personal/nixos-config#nixos
+```
+
+After that, open a new shell and `rebuild` / `rebuild-headless` are available.
+
 ## Use on a non-WSL machine
 
 1. Boot the target machine and run `sudo nixos-generate-config`, then replace
