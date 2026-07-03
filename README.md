@@ -1,26 +1,29 @@
 # nixos-config
 
-Flake-based NixOS configuration with two hosts:
+Flake-based NixOS configuration with three outputs:
 
-- **`nixos`** — this NixOS-WSL machine.
+- **`nixos`** — this NixOS-WSL machine, graphical (GNOME).
+- **`nixos-headless`** — the same WSL machine, no desktop.
 - **`nixos-default`** — a non-WSL template (no WSL code), for real hardware.
 
 ## Layout
 
 ```
 .
-├── flake.nix                       # inputs + nixosConfigurations.{nixos,nixos-default}
+├── flake.nix                       # inputs + nixosConfigurations.{nixos,nixos-headless,nixos-default}
 ├── flake.lock                      # pinned input revisions — the reproducibility guarantee
 ├── modules/
-│   ├── common.nix                  # shared: nix settings, packages, unfree, zsh, + neovim
+│   ├── common.nix                  # shared: nix settings, packages, unfree, zsh, fonts
 │   ├── desktop.nix                 # GNOME (shared by both hosts)
-│   ├── wsl.nix                     # WSL-only: wsl.enable, DISPLAY hack (imported by the nixos host)
-│   ├── neovim.nix                  # editor config (enabled via common.nix)
-│   └── emacs.nix                   # latest Emacs + Doom CLI on PATH (enabled via common.nix)
+│   └── wsl.nix                     # WSL-only: wsl.enable, opencode overlay, rebuild aliases (imported by the nixos host)
 ├── hosts/
-│   ├── nixos-wsl.nix               # WSL host  = common + desktop + wsl
+│   ├── nixos-wsl.nix               # WSL host  = common + desktop + wsl (nixos / nixos-headless outputs)
 │   ├── nixos-default.nix           # non-WSL host = common + desktop + nixos-default-hardware
 │   └── nixos-default-hardware.nix  # PLACEHOLDER — replace via nixos-generate-config
+├── home/                           # per-user home-manager config, wired in by hosts/*.nix
+│   ├── default.nix                 # imports, user packages, doom/claude symlinks
+│   ├── git.nix / ssh.nix / shell.nix / direnv.nix
+│   └── neovim.nix / emacs.nix      # editor config
 ├── doom/                           # private Doom Emacs config (~/.config/doom links here)
 └── claude/
     └── settings.json               # global Claude Code settings (~/.claude/settings.json links here)

@@ -29,6 +29,9 @@ a NixOS module — one rebuild applies system and user config together.
 - Commits: imperative subject plus a body explaining why; no AI-attribution lines.
 - After editing `doom/init.el` or `doom/packages.el`, run `doom sync`
   (`config.el` changes don't need it).
+- When adding, removing, or moving files under `modules/`, `home/`, or `hosts/`,
+  update the Layout tree in `README.md` in the same commit — it duplicates this
+  section's file listing and drifts silently otherwise.
 
 ## Hard rules
 
