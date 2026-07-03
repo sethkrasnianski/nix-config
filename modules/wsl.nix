@@ -1,6 +1,6 @@
 # WSL-specific configuration. Only imported by the WSL host; the nixos-wsl
 # module itself (which provides the `wsl.*` options) is added in flake.nix.
-{ ... }:
+{ lib, ... }:
 
 let
   flakePath = "/home/nixos/personal/nixos-config";
@@ -15,6 +15,11 @@ in
   # `emacs -nw`) render truecolor instead of approximating the theme with
   # the 256-color palette.
   environment.variables.COLORTERM = "truecolor";
+
+  # GNOME pulls in NetworkManager, whose module unconditionally enables the
+  # wpa_supplicant service for its wifi backend. WSL has no wifi hardware and
+  # the unit fails at startup (226/NAMESPACE), so force it off here.
+  networking.wireless.enable = lib.mkForce false;
 
   # NOTE: no DISPLAY override here. WSLg provides a local X socket
   # (/tmp/.X11-unix/X0, DISPLAY=:0) and GUI apps like Ghostty use it directly.
