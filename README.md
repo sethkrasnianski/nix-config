@@ -25,8 +25,11 @@ Flake-based NixOS configuration with three outputs:
 │   ├── git.nix / ssh.nix / shell.nix / direnv.nix
 │   └── neovim.nix / emacs.nix      # editor config
 ├── doom/                           # private Doom Emacs config (~/.config/doom links here)
-└── claude/
-    └── settings.json               # global Claude Code settings (~/.claude/settings.json links here)
+├── claude/
+│   └── settings.json               # global Claude Code settings (~/.claude/settings.json links here)
+└── agents/                         # tool-agnostic agent config (~/.agents links here)
+    └── skills/
+        └── new-project/SKILL.md    # skill: bootstrap a new project (flake, direnv, AGENTS.md, docs)
 ```
 
 (The WSL host has no `hardware-configuration.nix` — `nixos-wsl` provides the
@@ -115,8 +118,8 @@ terminal). X11 apps still work directly on WSLg as usual.
 `modules/emacs.nix` installs the latest Emacs from nixpkgs and puts Doom's CLI
 (`~/.config/emacs/bin`) on PATH. The private Doom config
 (`init.el` / `config.el` / `packages.el`) lives in `doom/` in this repo, and
-the WSL host symlinks `~/.config/doom` to it (a tmpfiles rule in
-`hosts/nixos-wsl.nix`), so those files are the single source of truth.
+home-manager symlinks `~/.config/doom` to it (`mkOutOfStoreSymlink` in
+`home/default.nix`), so those files are the single source of truth.
 
 Doom itself manages its own packages, so the framework is bootstrapped
 **once**, imperatively, after the first rebuild:
@@ -131,13 +134,23 @@ Day-to-day: edit files in `doom/`; run `doom sync` after changing
 
 ## Claude Code
 
-Global Claude Code settings are tracked in `claude/settings.json`; the WSL
-host symlinks `~/.claude/settings.json` to it (a tmpfiles rule in
-`hosts/nixos-wsl.nix`). Only `settings.json` is linked — the rest of `~/.claude`
-is mutable state. Commit/PR attribution is disabled there. Edit settings in
-the repo file: changes made through `/config` write through the symlink, but
-if a rewrite replaces the link with a plain file, the tmpfiles rule restores
-it (discarding those changes) on the next rebuild.
+Global Claude Code settings are tracked in `claude/settings.json`; home-manager
+symlinks `~/.claude/settings.json` to it (`mkOutOfStoreSymlink` in
+`home/default.nix`). Only `settings.json` and `skills` are linked — the rest of
+`~/.claude` is mutable state. Commit/PR attribution is disabled there. Edit
+settings in the repo file: changes made through `/config` write through the
+symlink, but if a rewrite replaces the link with a plain file, home-manager
+restores it (discarding those changes) on the next rebuild.
+
+## Agent skills
+
+Agent skills are tool-agnostic and never duplicated per tool. The source of
+truth is `agents/skills/<name>/SKILL.md` in this repo, exposed at `~/.agents`
+(the universal agent-config directory). Claude Code reads them through an
+alias — `~/.claude/skills` → `~/.agents/skills` — wired in `home/default.nix`;
+any other agent CLI gets its own alias into `~/.agents` the same way. Because
+the links point at the checkout, adding or editing a skill takes effect
+without a rebuild.
 
 ## Update pinned inputs
 

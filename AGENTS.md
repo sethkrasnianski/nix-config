@@ -10,8 +10,9 @@ a NixOS module — one rebuild applies system and user config together.
 - `hosts/` — per-host: hostname, `system.stateVersion`, home-manager user wiring
 - `modules/` — system-level shared config (`common.nix`, `desktop.nix`, `wsl.nix`)
 - `home/` — per-user home-manager config (git, ssh, shell, direnv, neovim, emacs)
-- `doom/`, `claude/settings.json` — Doom Emacs and Claude Code configs, live-symlinked
-  into `$HOME` (`home/default.nix`); edits apply without a rebuild
+- `doom/`, `claude/settings.json`, `agents/` — Doom Emacs, Claude Code, and
+  tool-agnostic agent configs, live-symlinked into `$HOME` (`home/default.nix`);
+  edits apply without a rebuild
 
 ## Working in this repo
 
@@ -32,6 +33,20 @@ a NixOS module — one rebuild applies system and user config together.
 - When adding, removing, or moving files under `modules/`, `home/`, or `hosts/`,
   update the Layout tree in `README.md` in the same commit — it duplicates this
   section's file listing and drifts silently otherwise.
+
+## Agent skills
+
+- Skills are tool-agnostic. The single source of truth is
+  `agents/skills/<name>/SKILL.md`, exposed at `~/.agents` (the universal
+  agent-config dir). Claude Code consumes them only through an alias —
+  `~/.claude/skills` → `~/.agents/skills` (`home/default.nix`). Wire any new
+  agent CLI the same way: give it an alias into `~/.agents`, never a copy, so
+  no configuration is ever duplicated.
+- A skill is a directory containing a `SKILL.md`: YAML frontmatter with `name`
+  and `description` (the description is what triggers invocation — write it
+  for matching), followed by the instructions.
+- Adding or editing a skill needs no rebuild (the directory is live-symlinked);
+  only creating the two links required the one initial `rebuild`.
 
 ## Hard rules
 

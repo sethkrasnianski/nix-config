@@ -41,4 +41,13 @@
     config.lib.file.mkOutOfStoreSymlink "/home/nixos/personal/nixos-config/doom";
   home.file.".claude/settings.json".source =
     config.lib.file.mkOutOfStoreSymlink "/home/nixos/personal/nixos-config/claude/settings.json";
+
+  # Tool-agnostic agent config (skills) — source of truth in agents/, exposed
+  # at ~/.agents. Claude Code doesn't read ~/.agents natively, so it's proxied
+  # with an alias: ~/.claude/skills → ~/.agents/skills. Other agent CLIs get
+  # their own alias; never copy skills into a tool-specific directory.
+  home.file.".agents".source =
+    config.lib.file.mkOutOfStoreSymlink "/home/nixos/personal/nixos-config/agents";
+  home.file.".claude/skills".source =
+    config.lib.file.mkOutOfStoreSymlink "/home/nixos/.agents/skills";
 }
