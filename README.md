@@ -50,13 +50,13 @@ hardware without any WSL assumptions.
 Graphical (GNOME desktop) — the default:
 
 ```sh
-sudo nixos-rebuild switch --flake ~/personal/nixos-config#nixos
+sudo nixos-rebuild switch --flake ~/oss/nixos-config#nixos
 ```
 
 Headless (no desktop; GUI apps like Ghostty still work via WSLg):
 
 ```sh
-sudo nixos-rebuild switch --flake ~/personal/nixos-config#nixos-headless
+sudo nixos-rebuild switch --flake ~/oss/nixos-config#nixos-headless
 ```
 
 Switch between them on demand by rebuilding with the other attribute — both are
@@ -80,7 +80,7 @@ built from this config yet (including right now). Run the full command once to
 install them:
 
 ```sh
-sudo nixos-rebuild switch --flake ~/personal/nixos-config#nixos
+sudo nixos-rebuild switch --flake ~/oss/nixos-config#nixos
 ```
 
 After that, open a new shell and `rebuild` / `rebuild-headless` are available.
@@ -183,7 +183,7 @@ Manual update, when you don't want to wait for Monday:
 ```sh
 nix flake update                 # all inputs
 nix flake update nixpkgs         # just one
-sudo nixos-rebuild switch --flake ~/personal/nixos-config#nixos
+sudo nixos-rebuild switch --flake ~/oss/nixos-config#nixos
 ```
 
 Commit `flake.lock` after updating.

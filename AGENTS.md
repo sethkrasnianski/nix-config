@@ -17,7 +17,7 @@ a NixOS module — one rebuild applies system and user config together.
 
 ## Working in this repo
 
-- Apply changes: `rebuild` (= `sudo nixos-rebuild switch --flake ~/personal/nixos-config#nixos`);
+- Apply changes: `rebuild` (= `sudo nixos-rebuild switch --flake ~/oss/nixos-config#nixos`);
   `rebuild-headless` for the headless variant.
 - Check without switching — all three outputs must evaluate:
   `nix eval .#nixosConfigurations.<name>.config.system.build.toplevel.drvPath --raw`

@@ -4,7 +4,7 @@
 { lib, nixpkgs-stable, ... }:
 
 let
-  flakePath = "/home/nixos/personal/nixos-config";
+  flakePath = "/home/nixos/oss/nixos-config";
 in
 {
   wsl.enable = true;
