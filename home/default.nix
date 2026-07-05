@@ -1,7 +1,13 @@
-# Per-user (home-manager) configuration. Applied through the NixOS module —
-# `rebuild` covers it, there is no separate home-manager switch.
+# Per-user (home-manager) configuration shared by every machine. Not imported
+# directly: each platform has a thin entrypoint — home/linux.nix (NixOS module,
+# applied by `rebuild`) and home/darwin.nix (standalone home-manager on macOS)
+# — that carries the per-machine facts (stateVersion, username, ...).
 { config, pkgs, ... }:
 
+let
+  # The checkout of this repo, assumed at the same place on every machine.
+  flakePath = "${config.home.homeDirectory}/oss/nixos-config";
+in
 {
   imports = [
     ./direnv.nix
@@ -13,8 +19,8 @@
     ./ghostty.nix
   ];
 
-  # Release home-manager state was first created with. Do not bump on upgrades.
-  home.stateVersion = "25.11";
+  # NOTE: home.stateVersion is per-machine and lives in the entrypoints
+  # (linux.nix / darwin.nix). Never bump it on upgrades.
 
   # Terminals used with this setup (Windows Terminal, Ghostty) support 24-bit
   # color but do not all advertise it. COLORTERM makes TUI apps (e.g.
@@ -27,7 +33,8 @@
   home.packages = with pkgs; [
     opencode
 
-    # unfree (allowed in modules/common.nix; useGlobalPkgs makes it apply here)
+    # unfree (allowed in modules/common.nix on NixOS via useGlobalPkgs; on
+    # macOS via the predicate in home/darwin.nix — keep the lists in sync)
     claude-code
     ngrok
   ];
@@ -39,29 +46,28 @@
   # individually so its other state remains mutable.
   # mkOutOfStoreSymlink links to the checkout itself, so edits take effect
   # without a rebuild.
-  home.file.".config/doom".source =
-    config.lib.file.mkOutOfStoreSymlink "/home/nixos/oss/nixos-config/doom";
+  home.file.".config/doom".source = config.lib.file.mkOutOfStoreSymlink "${flakePath}/doom";
   home.file.".claude/settings.json".source =
-    config.lib.file.mkOutOfStoreSymlink "/home/nixos/oss/nixos-config/claude/settings.json";
+    config.lib.file.mkOutOfStoreSymlink "${flakePath}/claude/settings.json";
   home.file.".config/opencode/opencode.jsonc".source =
-    config.lib.file.mkOutOfStoreSymlink "/home/nixos/oss/nixos-config/opencode/opencode.jsonc";
+    config.lib.file.mkOutOfStoreSymlink "${flakePath}/opencode/opencode.jsonc";
   home.file.".config/opencode/agents".source =
-    config.lib.file.mkOutOfStoreSymlink "/home/nixos/oss/nixos-config/opencode/agents";
+    config.lib.file.mkOutOfStoreSymlink "${flakePath}/opencode/agents";
   home.file.".config/opencode/commands".source =
-    config.lib.file.mkOutOfStoreSymlink "/home/nixos/oss/nixos-config/opencode/commands";
+    config.lib.file.mkOutOfStoreSymlink "${flakePath}/opencode/commands";
   home.file.".config/opencode/skills".source =
-    config.lib.file.mkOutOfStoreSymlink "/home/nixos/oss/nixos-config/opencode/skills";
+    config.lib.file.mkOutOfStoreSymlink "${flakePath}/opencode/skills";
   home.file.".local/bin/auto-pr-watch" = {
     text = ''
       #!/bin/sh
-      exec /home/nixos/oss/nixos-config/opencode/scripts/pr-watch.sh "$@"
+      exec ${flakePath}/opencode/scripts/pr-watch.sh "$@"
     '';
     executable = true;
   };
   home.file.".local/bin/auto-history-finalize" = {
     text = ''
       #!/bin/sh
-      exec /home/nixos/oss/nixos-config/opencode/scripts/history-finalize.sh "$@"
+      exec ${flakePath}/opencode/scripts/history-finalize.sh "$@"
     '';
     executable = true;
   };
@@ -70,17 +76,16 @@
   # at ~/.agents. Claude Code doesn't read ~/.agents natively, so it's proxied
   # with an alias: ~/.claude/skills → ~/.agents/skills. Other agent CLIs get
   # their own alias; never copy skills into a tool-specific directory.
-  home.file.".agents".source =
-    config.lib.file.mkOutOfStoreSymlink "/home/nixos/oss/nixos-config/agents";
+  home.file.".agents".source = config.lib.file.mkOutOfStoreSymlink "${flakePath}/agents";
   home.file.".claude/skills".source =
-    config.lib.file.mkOutOfStoreSymlink "/home/nixos/.agents/skills";
+    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.agents/skills";
 
   # Global agent instructions — single source of truth in agents/AGENTS.md,
   # aliased into each tool's expected path. Claude Code reads ~/.claude/CLAUDE.md;
   # opencode reads ~/.config/opencode/AGENTS.md. Both point at ~/.agents so the
   # instructions are never duplicated and edits apply without a rebuild.
   home.file.".claude/CLAUDE.md".source =
-    config.lib.file.mkOutOfStoreSymlink "/home/nixos/.agents/AGENTS.md";
+    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.agents/AGENTS.md";
   home.file.".config/opencode/AGENTS.md".source =
-    config.lib.file.mkOutOfStoreSymlink "/home/nixos/.agents/AGENTS.md";
+    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.agents/AGENTS.md";
 }

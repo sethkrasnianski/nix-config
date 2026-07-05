@@ -1,5 +1,5 @@
 {
-  description = "NixOS configuration — WSL host 'nixos' (graphical) / 'nixos-headless', + non-WSL 'nixos-default'";
+  description = "NixOS configuration — WSL host 'nixos' (graphical) / 'nixos-headless', non-WSL 'nixos-default', + macOS home 'macbook'";
 
   inputs = {
     # Track nixos-unstable (this system reports 26.11pre / "Zokor").
@@ -59,6 +59,17 @@
             home-manager.nixosModules.home-manager
             ./hosts/nixos-default.nix
           ];
+        };
+      };
+
+      # Standalone home-manager for the Mac — home directory only, no
+      # nix-darwin. Username and other per-machine facts live in
+      # home/darwin.nix. Apply on the Mac:
+      #   home-manager switch --flake ~/oss/nixos-config#macbook
+      homeConfigurations = {
+        macbook = home-manager.lib.homeManagerConfiguration {
+          pkgs = nixpkgs.legacyPackages.aarch64-darwin;
+          modules = [ ./home/darwin.nix ];
         };
       };
     };
