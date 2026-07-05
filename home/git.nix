@@ -1,5 +1,5 @@
 # Git with identity managed here instead of a hand-edited ~/.gitconfig.
-{ ... }:
+{ config, ... }:
 
 {
   programs.git = {
@@ -10,6 +10,11 @@
         email = "1910114+sethkrasnianski@users.noreply.github.com";
       };
       init.defaultBranch = "main";
+      # The system config (modules/common.nix) sets core.excludesFile to
+      # /etc/gitignore. Git honours only one excludesFile, so pin ours back to
+      # the XDG path — otherwise this user would stop reading ~/.config/git/ignore
+      # (the file `ignores` below writes) and inherit the system one instead.
+      core.excludesFile = "${config.xdg.configHome}/git/ignore";
     };
     # Machine-level backstop for agent-shell session transcripts: a repo's
     # tracked .gitignore only covers that repo, so a fresh clone or a new repo

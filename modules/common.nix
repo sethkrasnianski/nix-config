@@ -44,6 +44,22 @@
   # stay system-level so fontconfig (and GNOME/GDM) sees them.
   fonts.packages = [ pkgs.nerd-fonts.symbols-only ];
 
+  # System-wide git ignore, covering every user on the host — root, system
+  # scripts, and any login user — not just the home-manager user. Git consults a
+  # single core.excludesFile, so setting it here in /etc/gitconfig makes the main
+  # user resolve to /etc/gitignore too (home-manager leaves the key unset); to
+  # keep the per-user ~/.config/git/ignore from home/git.nix independently usable,
+  # that module pins its own excludesFile back to the XDG path. Keeps agent-shell
+  # transcripts — where a pasted token or env dump can land — out of every working
+  # tree by default.
+  programs.git = {
+    enable = true;
+    config.core.excludesfile = "/etc/gitignore";
+  };
+  environment.etc."gitignore".text = ''
+    .agent-shell/
+  '';
+
   # Base CLI tools, kept system-wide so root and system scripts have them too.
   # User-facing apps (editors, terminals, claude-code, ...) live in home/.
   environment.systemPackages = with pkgs; [
