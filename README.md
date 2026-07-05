@@ -156,13 +156,14 @@ without a rebuild.
 
 MCP servers follow the same single-source-of-truth rule: they're defined in
 `agents/mcp.json` (exposed at `~/.agents/mcp.json`). Claude Code has no global
-`.mcp.json`, so instead of a symlink it's proxied by a shell alias that passes
-`--mcp-config ~/.agents/mcp.json` (`home/shell.nix`). The GitHub server uses
-GitHub's hosted endpoint, which doesn't support OAuth dynamic client
-registration, so it authenticates with a token in the `Authorization` header.
-Rather than a separate PAT, the bashrc exports `GITHUB_MCP_PAT="$(gh auth
-token)"` and the config references `${GITHUB_MCP_PAT}` — a runtime lookup of the
-token gh is already logged in with, so no token is ever stored in the repo.
+`.mcp.json`, so instead of a symlink it's proxied by a `claude` shell function
+that passes `--mcp-config ~/.agents/mcp.json` (`home/shell.nix`). The GitHub
+server uses GitHub's hosted endpoint, which doesn't support OAuth dynamic
+client registration, so it authenticates with a token in the `Authorization`
+header. Rather than a separate PAT, the function looks up `gh auth token` at
+invocation and sets `GITHUB_MCP_PAT` in that one command's environment only —
+the config references `${GITHUB_MCP_PAT}`, so no token is ever stored in the
+repo, and no other process inherits it.
 
 ## Update pinned inputs
 
