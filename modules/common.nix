@@ -53,5 +53,6 @@
     jq
     tree
     ripgrep
+    gh
   ];
 }
