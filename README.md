@@ -188,6 +188,29 @@ sudo nixos-rebuild switch --flake ~/personal/nixos-config#nixos
 
 Commit `flake.lock` after updating.
 
+## ngrok
+
+ngrok (`home/default.nix`) exposes a local port to the **public internet**.
+Treat every tunnel as public — the random URL is not a secret, and scanners
+find ngrok endpoints without needing to guess it.
+
+- The authtoken is a secret: install it once with
+  `ngrok config add-authtoken <token>` (stored in `~/.config/ngrok/ngrok.yml`,
+  outside this repo). Never inline it in Nix files or shell rc (see Secrets
+  below).
+- Put auth on every tunnel to anything stateful or private:
+  `ngrok http 3000 --oauth google --oauth-allow-email you@example.com`, or at
+  minimum `--basic-auth 'user:long-random-password'`.
+- Never tunnel a service that has default or no credentials of its own
+  (database admin UIs, dev dashboards, anything bound to localhost on the
+  assumption that localhost is private — a tunnel breaks that assumption).
+- Tunnels live as long as the process: stop it when done rather than leaving
+  it running unattended, and audit active endpoints at
+  <https://dashboard.ngrok.com>.
+- The local inspector (<http://localhost:4040>) records request/response
+  bodies, including any credentials that pass through — another reason to
+  stop the agent when finished.
+
 ## Secrets
 
 This repo contains **no secrets** and is safe to publish (public or private).
