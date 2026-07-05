@@ -10,6 +10,7 @@
     ./shell.nix
     ./neovim.nix
     ./emacs.nix
+    ./ghostty.nix
   ];
 
   # Release home-manager state was first created with. Do not bump on upgrades.
@@ -22,8 +23,8 @@
   home.sessionVariables.COLORTERM = "truecolor";
 
   # User-facing apps. Base CLI tools stay in modules/common.nix.
+  # Ghostty is installed by programs.ghostty (home/ghostty.nix).
   home.packages = with pkgs; [
-    ghostty
     opencode
 
     # unfree (allowed in modules/common.nix; useGlobalPkgs makes it apply here)

@@ -23,7 +23,8 @@ Flake-based NixOS configuration with three outputs:
 ├── home/                           # per-user home-manager config, wired in by hosts/*.nix
 │   ├── default.nix                 # imports, user packages, doom/claude symlinks
 │   ├── git.nix / ssh.nix / shell.nix / direnv.nix
-│   └── neovim.nix / emacs.nix      # editor config
+│   ├── neovim.nix / emacs.nix      # editor config
+│   └── ghostty.nix                 # Ghostty terminal (WSLg Wayland GUI app)
 ├── doom/                           # private Doom Emacs config (~/.config/doom links here)
 ├── claude/
 │   └── settings.json               # global Claude Code settings (~/.claude/settings.json links here)
