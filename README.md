@@ -10,6 +10,8 @@ Flake-based NixOS configuration with three outputs:
 
 ```
 .
+├── .github/workflows/
+│   └── update-flake-lock.yml       # weekly lock-update PR, validated by evaluating all three outputs
 ├── flake.nix                       # inputs + nixosConfigurations.{nixos,nixos-headless,nixos-default}
 ├── flake.lock                      # pinned input revisions — the reproducibility guarantee
 ├── modules/
@@ -166,6 +168,17 @@ the config references `${GITHUB_MCP_PAT}`, so no token is ever stored in the
 repo, and no other process inherits it.
 
 ## Update pinned inputs
+
+Updates arrive as a weekly PR: `.github/workflows/update-flake-lock.yml` runs
+`nix flake update` every Monday, evaluates all three outputs against the new
+lock, and opens/refreshes a PR on the `flake-updates` branch only if they
+pass. Review, merge, then `rebuild` — nothing lands on the machine
+unattended. Security fixes in pinned inputs only reach the system through
+this loop, so don't let the PRs pile up. The workflow needs the repo setting
+"Allow GitHub Actions to create and approve pull requests"
+(Settings → Actions → General).
+
+Manual update, when you don't want to wait for Monday:
 
 ```sh
 nix flake update                 # all inputs

@@ -7,6 +7,7 @@ a NixOS module — one rebuild applies system and user config together.
 ## Layout
 
 - `flake.nix` — inputs: nixpkgs (nixos-unstable), nixos-wsl, home-manager (all pinned by `flake.lock`)
+- `.github/workflows/update-flake-lock.yml` — weekly `flake.lock` update PR; evaluates all three outputs before opening it
 - `hosts/` — per-host: hostname, `system.stateVersion`, home-manager user wiring
 - `modules/` — system-level shared config (`common.nix`, `desktop.nix`, `wsl.nix`)
 - `home/` — per-user home-manager config (git, ssh, shell, direnv, neovim, emacs)

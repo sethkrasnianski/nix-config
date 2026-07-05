@@ -1,0 +1,73 @@
+# Weekly flake.lock update, validated before the PR is opened.
+#
+# Flow: update the lock, evaluate all three nixosConfigurations (the same
+# check AGENTS.md prescribes locally), then open or refresh a single PR on
+# the `flake-updates` branch. If evaluation fails, the run goes red and no
+# PR appears — review the failure instead of merging a broken lock.
+#
+# The PR is created with the default GITHUB_TOKEN, which requires the repo
+# setting "Allow GitHub Actions to create and approve pull requests"
+# (Settings → Actions → General). PRs opened by that token can't trigger
+# other workflows, which is why validation runs here, before the PR exists,
+# rather than as a check on the PR itself.
+
+name: Update flake.lock
+
+on:
+  schedule:
+    - cron: "0 9 * * 1" # Mondays 09:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: DeterminateSystems/nix-installer-action@v16
+
+      # Log to $RUNNER_TEMP, not the workspace — create-pull-request commits
+      # every dirty file, and only flake.lock should land in the PR.
+      - name: Update flake inputs
+        id: update
+        run: |
+          nix flake update 2>&1 | tee "$RUNNER_TEMP/update.log"
+          {
+            echo "log<<NIX_UPDATE_LOG"
+            cat "$RUNNER_TEMP/update.log"
+            echo "NIX_UPDATE_LOG"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Evaluate all outputs
+        run: |
+          for output in nixos nixos-headless nixos-default; do
+            echo "::group::$output"
+            nix eval ".#nixosConfigurations.$output.config.system.build.toplevel.drvPath" --raw
+            echo "::endgroup::"
+          done
+
+      - name: Open or update the PR
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: flake-updates
+          delete-branch: true
+          commit-message: |
+            Update flake inputs
+
+            Automated weekly `nix flake update`; all three outputs were
+            evaluated in CI before this PR was opened.
+          title: Update flake inputs
+          body: |
+            Automated weekly `nix flake update`. All three flake outputs
+            (`nixos`, `nixos-headless`, `nixos-default`) evaluated successfully
+            against the new lock before this PR was opened.
+
+            ```
+            ${{ steps.update.outputs.log }}
+            ```
+
+            After merging, apply with `rebuild`.
