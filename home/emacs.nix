@@ -24,6 +24,10 @@
     claude-agent-acp # Claude ACP adapter for agent-shell (see doom/config.el)
     nil # :lang nix (+lsp) language server; formatting uses nixfmt (common.nix)
     yaml-language-server # :lang yaml (+lsp) language server
+    rust-analyzer # :lang rust (+lsp) language server
+    # :lang rust (+tree-sitter): Doom compiles the grammar at runtime via
+    # `treesit-install-language-grammar`, which needs a C compiler (`cc`).
+    gcc
   ];
 
   # Doom's CLI (`doom sync`, `doom doctor`, ...) lives inside the framework
