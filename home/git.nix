@@ -6,5 +6,6 @@
     enable = true;
     userName = "Seth Krasnianski";
     userEmail = "1910114+sethkrasnianski@users.noreply.github.com";
+    extraConfig.init.defaultBranch = "main";
   };
 }
