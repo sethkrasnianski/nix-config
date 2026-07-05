@@ -11,6 +11,13 @@ in
   wsl.defaultUser = "nixos";
   # wsl.wslg.enable = true;
 
+  # NixOS-WSL defaults wheel to passwordless sudo. This host runs agent CLIs
+  # that execute shell commands, so keep the password prompt as a tripwire
+  # against unattended privilege escalation. Requires the user to have a
+  # password — users are mutable here, so set it once with `passwd` (it
+  # survives rebuilds). Recovery if locked out: `wsl -u root` from Windows.
+  security.sudo.wheelNeedsPassword = lib.mkForce true;
+
   # opencode from nixos-unstable segfaults at startup under WSL2 — the crash
   # is in glibc's ld.so while it loads the Bun-compiled binary
   # (https://github.com/anomalyco/opencode/issues/26846). The nixos-25.11
