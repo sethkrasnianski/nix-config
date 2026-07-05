@@ -23,13 +23,15 @@ Flake-based NixOS configuration with three outputs:
 │   ├── nixos-default.nix           # non-WSL host = common + desktop + nixos-default-hardware
 │   └── nixos-default-hardware.nix  # PLACEHOLDER — replace via nixos-generate-config
 ├── home/                           # per-user home-manager config, wired in by hosts/*.nix
-│   ├── default.nix                 # imports, user packages, doom/claude symlinks
+│   ├── default.nix                 # imports, user packages, doom/claude/opencode symlinks
 │   ├── git.nix / ssh.nix / shell.nix / direnv.nix
 │   ├── neovim.nix / emacs.nix      # editor config
 │   └── ghostty.nix                 # Ghostty terminal (WSLg Wayland GUI app)
 ├── doom/                           # private Doom Emacs config (~/.config/doom links here)
 ├── claude/
 │   └── settings.json               # global Claude Code settings (~/.claude/settings.json links here)
+├── opencode/
+│   └── opencode.jsonc              # global opencode settings (~/.config/opencode/opencode.jsonc links here)
 └── agents/                         # tool-agnostic agent config (~/.agents links here)
     ├── mcp.json                    # shared MCP servers (Claude picks up via --mcp-config alias)
     └── skills/
@@ -145,6 +147,14 @@ symlinks `~/.claude/settings.json` to it (`mkOutOfStoreSymlink` in
 settings in the repo file: changes made through `/config` write through the
 symlink, but if a rewrite replaces the link with a plain file, home-manager
 restores it (discarding those changes) on the next rebuild.
+
+## OpenCode
+
+Global opencode settings are tracked in `opencode/opencode.jsonc`;
+home-manager symlinks `~/.config/opencode/opencode.jsonc` to it
+(`mkOutOfStoreSymlink` in `home/default.nix`), the same pattern as Claude
+Code's settings.json. Edit settings in the repo file — the rest of
+`~/.config/opencode` (node_modules, caches, etc.) is left as mutable state.
 
 ## Agent skills
 

@@ -34,14 +34,17 @@
 
   # Doom Emacs reads its user config from ~/.config/doom; point that at the
   # real config (init.el / config.el / packages.el) tracked in this repo
-  # (doom/). Claude Code's global settings are tracked here too (claude/);
-  # only settings.json is linked because the rest of ~/.claude is mutable
-  # state. mkOutOfStoreSymlink links to the checkout itself, so edits take
-  # effect without a rebuild.
+  # (doom/). Claude Code's and opencode's global settings are tracked here too
+  # (claude/, opencode/); only settings.json / opencode.jsonc are linked
+  # because the rest of ~/.claude and ~/.config/opencode is mutable state.
+  # mkOutOfStoreSymlink links to the checkout itself, so edits take effect
+  # without a rebuild.
   home.file.".config/doom".source =
     config.lib.file.mkOutOfStoreSymlink "/home/nixos/oss/nixos-config/doom";
   home.file.".claude/settings.json".source =
     config.lib.file.mkOutOfStoreSymlink "/home/nixos/oss/nixos-config/claude/settings.json";
+  home.file.".config/opencode/opencode.jsonc".source =
+    config.lib.file.mkOutOfStoreSymlink "/home/nixos/oss/nixos-config/opencode/opencode.jsonc";
 
   # Tool-agnostic agent config (skills) — source of truth in agents/, exposed
   # at ~/.agents. Claude Code doesn't read ~/.agents natively, so it's proxied
