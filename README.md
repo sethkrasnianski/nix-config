@@ -29,6 +29,7 @@ Flake-based NixOS configuration with three outputs:
 ├── claude/
 │   └── settings.json               # global Claude Code settings (~/.claude/settings.json links here)
 └── agents/                         # tool-agnostic agent config (~/.agents links here)
+    ├── mcp.json                    # shared MCP servers (Claude picks up via --mcp-config alias)
     └── skills/
         └── new-project/SKILL.md    # skill: bootstrap a new project (flake, direnv, AGENTS.md, docs)
 ```
@@ -152,6 +153,16 @@ alias — `~/.claude/skills` → `~/.agents/skills` — wired in `home/default.n
 any other agent CLI gets its own alias into `~/.agents` the same way. Because
 the links point at the checkout, adding or editing a skill takes effect
 without a rebuild.
+
+MCP servers follow the same single-source-of-truth rule: they're defined in
+`agents/mcp.json` (exposed at `~/.agents/mcp.json`). Claude Code has no global
+`.mcp.json`, so instead of a symlink it's proxied by a shell alias that passes
+`--mcp-config ~/.agents/mcp.json` (`home/shell.nix`). The GitHub server uses
+GitHub's hosted endpoint, which doesn't support OAuth dynamic client
+registration, so it authenticates with a token in the `Authorization` header.
+Rather than a separate PAT, the bashrc exports `GITHUB_MCP_PAT="$(gh auth
+token)"` and the config references `${GITHUB_MCP_PAT}` — a runtime lookup of the
+token gh is already logged in with, so no token is ever stored in the repo.
 
 ## Update pinned inputs
 
