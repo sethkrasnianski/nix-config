@@ -1,8 +1,9 @@
 # nixos-config
 
-Flake-based NixOS config. Three outputs: `nixos` (WSL host, GNOME), `nixos-headless`
-(same WSL host, no desktop), `nixos-default` (non-WSL template). home-manager runs as
-a NixOS module — one rebuild applies system and user config together.
+Flake-based NixOS config. Four outputs: `nixos` (WSL host, GNOME), `nixos-headless`
+(same WSL host, no desktop), `nixos-default` (non-WSL template) — where home-manager
+runs as a NixOS module, one rebuild applies system and user config together — and
+`macbook` (standalone home-manager for a Mac, aarch64-darwin, home directory only).
 
 ## Layout
 
@@ -10,9 +11,13 @@ a NixOS module — one rebuild applies system and user config together.
 - `.github/workflows/update-flake-lock.yml` — weekly `flake.lock` update PR; evaluates all three outputs before opening it
 - `hosts/` — per-host: hostname, `system.stateVersion`, home-manager user wiring
 - `modules/` — system-level shared config (`common.nix`, `desktop.nix`, `wsl.nix`)
-- `home/` — per-user home-manager config (git, ssh, shell, direnv, neovim, emacs)
+- `home/` — per-user home-manager config (git, ssh, shell, direnv, neovim, emacs);
+  `default.nix` is the shared core, `linux.nix`/`darwin.nix` the per-platform
+  entrypoints (NixOS hosts import `linux.nix`; the `macbook` output imports
+  `darwin.nix`, which owns the macOS username, unfree allowlist, and stand-ins
+  for the system layer — never import it from a NixOS host)
 - `doom/`, `claude/settings.json`, `agents/`, `opencode/` — Doom Emacs, Claude
-  Code, shared agent config, and OpenCode-specific agents/commands/skills,
+  Code, tool-agnostic agent config, and OpenCode-specific agents/commands/skills,
   live-symlinked into `$HOME` (`home/default.nix`); edits apply without a
   rebuild
 
@@ -20,8 +25,10 @@ a NixOS module — one rebuild applies system and user config together.
 
 - Apply changes: `rebuild` (= `sudo nixos-rebuild switch --flake ~/oss/nixos-config#nixos`);
   `rebuild-headless` for the headless variant.
-- Check without switching — all three outputs must evaluate:
+- Check without switching — all four outputs must evaluate:
   `nix eval .#nixosConfigurations.<name>.config.system.build.toplevel.drvPath --raw`
+  and `nix eval .#homeConfigurations.macbook.activationPackage.drvPath --raw`
+  (pure eval; works from Linux, no darwin builder needed).
 - `git add` new files before evaluating; flakes only see tracked files.
 - Format Nix files with `nixfmt`.
 - Keep the system/user split: base CLI tools, fonts, and login-shell plumbing in

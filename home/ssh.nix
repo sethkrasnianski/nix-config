@@ -4,6 +4,10 @@
 # (not managed by nix, never in this repo — it lives in ~/.ssh). ssh-agent
 # runs as a systemd user service and `AddKeysToAgent yes` adds the key on
 # first use, so the passphrase is typed once per boot, not per connection.
+# On macOS the system launchd ssh-agent (Keychain-integrated) already
+# provides SSH_AUTH_SOCK, so no agent is managed there — `AddKeysToAgent`
+# works with it as-is. (home-manager's module could run a launchd agent if
+# a nix-managed one is ever wanted.)
 #
 # Future: keys/known hosts shared across machines can be checked in as an
 # `ssh/` dir of *public* keys, wired via matchBlocks/IdentityFile here (or
@@ -15,8 +19,9 @@
 { pkgs, ... }:
 
 {
-  # ssh-agent as a systemd user service.
-  services.ssh-agent.enable = true;
+  # ssh-agent as a systemd user service (Linux only; macOS uses the system
+  # agent, see header).
+  services.ssh-agent.enable = pkgs.stdenv.isLinux;
 
   # ~/.ssh/config. Per-system keys go in `settings.<host>` blocks later.
   programs.ssh = {
@@ -42,7 +47,7 @@
       fi
       mkdir -p "$HOME/.ssh"
       chmod 700 "$HOME/.ssh"
-      ssh-keygen -t ed25519 -f "$key" -C "$USER@$(${pkgs.hostname}/bin/hostname)"
+      ssh-keygen -t ed25519 -f "$key" -C "$USER@$(${pkgs.unixtools.hostname}/bin/hostname)"
       echo
       echo "Public key (add this to GitHub / servers):"
       cat "$key.pub"

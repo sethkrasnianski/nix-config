@@ -1,10 +1,12 @@
 # nixos-config
 
-Flake-based NixOS configuration with three outputs:
+Flake-based NixOS configuration with four outputs:
 
 - **`nixos`** — this NixOS-WSL machine, graphical (GNOME).
 - **`nixos-headless`** — the same WSL machine, no desktop.
 - **`nixos-default`** — a non-WSL template (no WSL code), for real hardware.
+- **`macbook`** — standalone home-manager for a Mac (aarch64-darwin), home
+  directory only (no nix-darwin).
 
 ## Layout
 
@@ -12,7 +14,7 @@ Flake-based NixOS configuration with three outputs:
 .
 ├── .github/workflows/
 │   └── update-flake-lock.yml       # weekly lock-update PR, validated by evaluating all three outputs
-├── flake.nix                       # inputs + nixosConfigurations.{nixos,nixos-headless,nixos-default}
+├── flake.nix                       # inputs + nixosConfigurations.{nixos,nixos-headless,nixos-default} + homeConfigurations.macbook
 ├── flake.lock                      # pinned input revisions — the reproducibility guarantee
 ├── modules/
 │   ├── common.nix                  # shared: nix settings, packages, unfree, zsh, fonts
@@ -22,11 +24,13 @@ Flake-based NixOS configuration with three outputs:
 │   ├── nixos-wsl.nix               # WSL host  = common + desktop + wsl (nixos / nixos-headless outputs)
 │   ├── nixos-default.nix           # non-WSL host = common + desktop + nixos-default-hardware
 │   └── nixos-default-hardware.nix  # PLACEHOLDER — replace via nixos-generate-config
-├── home/                           # per-user home-manager config, wired in by hosts/*.nix
-│   ├── default.nix                 # imports, user packages, and managed config symlinks
+├── home/                           # per-user home-manager config
+│   ├── default.nix                 # shared core: imports, user packages, managed config symlinks
+│   ├── linux.nix                   # NixOS entrypoint (wired in by hosts/*.nix), carries home.stateVersion
+│   ├── darwin.nix                  # macOS entrypoint (standalone HM): username, unfree, system-layer stand-ins
 │   ├── git.nix / ssh.nix / shell.nix / direnv.nix
 │   ├── neovim.nix / emacs.nix      # editor config
-│   └── ghostty.nix                 # Ghostty terminal (WSLg Wayland GUI app)
+│   └── ghostty.nix                 # Ghostty terminal (WSLg Wayland on Linux, ghostty-bin on macOS)
 ├── doom/                           # private Doom Emacs config (~/.config/doom links here)
 ├── claude/
 │   └── settings.json               # global Claude Code settings (~/.claude/settings.json links here)
@@ -94,6 +98,42 @@ sudo nixos-rebuild switch --flake ~/oss/nixos-config#nixos
 ```
 
 After that, open a new shell and `rebuild` / `rebuild-headless` are available.
+
+## macOS (standalone home-manager)
+
+The `macbook` output manages only the home directory — no nix-darwin, no
+system layer. `home/darwin.nix` is the entrypoint: it sets the username
+(**edit it there** if the account isn't `seth`), allows the unfree packages,
+and stands in for `modules/common.nix` (base CLI tools, the Doom icon font).
+
+1. Install Nix (e.g. the [Determinate installer](https://determinate.systems/nix-installer/),
+   which enables flakes; with the upstream installer add
+   `experimental-features = nix-command flakes` to `/etc/nix/nix.conf`).
+2. Clone this repo to `~/oss/nixos-config` — the live symlinks and the
+   `rebuild` alias assume that path.
+3. First run (home-manager isn't installed yet):
+
+   ```sh
+   nix run home-manager/master -- switch -b hm-bak --flake ~/oss/nixos-config#macbook
+   ```
+
+   `-b hm-bak` is the standalone equivalent of `backupFileExtension` in
+   `modules/common.nix`; it moves aside pre-existing dotfiles (macOS ships a
+   default `.zshrc`).
+4. Thereafter just `rebuild` (aliased in `home/darwin.nix`), or the full
+   `home-manager switch --flake ~/oss/nixos-config#macbook`.
+
+Apple's `/bin/zsh` stays the login shell and sources the home-manager rc
+files — no `chsh` needed. Doom Emacs bootstraps the same way as on Linux
+(see below); GUI apps from `home.packages` (Ghostty.app, Emacs.app) are
+linked into `~/Applications` by home-manager's darwin support.
+
+The output evaluates from the Linux machine too (pure eval, no darwin
+builder needed):
+
+```sh
+nix eval .#homeConfigurations.macbook.activationPackage.drvPath --raw
+```
 
 ## Use on a non-WSL machine
 
