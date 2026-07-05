@@ -10,5 +10,16 @@
 { ... }:
 
 {
-  programs.ghostty.enable = true;
+  programs.ghostty = {
+    enable = true;
+
+    # Bind ctrl+v to paste, alongside Ghostty's default ctrl+shift+v, so a
+    # Windows-style paste works out of the box. This shadows readline's
+    # verbatim-insert (quoted C-v) in the terminal; ctrl+shift+v still pastes
+    # too. Multi-line pastes still hit clipboard-paste-protection's confirm
+    # prompt (Ghostty's default) — that guard is left on.
+    settings.keybind = [
+      "ctrl+v=paste_from_clipboard"
+    ];
+  };
 }
