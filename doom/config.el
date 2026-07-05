@@ -38,6 +38,20 @@
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type t)
 
+;;; Soften diff highlighting.
+;; agent-shell's inline diffs (and any `diff-mode' buffer) inherit Emacs'
+;; default `diff-added'/`diff-removed' (and their `-refine-' word-level)
+;; faces, which one-dark doesn't theme. The default refine backgrounds
+;; (#22aa22 green, #aa2222 red) are harshly saturated against the dark
+;; backdrop; desaturate both the line and word-level colors into muted tones
+;; that sit in the one-dark palette (background #282C34, green #98C379,
+;; red #BE5046).
+(custom-set-faces!
+  '(diff-added          :background "#2c352b" :foreground unspecified)
+  '(diff-refine-added   :background "#3c4f38" :foreground unspecified)
+  '(diff-removed        :background "#352b2b" :foreground unspecified)
+  '(diff-refine-removed :background "#4f3838" :foreground unspecified))
+
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/org/")
