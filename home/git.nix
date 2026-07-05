@@ -4,8 +4,12 @@
 {
   programs.git = {
     enable = true;
-    userName = "Seth Krasnianski";
-    userEmail = "1910114+sethkrasnianski@users.noreply.github.com";
-    extraConfig.init.defaultBranch = "main";
+    settings = {
+      user = {
+        name = "Seth Krasnianski";
+        email = "1910114+sethkrasnianski@users.noreply.github.com";
+      };
+      init.defaultBranch = "main";
+    };
   };
 }

@@ -18,11 +18,16 @@
   # ssh-agent as a systemd user service.
   services.ssh-agent.enable = true;
 
-  # ~/.ssh/config. matchBlocks is the place for per-system keys later.
+  # ~/.ssh/config. Per-system keys go in `settings.<host>` blocks later.
   programs.ssh = {
     enable = true;
-    # Cache the key in the agent the first time it's used.
-    addKeysToAgent = "yes";
+    # Opt out of home-manager's legacy default-config block (deprecated);
+    # set the one default-host option we actually care about ourselves.
+    enableDefaultConfig = false;
+    settings."*" = {
+      # Cache the key in the agent the first time it's used.
+      AddKeysToAgent = "yes";
+    };
   };
 
   # One-time, per-machine key generation. Interactive (prompts for a

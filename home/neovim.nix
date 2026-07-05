@@ -9,6 +9,12 @@
     viAlias = true;
     vimAlias = true;
 
+    # Adopt the new upstream defaults (was implicitly true under
+    # home.stateVersion < 26.05); no Ruby/Python plugins here so the
+    # provider wrappers are dead weight.
+    withRuby = false;
+    withPython3 = false;
+
     extraConfig = ''
       set number
       set tabstop=2
