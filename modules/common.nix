@@ -70,5 +70,6 @@
     tree
     ripgrep
     gh
+    unzip
   ];
 }

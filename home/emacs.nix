@@ -19,7 +19,7 @@
     emacs
 
     # Doom module dependencies (flagged by `doom doctor`):
-    nodejs # :tools lsp server auto-install
+    nodejs # :tools lsp server auto-install (also needs unzip, from common.nix)
     shellcheck # :lang sh linting
     claude-agent-acp # Claude ACP adapter for agent-shell (see doom/config.el)
     nil # :lang nix (+lsp) language server; formatting uses nixfmt (common.nix)
