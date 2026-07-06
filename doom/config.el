@@ -148,7 +148,17 @@ selection, e.g. `@server.py#L20-35'.  A single-line selection yields `@file#L20'
        :desc "Magit status"   "s" #'magit-status
        :desc "Stage hunk"     "g" #'diff-hl-stage-current-hunk)
       (:prefix "b"
-       :desc "Scratch buffer" "e" #'doom/open-scratch-buffer))
+       :desc "Scratch buffer" "e" #'doom/open-scratch-buffer)
+      ;; SPC a is `embark-act' (labeled "Actions" by the vertico module).
+      ;; Making it a prefix re-homes embark-act to SPC a a; C-; still
+      ;; invokes it everywhere. The unbind must come first: keys can't be
+      ;; nested under a key that is already bound to a command.
+      "a" nil
+      (:prefix ("a" . "Actions")
+       :desc "Embark act" "a" #'embark-act
+       (:prefix ("s" . "agent-shell")
+        :desc "Default (Claude Code)" "s" #'agent-shell
+        :desc "opencode"              "d" #'agent-shell-opencode-start-agent)))
 
 
 ;;; Sync the kill ring with the system clipboard (macOS and WSL).
