@@ -55,6 +55,12 @@ jobs:
         with:
           branch: flake-updates
           delete-branch: true
+          # Attribute the commit to the repo owner, not the bot. The action
+          # otherwise authors as github.actor and commits as github-actions[bot],
+          # which shows up as github-actions co-authoring the update. Both fields
+          # use the GitHub noreply identity from home/git.nix.
+          author: Seth Krasnianski <1910114+sethkrasnianski@users.noreply.github.com>
+          committer: Seth Krasnianski <1910114+sethkrasnianski@users.noreply.github.com>
           commit-message: |
             Update flake inputs
 
