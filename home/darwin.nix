@@ -7,7 +7,7 @@
 # (useGlobalPkgs), so they are NOT set here — same as home/linux.nix. Setting
 # nixpkgs.* here would assert-fail under useGlobalPkgs, which is why the unfree
 # allowlist lives in modules/darwin.nix instead.
-{ config, ... }:
+{ config, pkgs, ... }:
 
 {
   imports = [ ./default.nix ];
@@ -15,6 +15,18 @@
   # Release current at the first `darwin-rebuild switch` on the Mac. Do not
   # bump on upgrades.
   home.stateVersion = "26.05";
+
+  # macOS-only apps that nixpkgs builds for darwin. UTM is Mac-only; Slack and
+  # Teams have no Linux package here (Teams was dropped from nixpkgs on Linux).
+  # xcodes is the CLI that installs/switches full Xcode versions — Xcode itself
+  # is not nix-installable (see README "Xcode"). Cross-platform and global apps
+  # live in home/default.nix.
+  home.packages = with pkgs; [
+    utm
+    slack
+    teams
+    xcodes
+  ];
 
   # Mirror the WSL `rebuild` alias (modules/wsl.nix). darwin-rebuild activates
   # the system profile, so it needs sudo. home.shellAliases lands in the

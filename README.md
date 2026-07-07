@@ -168,6 +168,33 @@ builder needed) — this is the check to run before pushing macOS changes:
 nix eval .#darwinConfigurations.macbook.system.drvPath --raw
 ```
 
+### Xcode
+
+Xcode itself can't be installed through nix (Apple licensing forbids
+redistribution). What *is* packaged is **`xcodes`**, the CLI that downloads and
+switches between full Xcode versions — installed on the Mac via
+`home/darwin.nix`. Use it (a one-time Apple ID sign-in is required) rather than
+committing Xcode to the config:
+
+```sh
+xcodes install --latest     # download + install the latest Xcode
+xcodes installed            # list what's installed
+xcodes select 16.0          # make a version active
+```
+
+Xcode is also available from the Mac App Store if you prefer.
+
+The **Command Line Tools** (git, clang, `make`, headers) are separate from the
+full IDE and install **automatically**: `modules/darwin.nix` runs
+`xcode-select --install` on the first `darwin-rebuild switch` when they're
+missing, so you just confirm Apple's prompt — no manual bootstrap step. Most
+nix-driven work uses nix's own toolchain anyway; this covers tools that reach
+for the system SDK. To reinstall them by hand later:
+
+```sh
+xcode-select --install
+```
+
 ## Use on a non-WSL machine
 
 1. Boot the target machine and run `sudo nixos-generate-config`, then replace
