@@ -1,9 +1,10 @@
 # Weekly flake.lock update, validated before the PR is opened.
 #
-# Flow: update the lock, evaluate all three nixosConfigurations (the same
-# check AGENTS.md prescribes locally), then open or refresh a single PR on
-# the `flake-updates` branch. If evaluation fails, the run goes red and no
-# PR appears — review the failure instead of merging a broken lock.
+# Flow: update the lock, evaluate all four outputs — the three
+# nixosConfigurations plus the macbook darwinConfiguration (the same check
+# AGENTS.md prescribes locally) — then open or refresh a single PR on the
+# `flake-updates` branch. If evaluation fails, the run goes red and no PR
+# appears — review the failure instead of merging a broken lock.
 #
 # The PR is created with the default GITHUB_TOKEN, which requires the repo
 # setting "Allow GitHub Actions to create and approve pull requests"
@@ -49,6 +50,11 @@ jobs:
             nix eval ".#nixosConfigurations.$output.config.system.build.toplevel.drvPath" --raw
             echo "::endgroup::"
           done
+          # The macOS output evaluates from Linux too (pure eval, no darwin
+          # builder), so validate it here alongside the NixOS ones.
+          echo "::group::macbook"
+          nix eval ".#darwinConfigurations.macbook.system.drvPath" --raw
+          echo "::endgroup::"
 
       - name: Open or update the PR
         uses: peter-evans/create-pull-request@v7
@@ -64,13 +70,13 @@ jobs:
           commit-message: |
             Update flake inputs
 
-            Automated weekly `nix flake update`; all three outputs were
+            Automated weekly `nix flake update`; all four outputs were
             evaluated in CI before this PR was opened.
           title: Update flake inputs
           body: |
-            Automated weekly `nix flake update`. All three flake outputs
-            (`nixos`, `nixos-headless`, `nixos-default`) evaluated successfully
-            against the new lock before this PR was opened.
+            Automated weekly `nix flake update`. All four flake outputs
+            (`nixos`, `nixos-headless`, `nixos-default`, `macbook`) evaluated
+            successfully against the new lock before this PR was opened.
 
             ```
             ${{ steps.update.outputs.log }}

@@ -16,6 +16,18 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # macOS system layer (darwinConfigurations.macbook). Only the Mac uses it;
+    # the NixOS hosts don't reference it at all.
+    nix-darwin = {
+      url = "github:nix-darwin/nix-darwin/master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # Declarative Homebrew for the macOS GUI apps nixpkgs can't build on darwin
+    # (Parsec, Steam, Mullvad). Manages the Homebrew install itself; the cask
+    # list lives in modules/darwin.nix.
+    nix-homebrew.url = "github:zhaofengli/nix-homebrew";
   };
 
   outputs =
@@ -24,6 +36,8 @@
       nixpkgs,
       nixos-wsl,
       home-manager,
+      nix-darwin,
+      nix-homebrew,
       ...
     }:
     {
@@ -62,14 +76,19 @@
         };
       };
 
-      # Standalone home-manager for the Mac — home directory only, no
-      # nix-darwin. Username and other per-machine facts live in
-      # home/darwin.nix. Apply on the Mac:
-      #   home-manager switch --flake ~/oss/nixos-config#macbook
-      homeConfigurations = {
-        macbook = home-manager.lib.homeManagerConfiguration {
-          pkgs = nixpkgs.legacyPackages.aarch64-darwin;
-          modules = [ ./home/darwin.nix ];
+      # nix-darwin system for the Mac. home-manager runs as a darwin module
+      # (like the NixOS hosts) and nix-homebrew manages Homebrew for the casks
+      # nixpkgs can't build on darwin. Per-machine facts (username,
+      # hostPlatform, stateVersion) live in hosts/macbook.nix; the shared
+      # darwin system config in modules/darwin.nix. Apply on the Mac:
+      #   sudo darwin-rebuild switch --flake ~/oss/nixos-config#macbook
+      darwinConfigurations = {
+        macbook = nix-darwin.lib.darwinSystem {
+          modules = [
+            home-manager.darwinModules.home-manager
+            nix-homebrew.darwinModules.nix-homebrew
+            ./hosts/macbook.nix
+          ];
         };
       };
     };
