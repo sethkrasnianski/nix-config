@@ -13,11 +13,17 @@
 
   # Tell NixOS it's ok to install these packages despite unfree license.
   # home-manager.useGlobalPkgs below makes this cover home.packages too.
+  # KEEP IN SYNC with the copy in modules/darwin.nix (the macOS host has its
+  # own list); the two drift silently otherwise. steam/steam-unwrapped are for
+  # programs.steam (modules/desktop.nix); parsec-bin for home/linux.nix.
   nixpkgs.config.allowUnfreePredicate =
     pkg:
     builtins.elem (lib.getName pkg) [
       "claude-code"
       "ngrok"
+      "parsec-bin"
+      "steam"
+      "steam-unwrapped"
     ];
 
   # NOTE: system.stateVersion is intentionally NOT set here — it is per-host
@@ -59,6 +65,15 @@
   environment.etc."gitignore".text = ''
     .agent-shell/
   '';
+
+  # Mullvad VPN. The daemon + CLI are system-level (a NixOS service, not a
+  # home-manager package); the GUI ships in the same package and appears only
+  # on graphical hosts — headless hosts still get a working daemon and
+  # `mullvad` CLI. (On macOS Mullvad is a Homebrew cask; see modules/darwin.nix.)
+  services.mullvad-vpn = {
+    enable = true;
+    package = pkgs.mullvad-vpn;
+  };
 
   # Base CLI tools, kept system-wide so root and system scripts have them too.
   # User-facing apps (editors, terminals, claude-code, ...) live in home/.

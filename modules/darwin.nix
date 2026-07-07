@@ -70,7 +70,14 @@
   nix-homebrew.enable = true;
   homebrew = {
     enable = true;
-    casks = [ ];
+    # The GUI apps nixpkgs can't build on darwin. Their Linux counterparts are
+    # nix-managed: parsec-bin (home/linux.nix), programs.steam and
+    # services.mullvad-vpn (modules/desktop.nix, modules/common.nix).
+    casks = [
+      "parsec"
+      "steam"
+      "mullvad-vpn"
+    ];
     onActivation = {
       cleanup = "uninstall";
       autoUpdate = false;
