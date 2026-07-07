@@ -28,15 +28,21 @@ in
   # the 256-color palette.
   home.sessionVariables.COLORTERM = "truecolor";
 
-  # User-facing apps. Base CLI tools stay in modules/common.nix.
+  # User-facing apps shared by every machine (Linux and macOS). Platform-only
+  # apps live in the entrypoints (home/linux.nix, home/darwin.nix); base CLI
+  # tools stay in modules/common.nix (NixOS) / modules/darwin.nix (macOS).
   # Ghostty is installed by programs.ghostty (home/ghostty.nix).
   home.packages = with pkgs; [
     opencode
+    doctl
 
-    # unfree (allowed in modules/common.nix on NixOS via useGlobalPkgs; on
-    # macOS via the predicate in home/darwin.nix — keep the lists in sync)
+    # unfree — allowed on NixOS via modules/common.nix and on macOS via
+    # modules/darwin.nix (both use useGlobalPkgs, so the predicate reaches
+    # home.packages). Keep those two allowlists in sync.
     claude-code
     ngrok
+    spotify
+    obsidian
   ];
 
   # Doom Emacs reads its user config from ~/.config/doom; point that at the

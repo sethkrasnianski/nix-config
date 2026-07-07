@@ -23,8 +23,11 @@
     builtins.elem (lib.getName pkg) [
       "claude-code"
       "ngrok"
+      "obsidian"
       "slack"
+      "spotify"
       "teams"
+      "whatsapp-for-mac"
     ];
 
   # Icon font used by Doom Emacs' UI (modeline, treemacs, dashboard). nix-darwin

@@ -16,16 +16,19 @@
   # bump on upgrades.
   home.stateVersion = "26.05";
 
-  # macOS-only apps that nixpkgs builds for darwin. UTM is Mac-only; Slack and
-  # Teams have no Linux package here (Teams was dropped from nixpkgs on Linux).
-  # xcodes is the CLI that installs/switches full Xcode versions — Xcode itself
-  # is not nix-installable (see README "Xcode"). Cross-platform and global apps
-  # live in home/default.nix.
+  # macOS builds of apps that nixpkgs makes for darwin. UTM is Mac-only; Slack
+  # and Teams have no Linux package here (Teams was dropped from nixpkgs on
+  # Linux). xcodes is the CLI that installs/switches full Xcode versions —
+  # Xcode itself is not nix-installable (see README "Xcode"). vlc-bin and
+  # whatsapp-for-mac are the darwin equivalents of vlc / karere in
+  # home/linux.nix. Global apps live in home/default.nix.
   home.packages = with pkgs; [
     utm
     slack
     teams
     xcodes
+    vlc-bin
+    whatsapp-for-mac
   ];
 
   # Mirror the WSL `rebuild` alias (modules/wsl.nix). darwin-rebuild activates

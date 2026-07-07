@@ -21,7 +21,9 @@
     builtins.elem (lib.getName pkg) [
       "claude-code"
       "ngrok"
+      "obsidian"
       "parsec-bin"
+      "spotify"
       "steam"
       "steam-unwrapped"
     ];
