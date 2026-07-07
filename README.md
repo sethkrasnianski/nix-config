@@ -5,29 +5,32 @@ Flake-based NixOS configuration with four outputs:
 - **`nixos`** — this NixOS-WSL machine, graphical (GNOME).
 - **`nixos-headless`** — the same WSL machine, no desktop.
 - **`nixos-default`** — a non-WSL template (no WSL code), for real hardware.
-- **`macbook`** — standalone home-manager for a Mac (aarch64-darwin), home
-  directory only (no nix-darwin).
+- **`macbook`** — a Mac (aarch64-darwin) managed by nix-darwin, with
+  home-manager as a darwin module and nix-homebrew for the few GUI apps
+  nixpkgs can't build on darwin.
 
 ## Layout
 
 ```
 .
 ├── .github/workflows/
-│   └── update-flake-lock.yml       # weekly lock-update PR, validated by evaluating all three outputs
-├── flake.nix                       # inputs + nixosConfigurations.{nixos,nixos-headless,nixos-default} + homeConfigurations.macbook
+│   └── update-flake-lock.yml       # weekly lock-update PR, validated by evaluating all four outputs
+├── flake.nix                       # inputs + nixosConfigurations.{nixos,nixos-headless,nixos-default} + darwinConfigurations.macbook
 ├── flake.lock                      # pinned input revisions — the reproducibility guarantee
 ├── modules/
-│   ├── common.nix                  # shared: nix settings, packages, unfree, zsh, fonts
-│   ├── desktop.nix                 # GNOME (shared by both hosts)
-│   └── wsl.nix                     # WSL-only: wsl.enable, opencode overlay, rebuild aliases (imported by the nixos host)
+│   ├── common.nix                  # shared (NixOS): nix settings, packages, unfree, zsh, fonts
+│   ├── desktop.nix                 # GNOME + Steam (shared by both NixOS hosts)
+│   ├── wsl.nix                     # WSL-only: wsl.enable, opencode overlay, rebuild aliases (imported by the nixos host)
+│   └── darwin.nix                  # macOS system layer: nix settings, unfree, fonts, CLI tools, Homebrew (nix-darwin)
 ├── hosts/
 │   ├── nixos-wsl.nix               # WSL host  = common + desktop + wsl (nixos / nixos-headless outputs)
 │   ├── nixos-default.nix           # non-WSL host = common + desktop + nixos-default-hardware
-│   └── nixos-default-hardware.nix  # PLACEHOLDER — replace via nixos-generate-config
+│   ├── nixos-default-hardware.nix  # PLACEHOLDER — replace via nixos-generate-config
+│   └── macbook.nix                 # macOS host = darwin.nix + home-manager module (darwinConfigurations.macbook)
 ├── home/                           # per-user home-manager config
 │   ├── default.nix                 # shared core: imports, user packages, managed config symlinks
 │   ├── linux.nix                   # NixOS entrypoint (wired in by hosts/*.nix), carries home.stateVersion
-│   ├── darwin.nix                  # macOS entrypoint (standalone HM): username, unfree, system-layer stand-ins
+│   ├── darwin.nix                  # macOS home entrypoint (nix-darwin module), carries home.stateVersion
 │   ├── git.nix / ssh.nix / shell.nix / direnv.nix
 │   ├── neovim.nix / emacs.nix      # editor config
 │   └── ghostty.nix                 # Ghostty terminal (WSLg Wayland on Linux, ghostty-bin on macOS)
@@ -58,6 +61,32 @@ root filesystem. Generate one only for a real non-WSL machine.)
 The `nixos-wsl` flake module and `modules/wsl.nix` are only referenced by the
 `nixos` host. The `nixos-default` host imports neither, so it builds on non-WSL
 hardware without any WSL assumptions.
+
+## Applications
+
+The rule: **any app nixpkgs can build is managed by nix**, per platform; only
+the GUI apps nixpkgs can't build on macOS are installed as Homebrew casks
+through nix-darwin (`modules/darwin.nix`). Steam and Mullvad are system-level
+on NixOS (a `programs.*` / `services.*` module rather than home-manager).
+
+| App | Linux | macOS | How it's managed |
+| --- | --- | --- | --- |
+| Spotify | ✅ | ✅ | nix, global — `home/default.nix` |
+| Obsidian | ✅ | ✅ | nix, global — `home/default.nix` |
+| doctl | ✅ | ✅ | nix, global — `home/default.nix` |
+| VLC | ✅ `vlc` | ✅ `vlc-bin` | nix, per-platform entrypoint |
+| WhatsApp | ✅ `karere` (GTK4) | ✅ `whatsapp-for-mac` | nix, per-platform entrypoint |
+| Slack | — | ✅ `slack` | nix — `home/darwin.nix` |
+| Teams | — | ✅ `teams` | nix — `home/darwin.nix` |
+| UTM | — | ✅ `utm` | nix — `home/darwin.nix` |
+| Parsec | ✅ `parsec-bin` | ✅ | Linux: nix; macOS: Homebrew cask |
+| Steam | ✅ | ✅ | Linux: `programs.steam` (NixOS); macOS: Homebrew cask |
+| Mullvad VPN | ✅ | ✅ | Linux: `services.mullvad-vpn` (NixOS); macOS: Homebrew cask |
+| Xcode | — | ⚙️ | not nix-installable — see [Xcode](#xcode) |
+
+WhatsApp on Linux is the third-party `karere` GTK4 client (there is no official
+Linux client); on macOS it's the official `whatsapp-for-mac`. The Homebrew
+casks (`parsec`, `steam`, `mullvad-vpn`) are declared in `modules/darwin.nix`.
 
 ## Rebuild (this WSL machine)
 
@@ -99,29 +128,33 @@ sudo nixos-rebuild switch --flake ~/oss/nixos-config#nixos
 
 After that, open a new shell and `rebuild` / `rebuild-headless` are available.
 
-## macOS (standalone home-manager)
+## macOS (nix-darwin)
 
-The `macbook` output manages only the home directory — no nix-darwin, no
-system layer. `home/darwin.nix` is the entrypoint: it sets the username
-(**edit it there** if the account isn't `seth`), allows the unfree packages,
-and stands in for `modules/common.nix` (base CLI tools, the Doom icon font).
+The `macbook` output is a full nix-darwin system: home-manager runs as a
+darwin module (like the NixOS hosts) and **nix-homebrew** manages Homebrew for
+the handful of GUI apps nixpkgs can't build on darwin (see
+[Applications](#applications)). Per-machine facts live in `hosts/macbook.nix`
+(the username — **edit it there** if the account isn't `seth` — plus
+`hostPlatform` and `stateVersion`); shared darwin system config
+(nix settings, unfree allowlist, fonts, base CLI tools, Homebrew) lives in
+`modules/darwin.nix`. `home/darwin.nix` is the home entrypoint.
 
 1. Install Nix (e.g. the [Determinate installer](https://determinate.systems/nix-installer/),
    which enables flakes; with the upstream installer add
    `experimental-features = nix-command flakes` to `/etc/nix/nix.conf`).
 2. Clone this repo to `~/oss/nixos-config` — the live symlinks and the
    `rebuild` alias assume that path.
-3. First run (home-manager isn't installed yet):
+3. First run (nix-darwin isn't installed yet) — this also installs Homebrew
+   via nix-homebrew:
 
    ```sh
-   nix run home-manager/master -- switch -b hm-bak --flake ~/oss/nixos-config#macbook
+   sudo nix run nix-darwin -- switch --flake ~/oss/nixos-config#macbook
    ```
 
-   `-b hm-bak` is the standalone equivalent of `backupFileExtension` in
-   `modules/common.nix`; it moves aside pre-existing dotfiles (macOS ships a
-   default `.zshrc`).
+   Pre-existing dotfiles (macOS ships a default `.zshrc`) are moved aside via
+   `backupFileExtension = "hm-bak"` (`hosts/macbook.nix`).
 4. Thereafter just `rebuild` (aliased in `home/darwin.nix`), or the full
-   `home-manager switch --flake ~/oss/nixos-config#macbook`.
+   `sudo darwin-rebuild switch --flake ~/oss/nixos-config#macbook`.
 
 Apple's `/bin/zsh` stays the login shell and sources the home-manager rc
 files — no `chsh` needed. Doom Emacs bootstraps the same way as on Linux
@@ -129,10 +162,10 @@ files — no `chsh` needed. Doom Emacs bootstraps the same way as on Linux
 linked into `~/Applications` by home-manager's darwin support.
 
 The output evaluates from the Linux machine too (pure eval, no darwin
-builder needed):
+builder needed) — this is the check to run before pushing macOS changes:
 
 ```sh
-nix eval .#homeConfigurations.macbook.activationPackage.drvPath --raw
+nix eval .#darwinConfigurations.macbook.system.drvPath --raw
 ```
 
 ## Use on a non-WSL machine

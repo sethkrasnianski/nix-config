@@ -3,19 +3,22 @@
 Flake-based NixOS config. Four outputs: `nixos` (WSL host, GNOME), `nixos-headless`
 (same WSL host, no desktop), `nixos-default` (non-WSL template) — where home-manager
 runs as a NixOS module, one rebuild applies system and user config together — and
-`macbook` (standalone home-manager for a Mac, aarch64-darwin, home directory only).
+`macbook` (a Mac, aarch64-darwin, managed by nix-darwin with home-manager as a
+darwin module and nix-homebrew for the GUI apps nixpkgs can't build on darwin).
 
 ## Layout
 
-- `flake.nix` — inputs: nixpkgs (nixos-unstable), nixos-wsl, home-manager (all pinned by `flake.lock`)
-- `.github/workflows/update-flake-lock.yml` — weekly `flake.lock` update PR; evaluates all three outputs before opening it
-- `hosts/` — per-host: hostname, `system.stateVersion`, home-manager user wiring
-- `modules/` — system-level shared config (`common.nix`, `desktop.nix`, `wsl.nix`)
+- `flake.nix` — inputs: nixpkgs (nixos-unstable), nixos-wsl, home-manager, nix-darwin, nix-homebrew (all pinned by `flake.lock`)
+- `.github/workflows/update-flake-lock.yml` — weekly `flake.lock` update PR; evaluates all four outputs before opening it
+- `hosts/` — per-host: hostname/`hostPlatform`, `system.stateVersion`, home-manager user wiring (`macbook.nix` is the nix-darwin host)
+- `modules/` — system-level shared config: NixOS (`common.nix`, `desktop.nix`, `wsl.nix`) and darwin (`darwin.nix` — the macOS counterpart to `common.nix`: nix settings, unfree allowlist, fonts, base CLI tools, Homebrew; never imported by a NixOS host, and vice versa)
 - `home/` — per-user home-manager config (git, ssh, shell, direnv, neovim, emacs);
   `default.nix` is the shared core, `linux.nix`/`darwin.nix` the per-platform
-  entrypoints (NixOS hosts import `linux.nix`; the `macbook` output imports
-  `darwin.nix`, which owns the macOS username, unfree allowlist, and stand-ins
-  for the system layer — never import it from a NixOS host)
+  entrypoints (NixOS hosts import `linux.nix`; `hosts/macbook.nix` imports
+  `darwin.nix`). Both carry only `home.stateVersion`; username, unfree, and the
+  system layer moved to `hosts/macbook.nix` + `modules/darwin.nix`. Two unfree
+  allowlists — `modules/common.nix` (NixOS) and `modules/darwin.nix` (macOS) —
+  must be kept in sync.
 - `doom/`, `claude/settings.json`, `agents/`, `opencode/` — Doom Emacs, Claude
   Code, tool-agnostic agent config, and OpenCode-specific agents/commands/skills,
   live-symlinked into `$HOME` (`home/default.nix`); edits apply without a
@@ -24,10 +27,11 @@ runs as a NixOS module, one rebuild applies system and user config together — 
 ## Working in this repo
 
 - Apply changes: `rebuild` (= `sudo nixos-rebuild switch --flake ~/oss/nixos-config#nixos`);
-  `rebuild-headless` for the headless variant.
+  `rebuild-headless` for the headless variant. On the Mac, `rebuild` =
+  `sudo darwin-rebuild switch --flake ~/oss/nixos-config#macbook`.
 - Check without switching — all four outputs must evaluate:
   `nix eval .#nixosConfigurations.<name>.config.system.build.toplevel.drvPath --raw`
-  and `nix eval .#homeConfigurations.macbook.activationPackage.drvPath --raw`
+  and `nix eval .#darwinConfigurations.macbook.system.drvPath --raw`
   (pure eval; works from Linux, no darwin builder needed).
 - `git add` new files before evaluating; flakes only see tracked files.
 - Format Nix files with `nixfmt`.
