@@ -10,10 +10,14 @@
   # Release home-manager state was first created with. Do not bump on upgrades.
   home.stateVersion = "25.11";
 
-  # Linux-only apps available in nixpkgs. parsec-bin is the Parsec client (on
-  # macOS Parsec is a Homebrew cask; see modules/darwin.nix). Cross-platform
-  # and global apps live in home/default.nix.
+  # Linux builds of apps whose macOS equivalent differs. parsec-bin is the
+  # Parsec client (a Homebrew cask on macOS); vlc is the full Qt build (macOS
+  # uses vlc-bin); karere is the third-party GTK4 WhatsApp client (there is no
+  # official Linux client — macOS uses whatsapp-for-mac). Global apps live in
+  # home/default.nix.
   home.packages = with pkgs; [
     parsec-bin
+    vlc
+    karere
   ];
 }
