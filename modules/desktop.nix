@@ -29,5 +29,16 @@ in
 
     # Keyboard layout for X.
     services.xserver.xkb.layout = "us";
+
+    # Steam. Must be the system module, not a home.packages entry: it pulls in
+    # the 32-bit graphics stack Steam needs and opens the firewall ports for
+    # Remote Play and local-network game transfers. Gated with the desktop
+    # since it's only useful with a display. (On macOS Steam is a Homebrew
+    # cask; see modules/darwin.nix.)
+    programs.steam = {
+      enable = true;
+      remotePlay.openFirewall = true;
+      localNetworkGameTransfers.openFirewall = true;
+    };
   };
 }
