@@ -33,7 +33,8 @@ Flake-based NixOS configuration with four outputs:
 │   ├── darwin.nix                  # macOS home entrypoint (nix-darwin module), carries home.stateVersion
 │   ├── git.nix / ssh.nix / shell.nix / direnv.nix
 │   ├── neovim.nix / emacs.nix      # editor config
-│   └── ghostty.nix                 # Ghostty terminal (WSLg Wayland on Linux, ghostty-bin on macOS)
+│   ├── ghostty.nix                 # Ghostty terminal (WSLg Wayland on Linux, ghostty-bin on macOS)
+│   └── photogimp.nix               # seeds GIMP's config dir from a pinned PhotoGIMP release
 ├── doom/                           # private Doom Emacs config (~/.config/doom links here)
 ├── claude/
 │   └── settings.json               # global Claude Code settings (~/.claude/settings.json links here)
@@ -83,11 +84,27 @@ on NixOS (a `programs.*` / `services.*` module rather than home-manager).
 | Parsec | ✅ `parsec-bin` | ✅ | Linux: nix; macOS: Homebrew cask |
 | Steam | ✅ | ✅ | Linux: `programs.steam` (NixOS); macOS: Homebrew cask |
 | Mullvad VPN | ✅ | ✅ | Linux: `services.mullvad-vpn` (NixOS); macOS: Homebrew cask |
+| GIMP (PhotoGIMP) | ✅ `gimp` | ✅ | Linux: nix (`home/linux.nix`); macOS: Homebrew cask |
 | Xcode | — | ⚙️ | not nix-installable — see [Xcode](#xcode) |
 
 WhatsApp on Linux is the third-party `karere` GTK4 client (there is no official
 Linux client); on macOS it's the official `whatsapp-for-mac`. The Homebrew
-casks (`parsec`, `steam`, `mullvad-vpn`) are declared in `modules/darwin.nix`.
+casks (`parsec`, `steam`, `mullvad-vpn`, `gimp`) are declared in
+`modules/darwin.nix`.
+
+### GIMP (PhotoGIMP)
+
+GIMP is skinned with [PhotoGIMP](https://github.com/Diolinux/PhotoGIMP) — a
+Photoshop-like layout, shortcuts, and tool config. PhotoGIMP isn't a package;
+it's a set of files overlaid onto GIMP's user config dir. Because GIMP rewrites
+most of those files at runtime (window layout, shortcuts, session state), they
+can't be a read-only store symlink without fighting GIMP on every save.
+Instead, `home/photogimp.nix` pins a PhotoGIMP release by tag + sha256 via
+`fetchzip` and seeds `~/.config/GIMP/3.2` (`~/Library/Application
+Support/GIMP/3.2` on macOS) from it **once** — a version marker file skips
+re-seeding on later rebuilds, so your in-app customizations persist. To pull a
+newer PhotoGIMP release, bump `version` in that file and refresh the
+platform's hash (the rebuild's hash-mismatch error reports the correct one).
 
 ## Rebuild (this WSL machine)
 
