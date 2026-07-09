@@ -5,10 +5,6 @@
     # Track nixos-unstable (this system reports 26.11pre / "Zokor").
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    # Stable channel, used only to swap in packages that are broken on
-    # unstable (currently opencode on WSL2 — see modules/wsl.nix).
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.11";
-
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL/main";
       # Build NixOS-WSL against the same nixpkgs pinned above.
@@ -26,7 +22,6 @@
     {
       self,
       nixpkgs,
-      nixpkgs-stable,
       nixos-wsl,
       home-manager,
       ...
@@ -36,7 +31,6 @@
         # WSL host, graphical (GNOME). This is the default.
         nixos = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
-          specialArgs = { inherit nixpkgs-stable; };
           modules = [
             nixos-wsl.nixosModules.default
             home-manager.nixosModules.home-manager
@@ -48,7 +42,6 @@
         # Switch on demand:  nixos-rebuild switch --flake .#nixos-headless
         nixos-headless = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
-          specialArgs = { inherit nixpkgs-stable; };
           modules = [
             nixos-wsl.nixosModules.default
             home-manager.nixosModules.home-manager
