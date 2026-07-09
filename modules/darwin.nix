@@ -22,6 +22,8 @@
     pkg:
     builtins.elem (lib.getName pkg) [
       "claude-code"
+      "firefox-bin"
+      "firefox-bin-unwrapped"
       "ngrok"
       "obsidian"
       "slack"
