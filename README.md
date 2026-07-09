@@ -76,6 +76,7 @@ on NixOS (a `programs.*` / `services.*` module rather than home-manager).
 | doctl | ✅ | ✅ | nix, global — `home/default.nix` |
 | VLC | ✅ `vlc` | ✅ `vlc-bin` | nix, per-platform entrypoint |
 | WhatsApp | ✅ `karere` (GTK4) | ✅ `whatsapp-for-mac` | nix, per-platform entrypoint |
+| Firefox | ✅ `firefox` | ✅ `firefox-bin` | nix, per-platform entrypoint |
 | Slack | — | ✅ `slack` | nix — `home/darwin.nix` |
 | Teams | — | ✅ `teams` | nix — `home/darwin.nix` |
 | UTM | — | ✅ `utm` | nix — `home/darwin.nix` |

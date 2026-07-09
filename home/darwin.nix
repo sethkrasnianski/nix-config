@@ -16,13 +16,15 @@
   # bump on upgrades.
   home.stateVersion = "26.05";
 
-  # macOS builds of apps that nixpkgs makes for darwin. UTM is Mac-only; Slack
-  # and Teams have no Linux package here (Teams was dropped from nixpkgs on
-  # Linux). xcodes is the CLI that installs/switches full Xcode versions —
+  # macOS builds of apps that nixpkgs makes for darwin. firefox-bin is the
+  # prebuilt Firefox (avoids a source compile on darwin); UTM is Mac-only;
+  # Slack and Teams have no Linux package here (Teams was dropped from nixpkgs
+  # on Linux). xcodes is the CLI that installs/switches full Xcode versions —
   # Xcode itself is not nix-installable (see README "Xcode"). vlc-bin and
   # whatsapp-for-mac are the darwin equivalents of vlc / karere in
   # home/linux.nix. Global apps live in home/default.nix.
   home.packages = with pkgs; [
+    firefox-bin
     utm
     slack
     teams
