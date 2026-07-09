@@ -17,6 +17,7 @@ in
     ./neovim.nix
     ./emacs.nix
     ./ghostty.nix
+    ./photogimp.nix
   ];
 
   # NOTE: home.stateVersion is per-machine and lives in the entrypoints
