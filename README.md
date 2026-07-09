@@ -160,7 +160,15 @@ the handful of GUI apps nixpkgs can't build on darwin (see
 Apple's `/bin/zsh` stays the login shell and sources the home-manager rc
 files — no `chsh` needed. Doom Emacs bootstraps the same way as on Linux
 (see below); GUI apps from `home.packages` (Ghostty.app, Emacs.app) are
-linked into `~/Applications` by home-manager's darwin support.
+linked into `~/Applications/Home Manager Apps/` by home-manager's darwin
+support.
+
+The Dock ("taskbar") contents and order are managed declaratively in
+`hosts/macbook.nix` (`system.defaults.dock`): the pinned apps, a Downloads
+stack, and `show-recents = false`. It's reset to that on every rebuild, so
+manual reordering won't stick. If a Dock icon shows as a "?", the app's `.app`
+path in that file is wrong — check the real name under
+`~/Applications/Home Manager Apps/`.
 
 The output evaluates from the Linux machine too (pure eval, no darwin
 builder needed) — this is the check to run before pushing macOS changes:
