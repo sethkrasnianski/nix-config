@@ -1,6 +1,15 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "github-copilot/claude-sonnet-5",
+  "model": "github-copilot/gpt-5.6-luna",
+  "agent": {
+    "build": {
+      "variant": "medium"
+    },
+    "plan": {
+      "model": "github-copilot/gpt-5.6-sol",
+      "variant": "medium"
+    }
+  },
   "lsp": true,
   "mcp": {
     "github": {
