@@ -1,5 +1,15 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "model": "github-copilot/claude-sonnet-5",
+  "lsp": true,
+  "mcp": {
+    "github": {
+      "type": "remote",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer {env:GITHUB_MCP_PAT}"
+      }
+    }
+  },
   "permission": "allow"
 }

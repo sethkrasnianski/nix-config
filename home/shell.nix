@@ -12,16 +12,18 @@ let
   # servers on top of Claude's own config.
   #
   # The GitHub server needs a token in the Authorization header (the endpoint
-  # doesn't support OAuth dynamic client registration, so Claude Code can't
-  # self-authenticate); agents/mcp.json references it as ''${GITHUB_MCP_PAT}.
-  # The token is looked up from `gh auth token` at invocation time and set only
-  # in this one command's environment — never exported shell-wide, so arbitrary
-  # child processes don't inherit it and no secret lands in the repo. A
-  # function rather than an alias because aliases can't set per-invocation
+  # doesn't support OAuth dynamic client registration, so the CLIs can't
+  # self-authenticate). The token is looked up from `gh auth token` at
+  # invocation time and set only in that command's environment — never exported
+  # shell-wide, so arbitrary child processes don't inherit it and no secret
+  # lands in the repo. Functions rather than aliases can set per-invocation
   # environment variables. Defined for both shells below.
   claudeWithMcp = ''
     claude() {
       GITHUB_MCP_PAT="$(gh auth token 2>/dev/null)" command claude --mcp-config ~/.agents/mcp.json "$@"
+    }
+    opencode() {
+      GITHUB_MCP_PAT="$(gh auth token 2>/dev/null)" command opencode "$@"
     }
   '';
 in
