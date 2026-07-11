@@ -62,14 +62,18 @@
 
   # Base CLI tools, kept system-wide so root and system scripts have them too.
   # User-facing apps (editors, terminals, claude-code, ...) live in home/.
-  environment.systemPackages = with pkgs; [
-    nixfmt
-    wget
-    fd
-    jq
-    tree
-    ripgrep
-    gh
-    unzip
-  ];
+  environment.systemPackages =
+    with pkgs;
+    [
+      nixfmt
+      wget
+      fd
+      jq
+      tree
+      ripgrep
+      gh
+      unzip
+    ]
+    # macOS ships lsof by default; Linux does not, so pull it in there only.
+    ++ lib.optionals stdenv.isLinux [ lsof ];
 }
