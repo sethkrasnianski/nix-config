@@ -34,6 +34,12 @@
 ;; `load-theme' function. This is the default:
 (setq doom-theme 'one-dark)
 
+;; Load grammars provided declaratively by Nix. The environment variable keeps
+;; this live-linked Doom config independent of a store path.
+(when-let ((treesit-load-path (getenv "EMACS_TREESIT_LOAD_PATH")))
+  (with-eval-after-load 'treesit
+    (add-to-list 'treesit-extra-load-path treesit-load-path)))
+
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type t)
