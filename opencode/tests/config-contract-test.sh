@@ -12,6 +12,8 @@ require agents/auto-history-finalizer.md 'model: github-copilot/gpt-5.6-terra'
 require agents/auto-history-finalizer.md 'edit: deny'
 require agents/auto-history-finalizer.md '"auto-history-finalize prepare *": allow'
 require agents/auto-committer.md 'model: github-copilot/gpt-5.6-luna'
+require agents/auto-implementer.md 'model: github-copilot/gpt-5.3-codex'
+require agents/auto-implementer.md 'reasoningEffort: high'
 if grep -q '"git \(rebase\|push\|fetch\)' "$ROOT/agents/auto-committer.md"; then
   printf 'committer must not have rewrite, push, or fetch permission\n' >&2
   exit 1

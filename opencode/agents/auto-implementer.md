@@ -1,8 +1,8 @@
 ---
 description: Implements the minimum production code to turn one step's already-red test(s) green, without regressing the rest of the suite. Part of the TDD loop — see tdd-loop skill. Does not fix its own failures beyond one attempt; hands off to auto-test-fixer.
 mode: subagent
-model: github-copilot/gpt-5.6-luna
-reasoningEffort: medium
+model: github-copilot/gpt-5.3-codex
+reasoningEffort: high
 color: "#4dabf7"
 permission:
   edit: allow

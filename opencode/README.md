@@ -163,7 +163,7 @@ Every agent's model and reasoning depth is a couple of frontmatter lines in
 | `auto-researcher` | `github-copilot/gpt-5.6-sol` | high | broad investigation, interactive |
 | `auto-planner` | `github-copilot/claude-fable-5` | max | design decisions, interactive |
 | `auto-test-writer` | `github-copilot/gpt-5.6-luna` | medium | focused, mechanical |
-| `auto-implementer` | `github-copilot/gpt-5.6-luna` | medium | focused, mechanical |
+| `auto-implementer` | `github-copilot/gpt-5.3-codex` | high | coding-specialized quality without Sol-level cost |
 | `auto-test-fixer` | `github-copilot/gpt-5.6-luna` | medium | **pinned** — see below |
 | `auto-reviewer` | `github-copilot/gpt-5.6-sol` | max | read-only, quality-dominant |
 | `auto-committer` | `github-copilot/gpt-5.6-luna` | low | normal, bootstrap, and fixup commits only |
@@ -174,6 +174,12 @@ re-run `./install.sh` (symlinks mean this is instant — no reinstall needed
 for content changes, only for adding/removing files). To change for one repo
 only, use `/auto-init` instead (see above) so the change doesn't affect other
 projects.
+
+The implementer deliberately uses GPT-5.3 Codex rather than Luna. Implementation
+is where weak first-pass correctness creates repeated reviewer and fixer calls;
+the coding-specialized model is more expensive per invocation than Luna but
+substantially cheaper than Sol, making it the cost-conscious quality tier for
+production code. Keep mechanical test writing, retries, and commits on Luna.
 
 **Note on `auto-test-fixer`:** its model is a hard constraint, not a
 suggestion (see `skills/tdd-loop/SKILL.md`) — the harness explicitly never
