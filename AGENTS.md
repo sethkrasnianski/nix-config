@@ -11,9 +11,10 @@ a NixOS module — one rebuild applies system and user config together.
 - `hosts/` — per-host: hostname, `system.stateVersion`, home-manager user wiring
 - `modules/` — system-level shared config (`common.nix`, `desktop.nix`, `wsl.nix`)
 - `home/` — per-user home-manager config (git, ssh, shell, direnv, neovim, emacs)
-- `doom/`, `claude/settings.json`, `agents/` — Doom Emacs, Claude Code, and
-  tool-agnostic agent configs, live-symlinked into `$HOME` (`home/default.nix`);
-  edits apply without a rebuild
+- `doom/`, `claude/settings.json`, `agents/`, `opencode/` — Doom Emacs, Claude
+  Code, shared agent config, and OpenCode-specific agents/commands/skills,
+  live-symlinked into `$HOME` (`home/default.nix`); edits apply without a
+  rebuild
 
 ## Working in this repo
 
@@ -48,6 +49,9 @@ a NixOS module — one rebuild applies system and user config together.
   for matching), followed by the instructions.
 - Adding or editing a skill needs no rebuild (the directory is live-symlinked);
   only creating the two links required the one initial `rebuild`.
+- OpenCode-specific auto-agent changes belong under `opencode/`. Improve the
+  smallest relevant agent, command, or skill, preserve the approval/TDD/review
+  boundaries, and run `opencode/tests/` before evaluating the flake outputs.
 
 ## Hard rules
 

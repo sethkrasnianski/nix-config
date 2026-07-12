@@ -23,7 +23,7 @@ Flake-based NixOS configuration with three outputs:
 │   ├── nixos-default.nix           # non-WSL host = common + desktop + nixos-default-hardware
 │   └── nixos-default-hardware.nix  # PLACEHOLDER — replace via nixos-generate-config
 ├── home/                           # per-user home-manager config, wired in by hosts/*.nix
-│   ├── default.nix                 # imports, user packages, doom/claude/opencode symlinks
+│   ├── default.nix                 # imports, user packages, and managed config symlinks
 │   ├── git.nix / ssh.nix / shell.nix / direnv.nix
 │   ├── neovim.nix / emacs.nix      # editor config
 │   └── ghostty.nix                 # Ghostty terminal (WSLg Wayland GUI app)
@@ -31,7 +31,13 @@ Flake-based NixOS configuration with three outputs:
 ├── claude/
 │   └── settings.json               # global Claude Code settings (~/.claude/settings.json links here)
 ├── opencode/
-│   └── opencode.jsonc              # global opencode settings (~/.config/opencode/opencode.jsonc links here)
+│   ├── opencode.jsonc              # global OpenCode settings
+│   ├── agents/                      # OpenCode auto-agent definitions
+│   ├── commands/                    # /auto, /research, /plan, and related commands
+│   ├── skills/                      # OpenCode auto-agent skills
+│   ├── scripts/                     # PR watcher and history finalizer helpers
+│   ├── tests/                       # auto-agent contract tests
+│   └── README.md                    # auto-agent usage and maintenance guide
 └── agents/                         # tool-agnostic agent config (~/.agents links here)
     ├── mcp.json                    # shared MCP servers (Claude picks up via --mcp-config alias)
     └── skills/
@@ -157,9 +163,15 @@ home-manager symlinks `~/.config/opencode/opencode.jsonc` to it
 Code's settings.json. Edit settings in the repo file — the rest of
 `~/.config/opencode` (node_modules, caches, etc.) is left as mutable state.
 
+OpenCode's auto-agent is maintained in this repository under `opencode/`.
+Home-manager exposes its agents, commands, and skills in the global OpenCode
+configuration, and exposes its PR watcher and history finalizer in
+`~/.local/bin`. Improve the relevant file under `opencode/` and run the harness
+tests before evaluating the NixOS outputs.
+
 ## Agent skills
 
-Agent skills are tool-agnostic and never duplicated per tool. The source of
+Shared agent skills are tool-agnostic and never duplicated per tool. The source of
 truth is `agents/skills/<name>/SKILL.md` in this repo, exposed at `~/.agents`
 (the universal agent-config directory). Claude Code reads them through an
 alias — `~/.claude/skills` → `~/.agents/skills` — wired in `home/default.nix`;

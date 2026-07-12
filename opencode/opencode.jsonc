@@ -20,5 +20,8 @@
       }
     }
   },
-  "permission": "allow"
+  "permission": {
+    "edit": "allow",
+    "bash": "allow"
+  }
 }
