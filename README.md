@@ -42,7 +42,8 @@ Flake-based NixOS configuration with three outputs:
     ├── mcp.json                    # shared MCP servers (Claude picks up via --mcp-config alias)
     └── skills/
         ├── new-project/SKILL.md    # skill: bootstrap a new project (flake, direnv, AGENTS.md, docs)
-        └── handoff/SKILL.md        # skill: compact the conversation into a handoff doc for another agent
+        ├── handoff/SKILL.md        # skill: compact the conversation into a handoff doc for another agent
+        └── tickets/SKILL.md        # skill: durable ticket board and per-ticket implementation plans
 ```
 
 (The WSL host has no `hardware-configuration.nix` — `nixos-wsl` provides the
@@ -175,7 +176,9 @@ Shared agent skills are tool-agnostic and never duplicated per tool. The source 
 truth is `agents/skills/<name>/SKILL.md` in this repo, exposed at `~/.agents`
 (the universal agent-config directory). Claude Code reads them through an
 alias — `~/.claude/skills` → `~/.agents/skills` — wired in `home/default.nix`;
-any other agent CLI gets its own alias into `~/.agents` the same way. Because
+OpenCode's `tickets` entry similarly aliases `~/.agents/skills/tickets` into
+its global skill directory. Any other agent CLI gets its own alias into
+`~/.agents` the same way. Because
 the links point at the checkout, adding or editing a skill takes effect
 without a rebuild.
 
