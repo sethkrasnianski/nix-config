@@ -54,4 +54,13 @@
     config.lib.file.mkOutOfStoreSymlink "/home/nixos/oss/nixos-config/agents";
   home.file.".claude/skills".source =
     config.lib.file.mkOutOfStoreSymlink "/home/nixos/.agents/skills";
+
+  # Global agent instructions — single source of truth in agents/AGENTS.md,
+  # aliased into each tool's expected path. Claude Code reads ~/.claude/CLAUDE.md;
+  # opencode reads ~/.config/opencode/AGENTS.md. Both point at ~/.agents so the
+  # instructions are never duplicated and edits apply without a rebuild.
+  home.file.".claude/CLAUDE.md".source =
+    config.lib.file.mkOutOfStoreSymlink "/home/nixos/.agents/AGENTS.md";
+  home.file.".config/opencode/AGENTS.md".source =
+    config.lib.file.mkOutOfStoreSymlink "/home/nixos/.agents/AGENTS.md";
 }
