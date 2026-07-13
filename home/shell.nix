@@ -3,7 +3,7 @@
 # home.sessionPath) — bash because it's the login shell on the WSL host,
 # zsh for interactive use. Without this, those variables never load. Both
 # shells use the same minimal hostname/cwd prompt.
-{ ... }:
+{ pkgs, ... }:
 
 let
   # MCP servers for agent CLIs live in the tool-agnostic ~/.agents/mcp.json
@@ -43,6 +43,18 @@ in
 
   programs.zsh = {
     enable = true;
+    # macOS ships BSD ls, whose -G flag enables colors (GNU ls uses
+    # --color=tty). Keep these aliases Darwin-only so Linux retains its
+    # system-provided dircolors setup.
+    shellAliases =
+      if pkgs.stdenv.isDarwin then
+        {
+          ls = "ls -G";
+          l = "ls -alhG";
+          ll = "ls -lhG";
+        }
+      else
+        { };
     initContent = ''
       PROMPT=$'\e[38;2;159;226;191m%n\e[0m:%~$ '
     ''
