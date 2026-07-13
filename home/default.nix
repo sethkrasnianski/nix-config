@@ -58,6 +58,8 @@ in
     config.lib.file.mkOutOfStoreSymlink "${flakePath}/claude/settings.json";
   home.file.".config/opencode/opencode.jsonc".source =
     config.lib.file.mkOutOfStoreSymlink "${flakePath}/opencode/opencode.jsonc";
+  home.file.".config/opencode/tui.json".source =
+    config.lib.file.mkOutOfStoreSymlink "${flakePath}/opencode/tui.json";
   home.file.".config/opencode/agents".source =
     config.lib.file.mkOutOfStoreSymlink "${flakePath}/opencode/agents";
   home.file.".config/opencode/commands".source =
