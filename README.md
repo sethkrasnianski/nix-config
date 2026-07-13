@@ -40,6 +40,7 @@ Flake-based NixOS configuration with four outputs:
 │   └── settings.json               # global Claude Code settings (~/.claude/settings.json links here)
 ├── opencode/
 │   ├── opencode.jsonc              # global OpenCode settings
+│   ├── tui.json                     # global OpenCode UI theme
 │   ├── agents/                      # OpenCode auto-agent definitions
 │   ├── commands/                    # /auto, /research, /plan, and related commands
 │   ├── skills/                      # OpenCode auto-agent skills
@@ -284,11 +285,12 @@ restores it (discarding those changes) on the next rebuild.
 
 ## OpenCode
 
-Global opencode settings are tracked in `opencode/opencode.jsonc`;
-home-manager symlinks `~/.config/opencode/opencode.jsonc` to it
-(`mkOutOfStoreSymlink` in `home/default.nix`), the same pattern as Claude
-Code's settings.json. Edit settings in the repo file — the rest of
-`~/.config/opencode` (node_modules, caches, etc.) is left as mutable state.
+Global opencode settings and TUI preferences are tracked in
+`opencode/opencode.jsonc` and `opencode/tui.json`; home-manager symlinks them
+to `~/.config/opencode/` (`mkOutOfStoreSymlink` in `home/default.nix`), the
+same pattern as Claude Code's settings.json. Edit settings in the repo files —
+the rest of `~/.config/opencode` (node_modules, caches, etc.) is left as
+mutable state.
 
 OpenCode's auto-agent is maintained in this repository under `opencode/`.
 Home-manager exposes its agents, commands, and skills in the global OpenCode

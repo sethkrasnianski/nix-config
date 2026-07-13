@@ -252,6 +252,7 @@ skills/      address-pr-feedback, resolve-merge-conflicts, review-changes,
 scripts/     pr-watch.sh  (installed as `auto-pr-watch`)
 install.sh
 opencode.jsonc   base project config + disabled MCP stubs
+tui.json         global OpenCode TUI preferences
 ```
 
 ## Design notes
