@@ -1,7 +1,8 @@
 # Shell config. Both shells are managed so their rc files source
 # home-manager's session variables (SSH_AUTH_SOCK, COLORTERM, EDITOR,
 # home.sessionPath) — bash because it's the login shell on the WSL host,
-# zsh for interactive use. Without this, those variables never load.
+# zsh for interactive use. Without this, those variables never load. Both
+# shells use the same minimal hostname/cwd prompt.
 { ... }:
 
 let
@@ -42,6 +43,9 @@ in
 
   programs.zsh = {
     enable = true;
-    initContent = claudeWithMcp;
+    initContent = ''
+      PROMPT=$'\e[38;2;159;226;191m%n\e[0m:%~$ '
+    ''
+    + claudeWithMcp;
   };
 }
