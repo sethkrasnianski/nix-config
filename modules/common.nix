@@ -88,7 +88,6 @@
       jq
       tree
       ripgrep
-      gh
       unzip
     ]
     # macOS ships lsof by default; Linux does not, so pull it in there only.

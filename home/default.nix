@@ -36,6 +36,7 @@ in
   home.packages = with pkgs; [
     opencode
     doctl
+    gh
 
     # unfree — allowed on NixOS via modules/common.nix and on macOS via
     # modules/darwin.nix (both use useGlobalPkgs, so the predicate reaches
