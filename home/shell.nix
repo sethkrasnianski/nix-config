@@ -17,14 +17,16 @@ let
   # self-authenticate). The token is looked up from `gh auth token` at
   # invocation time and set only in that command's environment — never exported
   # shell-wide, so arbitrary child processes don't inherit it and no secret
-  # lands in the repo. Functions rather than aliases can set per-invocation
-  # environment variables. Defined for both shells below.
+  # lands in the repo. The OpenCode wrapper also exposes its trusted helper
+  # commands only to OpenCode and its delegated agents. Functions rather than
+  # aliases can set per-invocation environment variables. Defined for both
+  # shells below.
   claudeWithMcp = ''
     claude() {
       GITHUB_MCP_PAT="$(gh auth token 2>/dev/null)" command claude --mcp-config ~/.agents/mcp.json "$@"
     }
     opencode() {
-      GITHUB_MCP_PAT="$(gh auth token 2>/dev/null)" command opencode "$@"
+      PATH="$HOME/.local/bin:$PATH" GITHUB_MCP_PAT="$(gh auth token 2>/dev/null)" command opencode "$@"
     }
   '';
 in
