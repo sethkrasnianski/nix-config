@@ -33,6 +33,7 @@ in
     nil # :lang nix (+lsp) language server; formatting uses nixfmt (common.nix)
     yaml-language-server # :lang yaml (+lsp) language server
     rust-analyzer # :lang rust (+lsp) language server
+    svelte-language-server # :lang web (+lsp) Svelte language server
     # :lang rust (+tree-sitter): Doom compiles the grammar at runtime via
     # `treesit-install-language-grammar`, which needs a C compiler (`cc`).
     gcc
