@@ -28,6 +28,13 @@
     # (Parsec, Steam, Mullvad). Manages the Homebrew install itself; the cask
     # list lives in modules/darwin.nix.
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
+
+    # Disabled by default; rebuild tooling can replace this pure path input with
+    # the ignored .local/config directory for host-specific settings.
+    local-config = {
+      url = "path:./local-config";
+      flake = false;
+    };
   };
 
   outputs =
@@ -38,8 +45,12 @@
       home-manager,
       nix-darwin,
       nix-homebrew,
+      local-config,
       ...
     }:
+    let
+      localConfigModule = local-config + "/default.nix";
+    in
     {
       nixosConfigurations = {
         # WSL host, graphical (GNOME). This is the default.
@@ -48,6 +59,9 @@
           modules = [
             nixos-wsl.nixosModules.default
             home-manager.nixosModules.home-manager
+            ./modules/local-llm.nix
+            ./modules/local-llm-nixos.nix
+            localConfigModule
             ./hosts/nixos-wsl.nix
           ];
         };
@@ -59,6 +73,9 @@
           modules = [
             nixos-wsl.nixosModules.default
             home-manager.nixosModules.home-manager
+            ./modules/local-llm.nix
+            ./modules/local-llm-nixos.nix
+            localConfigModule
             ./hosts/nixos-wsl.nix
             { local.graphical.enable = false; }
           ];
@@ -71,6 +88,9 @@
           system = "x86_64-linux";
           modules = [
             home-manager.nixosModules.home-manager
+            ./modules/local-llm.nix
+            ./modules/local-llm-nixos.nix
+            localConfigModule
             ./hosts/nixos-default.nix
           ];
         };
@@ -87,6 +107,9 @@
           modules = [
             home-manager.darwinModules.home-manager
             nix-homebrew.darwinModules.nix-homebrew
+            ./modules/local-llm.nix
+            ./modules/local-llm-darwin.nix
+            localConfigModule
             ./hosts/macbook.nix
           ];
         };

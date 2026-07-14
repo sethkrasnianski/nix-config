@@ -21,7 +21,10 @@ Flake-based NixOS configuration with four outputs:
 │   ├── common.nix                  # shared (NixOS): nix settings, packages, unfree, zsh, fonts
 │   ├── desktop.nix                 # GNOME + Steam (shared by both NixOS hosts)
 │   ├── wsl.nix                     # WSL-only: wsl.enable, opencode overlay, rebuild aliases (imported by the nixos host)
-│   └── darwin.nix                  # macOS system layer: nix settings, unfree, fonts, CLI tools, Homebrew (nix-darwin)
+│   ├── darwin.nix                  # macOS system layer: nix settings, unfree, fonts, CLI tools, Homebrew (nix-darwin)
+│   ├── local-llm.nix               # optional host-local Ollama and OpenCode routing
+│   ├── local-llm-nixos.nix         # NixOS Ollama service wiring
+│   └── local-llm-darwin.nix        # nix-darwin launchd wiring
 ├── hosts/
 │   ├── nixos-wsl.nix               # WSL host  = common + desktop + wsl (nixos / nixos-headless outputs)
 │   ├── nixos-default.nix           # non-WSL host = common + desktop + nixos-default-hardware
@@ -44,9 +47,12 @@ Flake-based NixOS configuration with four outputs:
 │   ├── agents/                      # OpenCode auto-agent definitions
 │   ├── commands/                    # /auto, /research, /plan, and related commands
 │   ├── skills/                      # OpenCode auto-agent skills
+│   ├── plugins/                     # OpenCode runtime plugins
 │   ├── scripts/                     # PR watcher and history finalizer helpers
 │   ├── tests/                       # auto-agent contract tests
 │   └── README.md                    # auto-agent usage and maintenance guide
+├── scripts/
+│   └── rebuild-local.sh              # rebuild helper with optional host override
 └── agents/                         # tool-agnostic agent config (~/.agents links here)
     ├── mcp.json                    # shared MCP servers (Claude picks up via --mcp-config alias)
     └── skills/
@@ -54,6 +60,35 @@ Flake-based NixOS configuration with four outputs:
         ├── handoff/SKILL.md        # skill: compact the conversation into a handoff doc for another agent
         └── tickets/SKILL.md        # skill: durable ticket board and per-ticket implementation plans
 ```
+
+### Optional Local LLM
+
+Local LLM support is disabled by default. To enable it on one host, create the
+ignored `.local/config/default.nix` file and configure `local.llm` there. The
+file is an explicit flake input and is copied into the Nix store, so it must not
+contain secrets. A minimal configuration is:
+
+```nix
+{ pkgs, ... }:
+{
+  local.llm = {
+    enable = true;
+    package = pkgs.ollama;
+    model = "qwen3-coder:30b";
+    agents = [ "auto-history-finalizer" "auto-committer" "auto-test-writer" ];
+  };
+}
+```
+
+Use `rebuild` (or `rebuild-headless`) after creating it. The rebuild helper
+automatically supplies the ignored config as the `local-config` input. Then run
+`ollama pull qwen3-coder:30b` once; rebuilds never download models. Check the
+service with `ollama ps` and `curl http://127.0.0.1:11434/v1/models`.
+
+OpenCode reads the generated profile only when enabled. Restart OpenCode after
+changing the profile or plugin. To disable routing and the service, set
+`enable = false` and rebuild; downloaded model data remains until explicitly
+removed with `ollama rm <model>` (or by removing Ollama's data directory).
 
 (The WSL host has no `hardware-configuration.nix` — `nixos-wsl` provides the
 root filesystem. Generate one only for a real non-WSL machine.)
