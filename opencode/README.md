@@ -246,14 +246,20 @@ commands/    /auto, /research, /plan, /implement, /auto-init
 skills/      address-pr-feedback, resolve-merge-conflicts, review-changes,
               frontend-design
              tdd-loop, atomic-commits, worktree-workflow
-                                — this harness's own doctrine, shared by
-                                  every agent above instead of duplicated
-                                  per-prompt
+                                 — this harness's own doctrine, shared by
+                                   every agent above instead of duplicated
+                                   per-prompt
+plugins/     local-llm-routing.js — optional Ollama provider/agent routing
 scripts/     pr-watch.sh  (installed as `auto-pr-watch`)
 install.sh
 opencode.jsonc   base project config + disabled MCP stubs
 tui.json         global OpenCode TUI preferences
 ```
+
+When this configuration enables local Ollama support, Home Manager generates
+`~/.config/opencode/local-llm.json` and the bundled plugin routes only the
+configured agent allowlist to `ollama/<model>`. All other agents and the global
+cloud model remain unchanged. Restart OpenCode after changing this profile.
 
 ## Design notes
 

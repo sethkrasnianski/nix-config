@@ -36,5 +36,5 @@
   # Mirror the WSL `rebuild` alias (modules/wsl.nix). darwin-rebuild activates
   # the system profile, so it needs sudo. home.shellAliases lands in the
   # home-manager-managed bash/zsh rc files (home/shell.nix).
-  home.shellAliases.rebuild = "sudo darwin-rebuild switch --flake ${config.home.homeDirectory}/oss/nixos-config#macbook";
+  home.shellAliases.rebuild = "sudo ${config.home.homeDirectory}/oss/nixos-config/scripts/rebuild-local.sh macbook";
 }
