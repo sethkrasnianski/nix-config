@@ -125,6 +125,12 @@ do_uninstall() {
     unlink_item "$CONFIG_DIR/skills/$(basename "$src")" "$src"
   done
 
+  note "Plugins:"
+  for src in "$REPO_ROOT"/plugins/*.js; do
+    [ -e "$src" ] || continue
+    unlink_item "$CONFIG_DIR/plugins/$(basename "$src")" "$src"
+  done
+
   note "PR watch script:"
   unlink_item "$BIN_DIR/auto-pr-watch" "$REPO_ROOT/scripts/pr-watch.sh"
 
@@ -141,7 +147,7 @@ do_install() {
   note ""
 
   if [ -z "$DRY_RUN" ]; then
-    mkdir -p "$CONFIG_DIR/agents" "$CONFIG_DIR/commands" "$CONFIG_DIR/skills" "$BIN_DIR"
+    mkdir -p "$CONFIG_DIR/agents" "$CONFIG_DIR/commands" "$CONFIG_DIR/skills" "$CONFIG_DIR/plugins" "$BIN_DIR"
   fi
 
   note "Agents:"
@@ -161,6 +167,12 @@ do_install() {
     [ -e "$src" ] || continue
     src="${src%/}" # strip trailing slash from the glob match
     link_item "$CONFIG_DIR/skills/$(basename "$src")" "$src"
+  done
+
+  note "Plugins:"
+  for src in "$REPO_ROOT"/plugins/*.js; do
+    [ -e "$src" ] || continue
+    link_item "$CONFIG_DIR/plugins/$(basename "$src")" "$src"
   done
 
   note "PR watch script:"

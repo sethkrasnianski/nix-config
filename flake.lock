@@ -53,6 +53,18 @@
         "type": "github"
       }
     },
+    "local-config": {
+      "flake": false,
+      "locked": {
+        "path": "./local-config",
+        "type": "path"
+      },
+      "original": {
+        "path": "./local-config",
+        "type": "path"
+      },
+      "parent": []
+    },
     "nix-darwin": {
       "inputs": {
         "nixpkgs": [
@@ -133,6 +145,7 @@
     "root": {
       "inputs": {
         "home-manager": "home-manager",
+        "local-config": "local-config",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
         "nixos-wsl": "nixos-wsl",

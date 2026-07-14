@@ -24,5 +24,8 @@ require agents/auto-test-fixer.md 'question: deny'
 require agents/auto-reviewer.md 'question: deny'
 require skills/post-plan-autonomy/SKILL.md 'OUTCOME: continue | plan-delta | needs-context | safety-decision'
 require install.sh 'auto-history-finalize'
+require install.sh 'plugins/*.js'
+require ../modules/local-llm-nixos.nix 'OLLAMA_NO_CLOUD'
+require ../flake.nix 'local-config'
 
 printf 'config contracts passed\n'
