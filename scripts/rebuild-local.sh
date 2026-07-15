@@ -11,7 +11,7 @@ case "$target" in
 esac
 
 set -- "$command" switch --flake "$repo#$target"
-if [ -d "$repo/.local/config" ]; then
-  set -- "$@" --override-input local-config "path:$repo/.local/config"
+if [ -f "$HOME/.config/nix/local.nix" ]; then
+  set -- "$@" --override-input local-config "path:$HOME/.config/nix/local.nix"
 fi
 exec "$@"

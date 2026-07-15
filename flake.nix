@@ -30,9 +30,9 @@
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
 
     # Disabled by default; rebuild tooling can replace this pure path input with
-    # the ignored .local/config directory for host-specific settings.
+    # the user's ~/.config/nix/local.nix for host-specific settings.
     local-config = {
-      url = "path:./local-config";
+      url = "path:./local-config/default.nix";
       flake = false;
     };
   };
@@ -49,7 +49,7 @@
       ...
     }:
     let
-      localConfigModule = local-config + "/default.nix";
+      localConfigModule = local-config;
     in
     {
       nixosConfigurations = {
