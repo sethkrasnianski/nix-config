@@ -49,7 +49,7 @@
       ...
     }:
     let
-      localConfigModule = local-config;
+      localConfigModule = import local-config.outPath;
     in
     {
       nixosConfigurations = {
