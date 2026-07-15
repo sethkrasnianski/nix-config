@@ -13,6 +13,3 @@ result-*
 # content; ignored here (tracked) so fresh clones are protected too, not
 # just via the local-only .git/info/exclude
 .agent-shell/
-
-# Explicit flake input for optional local settings.
-.local/config/

@@ -56,11 +56,11 @@
     "local-config": {
       "flake": false,
       "locked": {
-        "path": "./local-config",
+        "path": "./local-config/default.nix",
         "type": "path"
       },
       "original": {
-        "path": "./local-config",
+        "path": "./local-config/default.nix",
         "type": "path"
       },
       "parent": []

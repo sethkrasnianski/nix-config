@@ -1,4 +1,4 @@
-# Safe default for the explicit local-config flake input.
+# Safe default for the explicit local-config file input.
 { ... }:
 
 {

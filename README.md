@@ -63,10 +63,10 @@ Flake-based NixOS configuration with four outputs:
 
 ### Optional Local LLM
 
-Local LLM support is disabled by default. To enable it on one host, create the
-ignored `.local/config/default.nix` file and configure `local.llm` there. The
-file is an explicit flake input and is copied into the Nix store, so it must not
-contain secrets. A minimal configuration is:
+Local LLM support is disabled by default. To enable it on one host, create
+`~/.config/nix/local.nix` and configure `local.llm` there. The file is an
+explicit flake input and is copied into the Nix store, so it must not contain
+secrets. A minimal configuration is:
 
 ```nix
 { pkgs, ... }:
@@ -81,9 +81,9 @@ contain secrets. A minimal configuration is:
 ```
 
 Use `rebuild` (or `rebuild-headless`) after creating it. The rebuild helper
-automatically supplies the ignored config as the `local-config` input. Then run
-`ollama pull qwen3-coder:30b` once; rebuilds never download models. Check the
-service with `ollama ps` and `curl http://127.0.0.1:11434/v1/models`.
+automatically supplies `~/.config/nix/local.nix` as the `local-config` input.
+Then run `ollama pull qwen3-coder:30b` once; rebuilds never download models.
+Check the service with `ollama ps` and `curl http://127.0.0.1:11434/v1/models`.
 
 OpenCode reads the generated profile only when enabled. Restart OpenCode after
 changing the profile or plugin. To disable routing and the service, set
