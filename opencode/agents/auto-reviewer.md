@@ -1,8 +1,6 @@
 ---
 description: Read-only review pass over the auto-agent branch before finalization, using the review-changes skill. Never edits files or posts to GitHub without explicit approval relayed through the orchestrator.
 mode: subagent
-model: github-copilot/gpt-5.6-sol
-reasoningEffort: max
 color: "#51cf66"
 permission:
   edit: deny

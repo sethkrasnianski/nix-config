@@ -1,8 +1,6 @@
 ---
 description: Bounded retry loop to fix a failing test/implementation after auto-implementer's initial attempts. Pinned to a fixed model for its entire retry loop — never escalates tiers on repeated failure. Stops and asks the user after 5 failed attempts (configurable below).
 mode: subagent
-model: github-copilot/gpt-5.6-luna
-reasoningEffort: medium
 color: "#f06595"
 permission:
   edit: allow

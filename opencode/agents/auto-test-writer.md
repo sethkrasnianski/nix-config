@@ -1,8 +1,6 @@
 ---
 description: Writes the failing test(s) for one step of an approved auto-agent plan, and verifies red for the right reason. Never writes production/implementation code. Part of the TDD loop — see tdd-loop skill.
 mode: subagent
-model: github-copilot/gpt-5.6-luna
-reasoningEffort: medium
 color: "#e05561"
 permission:
   edit: allow

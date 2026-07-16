@@ -59,6 +59,7 @@
           modules = [
             nixos-wsl.nixosModules.default
             home-manager.nixosModules.home-manager
+            ./modules/local-agents.nix
             ./modules/local-llm.nix
             ./modules/local-llm-nixos.nix
             localConfigModule
@@ -73,6 +74,7 @@
           modules = [
             nixos-wsl.nixosModules.default
             home-manager.nixosModules.home-manager
+            ./modules/local-agents.nix
             ./modules/local-llm.nix
             ./modules/local-llm-nixos.nix
             localConfigModule
@@ -88,6 +90,7 @@
           system = "x86_64-linux";
           modules = [
             home-manager.nixosModules.home-manager
+            ./modules/local-agents.nix
             ./modules/local-llm.nix
             ./modules/local-llm-nixos.nix
             localConfigModule
@@ -107,6 +110,7 @@
           modules = [
             home-manager.darwinModules.home-manager
             nix-homebrew.darwinModules.nix-homebrew
+            ./modules/local-agents.nix
             ./modules/local-llm.nix
             ./modules/local-llm-darwin.nix
             localConfigModule

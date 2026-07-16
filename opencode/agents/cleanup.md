@@ -1,8 +1,6 @@
 ---
 description: Audit an existing codebase for verified bugs, dead code, and obvious low-risk refactors, then implement and commit each cleanup atomically.
 mode: primary
-model: github-copilot/gpt-5.6-sol
-reasoningEffort: low
 color: "#fab005"
 permission:
   edit: allow

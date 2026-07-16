@@ -1,8 +1,6 @@
 ---
 description: Stages precisely-scoped normal, bootstrap, and fixup commits for the auto-agent pipeline. History finalization and publication are delegated to auto-history-finalizer.
 mode: subagent
-model: github-copilot/gpt-5.6-luna
-reasoningEffort: low
 color: "#94d82d"
 permission:
   edit: allow

@@ -242,6 +242,7 @@ it up as part of its research pass.
 
 ```
 agents/      auto.md + 7 auto-*.md subagents (see table above)
+agent-defaults.nix  repository-owned model and inference defaults
 commands/    /auto, /research, /plan, /implement, /auto-init
 skills/      address-pr-feedback, resolve-merge-conflicts, review-changes,
               frontend-design
@@ -249,17 +250,18 @@ skills/      address-pr-feedback, resolve-merge-conflicts, review-changes,
                                  — this harness's own doctrine, shared by
                                    every agent above instead of duplicated
                                    per-prompt
-plugins/     local-llm-routing.js — optional Ollama provider/agent routing
+plugins/     local-llm-routing.js — local agent inference overlay and Ollama provider
 scripts/     pr-watch.sh  (installed as `auto-pr-watch`)
 install.sh
 opencode.jsonc   base project config + disabled MCP stubs
 tui.json         global OpenCode TUI preferences
 ```
 
-When this configuration enables local Ollama support, Home Manager generates
-`~/.config/opencode/local-llm.json` and the bundled plugin routes only the
-configured agent allowlist to `ollama/<model>`. All other agents and the global
-cloud model remain unchanged. Restart OpenCode after changing this profile.
+Home Manager generates `~/.config/opencode/local-agents.json` from the selected
+`local.opencode.agents.provider` profile, merged with any host-local provider
+overrides. The bundled plugin overlays only inference fields, leaving prompts,
+permissions, and other agent fields unchanged. Ollama is registered only when
+`local.llm.enable` is true. Restart OpenCode after changing this profile.
 
 ## Design notes
 

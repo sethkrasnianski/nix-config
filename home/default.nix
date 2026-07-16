@@ -2,7 +2,16 @@
 # directly: each platform has a thin entrypoint — home/linux.nix (NixOS module,
 # applied by `rebuild`) and home/darwin.nix (standalone home-manager on macOS)
 # — that carries the per-machine facts (stateVersion, username, ...).
-{ config, lib, pkgs, localLlm ? { enable = false; }, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  localOpenCodeAgents ? { },
+  localLlm ? {
+    enable = false;
+  },
+  ...
+}:
 
 let
   # The checkout of this repo, assumed at the same place on every machine.
@@ -69,8 +78,11 @@ in
     config.lib.file.mkOutOfStoreSymlink "${flakePath}/opencode/skills";
   home.file.".config/opencode/plugins/local-llm-routing.js".source =
     config.lib.file.mkOutOfStoreSymlink "${flakePath}/opencode/plugins/local-llm-routing.js";
-  home.file.".config/opencode/local-llm.json" = lib.mkIf localLlm.enable {
-    text = builtins.toJSON localLlm;
+  home.file.".config/opencode/local-agents.json" = {
+    text = builtins.toJSON {
+      agents = localOpenCodeAgents;
+      ollama = localLlm;
+    };
   };
   home.file.".local/bin/auto-pr-watch" = {
     text = ''

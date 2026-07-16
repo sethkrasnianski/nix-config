@@ -22,6 +22,7 @@ Flake-based NixOS configuration with four outputs:
 │   ├── desktop.nix                 # GNOME + Steam (shared by both NixOS hosts)
 │   ├── wsl.nix                     # WSL-only: wsl.enable, opencode overlay, rebuild aliases (imported by the nixos host)
 │   ├── darwin.nix                  # macOS system layer: nix settings, unfree, fonts, CLI tools, Homebrew (nix-darwin)
+│   ├── local-agents.nix             # typed host-local OpenCode agent inference overrides
 │   ├── local-llm.nix               # optional host-local Ollama and OpenCode routing
 │   ├── local-llm-nixos.nix         # NixOS Ollama service wiring
 │   └── local-llm-darwin.nix        # nix-darwin launchd wiring
@@ -61,12 +62,12 @@ Flake-based NixOS configuration with four outputs:
         └── tickets/SKILL.md        # skill: durable ticket board and per-ticket implementation plans
 ```
 
-### Optional Local LLM
+### OpenCode Provider Profiles
 
-Local LLM support is disabled by default. To enable it on one host, create
-`~/.config/nix/local.nix` and configure `local.llm` there. The file is an
-explicit flake input and is copied into the Nix store, so it must not contain
-secrets. A minimal configuration is:
+OpenCode agent inference uses the repository's `github-copilot` profile by
+default. To select or override a provider profile on one host, create
+`~/.config/nix/local.nix` and set fields under `local.opencode.agents`. The
+file is copied into the Nix store, so it must not contain secrets. For example:
 
 ```nix
 { pkgs, ... }:
@@ -75,20 +76,36 @@ secrets. A minimal configuration is:
     enable = true;
     package = pkgs.ollama;
     model = "qwen3-coder:30b";
-    agents = [ "auto-history-finalizer" "auto-committer" "auto-test-writer" ];
+  };
+
+  local.opencode.agents = {
+    provider = "local";
+    providers.local = {
+      auto-planner.model = "ollama/qwen3-coder:30b";
+      auto-reviewer = {
+        model = "github-copilot/gpt-5.6-sol";
+        reasoningEffort = "high";
+      };
+    };
   };
 }
 ```
 
-Use `rebuild` (or `rebuild-headless`) after creating it. The rebuild helper
-automatically supplies `~/.config/nix/local.nix` as the `local-config` input.
+Switch profiles by changing `provider`; host-local profile entries merge onto
+the repository profile of the same name. Supported agent inference fields are
+`model`, `reasoningEffort`, `variant`, `temperature`, and `top_p`. Set one to
+`null` to remove the repository default. Prompts, descriptions, modes, colors,
+and permissions remain repository-owned. Use `rebuild` (or
+`rebuild-headless`) after creating the file. The rebuild helper automatically
+supplies it as the directory-shaped `local-config` input.
 Then run `ollama pull qwen3-coder:30b` once; rebuilds never download models.
 Check the service with `ollama ps` and `curl http://127.0.0.1:11434/v1/models`.
 
-OpenCode reads the generated profile only when enabled. Restart OpenCode after
-changing the profile or plugin. To disable routing and the service, set
-`enable = false` and rebuild; downloaded model data remains until explicitly
-removed with `ollama rm <model>` (or by removing Ollama's data directory).
+OpenCode reads the generated profile at startup. Restart OpenCode after changing
+the profile or plugin. Any configured `ollama/...` agent model requires Ollama
+to be enabled and to match `local.llm.model`; downloaded model data remains
+until explicitly removed with `ollama rm <model>` (or by removing Ollama's data
+directory).
 
 (The WSL host has no `hardware-configuration.nix` — `nixos-wsl` provides the
 root filesystem. Generate one only for a real non-WSL machine.)

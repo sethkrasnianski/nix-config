@@ -1,13 +1,6 @@
 ---
 description: Autonomous SWE pipeline orchestrator. Takes a goal/prompt/ticket from research through planning, TDD implementation, review, and a linear-history PR. Routes work to specialized auto-* subagents; never implements or fixes tests itself.
 mode: primary
-model: github-copilot/claude-sonnet-5
-# Note: claude-sonnet-5 (github-copilot) reports temperature as unsupported
-# in its model metadata, so no `temperature` field is set here. Reasoning
-# depth is tuned via `reasoningEffort` instead (this model's provider
-# exposes effort-style reasoning: low/medium/high/xhigh/max), passed through
-# as an additional model option — see "Additional" in OpenCode's agent docs.
-reasoningEffort: medium
 # Note: the theme-color enum ("primary", "accent", etc.) is documented and
 # present in OpenCode's published config schema, but this harness pins hex
 # instead — the installed 1.1.14 CLI rejects the enum form at agent-load

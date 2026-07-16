@@ -8,12 +8,10 @@ require() {
   grep -qF "$text" "$ROOT/$file" || { printf 'missing %s in %s\n' "$text" "$file" >&2; exit 1; }
 }
 
-require agents/auto-history-finalizer.md 'model: github-copilot/gpt-5.6-terra'
+require ../opencode/agent-defaults.nix 'gpt-5.6-terra'
 require agents/auto-history-finalizer.md 'edit: deny'
 require agents/auto-history-finalizer.md '"auto-history-finalize prepare *": allow'
-require agents/auto-committer.md 'model: github-copilot/gpt-5.6-luna'
-require agents/auto-implementer.md 'model: github-copilot/gpt-5.3-codex'
-require agents/auto-implementer.md 'reasoningEffort: high'
+require ../opencode/agent-defaults.nix 'gpt-5.3-codex'
 if grep -q '"git \(rebase\|push\|fetch\)' "$ROOT/agents/auto-committer.md"; then
   printf 'committer must not have rewrite, push, or fetch permission\n' >&2
   exit 1
@@ -27,5 +25,6 @@ require install.sh 'auto-history-finalize'
 require install.sh 'plugins/*.js'
 require ../modules/local-llm-nixos.nix 'OLLAMA_NO_CLOUD'
 require ../flake.nix 'local-config'
+require ../modules/local-agents.nix 'local.opencode.agents'
 
 printf 'config contracts passed\n'

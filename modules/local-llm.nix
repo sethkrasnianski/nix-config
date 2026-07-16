@@ -54,11 +54,6 @@ in
       default = "5m";
     };
 
-    agents = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = [ ];
-    };
-
     extraEnvironment = lib.mkOption {
       type = lib.types.attrsOf lib.types.str;
       default = { };
@@ -69,7 +64,7 @@ in
   config = {
     home-manager.extraSpecialArgs.localLlm = {
       enable = cfg.enable;
-      inherit (cfg) model contextLength agents;
+      inherit (cfg) model contextLength;
     };
   };
 }
