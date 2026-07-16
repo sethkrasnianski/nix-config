@@ -52,6 +52,12 @@ let
     config.local.opencode.agents.providers.${config.local.opencode.agents.provider} or { };
 in
 {
+  options.local.opencode.model = lib.mkOption {
+    type = lib.types.nullOr lib.types.str;
+    default = null;
+    description = "Host-local top-level OpenCode model override.";
+  };
+
   options.local.opencode.agents = {
     provider = lib.mkOption {
       type = lib.types.str;
@@ -89,5 +95,6 @@ in
     );
 
     home-manager.extraSpecialArgs.localOpenCodeAgents = selectedAgents;
+    home-manager.extraSpecialArgs.localOpenCodeModel = config.local.opencode.model;
   };
 }

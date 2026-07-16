@@ -26,5 +26,6 @@ require install.sh 'plugins/*.js'
 require ../modules/local-llm-nixos.nix 'OLLAMA_NO_CLOUD'
 require ../flake.nix 'local-config'
 require ../modules/local-agents.nix 'local.opencode.agents'
+require ../modules/local-agents.nix 'local.opencode.model'
 
 printf 'config contracts passed\n'

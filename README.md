@@ -78,6 +78,7 @@ file is copied into the Nix store, so it must not contain secrets. For example:
     model = "qwen3-coder:30b";
   };
 
+  local.opencode.model = "ollama/qwen3-coder:30b";
   local.opencode.agents = {
     provider = "local";
     providers.local = {
@@ -92,10 +93,13 @@ file is copied into the Nix store, so it must not contain secrets. For example:
 ```
 
 Switch profiles by changing `provider`; host-local profile entries merge onto
-the repository profile of the same name. Supported agent inference fields are
-`model`, `reasoningEffort`, `variant`, `temperature`, and `top_p`. Set one to
-`null` to remove the repository default. Prompts, descriptions, modes, colors,
-and permissions remain repository-owned. Use `rebuild` (or
+the repository profile of the same name. Set `local.opencode.model` to override
+the top-level model in `opencode.jsonc`. `build` and `plan` can be added as
+agent profile names to override their built-in settings. Supported agent
+inference fields are `model`, `reasoningEffort`, `variant`, `temperature`, and
+`top_p`. Set one to `null` to remove the repository default. Prompts,
+descriptions, modes, colors, and permissions remain repository-owned. Use
+`rebuild` (or
 `rebuild-headless`) after creating the file. The rebuild helper automatically
 supplies it as the directory-shaped `local-config` input.
 Then run `ollama pull qwen3-coder:30b` once; rebuilds never download models.

@@ -6,6 +6,7 @@
   config,
   lib,
   pkgs,
+  localOpenCodeModel ? null,
   localOpenCodeAgents ? { },
   localLlm ? {
     enable = false;
@@ -79,10 +80,15 @@ in
   home.file.".config/opencode/plugins/local-llm-routing.js".source =
     config.lib.file.mkOutOfStoreSymlink "${flakePath}/opencode/plugins/local-llm-routing.js";
   home.file.".config/opencode/local-agents.json" = {
-    text = builtins.toJSON {
-      agents = localOpenCodeAgents;
-      ollama = localLlm;
-    };
+    text = builtins.toJSON (
+      {
+        agents = localOpenCodeAgents;
+        ollama = localLlm;
+      }
+      // lib.optionalAttrs (localOpenCodeModel != null) {
+        model = localOpenCodeModel;
+      }
+    );
   };
   home.file.".local/bin/auto-pr-watch" = {
     text = ''
