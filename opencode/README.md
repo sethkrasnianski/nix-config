@@ -259,9 +259,11 @@ tui.json         global OpenCode TUI preferences
 
 Home Manager generates `~/.config/opencode/local-agents.json` from the selected
 `local.opencode.agents.provider` profile, merged with any host-local provider
-overrides. The bundled plugin overlays only inference fields, leaving prompts,
-permissions, and other agent fields unchanged. Ollama is registered only when
-`local.llm.enable` is true. Restart OpenCode after changing this profile.
+overrides. `local.opencode.model` is also written there when set and overlays
+the top-level `model`. The bundled plugin overlays only inference fields,
+leaving prompts, permissions, and other agent fields unchanged. Ollama is
+registered only when `local.llm.enable` is true. Restart OpenCode after changing
+this profile.
 
 ## Design notes
 

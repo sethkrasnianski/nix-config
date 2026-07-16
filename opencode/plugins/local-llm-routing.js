@@ -19,6 +19,10 @@ export default async function localLlmRouting() {
   return {
     config(config) {
       const profile = readProfile();
+      if (profile && "model" in profile) {
+        config.model = profile.model;
+      }
+
       const ollama = profile?.ollama;
       if (ollama?.enable) {
         const model = ollama.model;
