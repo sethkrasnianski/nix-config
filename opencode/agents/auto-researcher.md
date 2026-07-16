@@ -1,8 +1,6 @@
 ---
 description: Research subagent for initial discovery and bounded post-approval investigation. Writes only its .auto artifact.
 mode: subagent
-model: github-copilot/gpt-5.6-sol
-reasoningEffort: high
 color: "#8e6bff"
 permission:
   edit: allow

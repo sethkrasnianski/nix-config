@@ -33,8 +33,8 @@
     whatsapp-for-mac
   ];
 
-  # Mirror the WSL `rebuild` alias (modules/wsl.nix). darwin-rebuild activates
-  # the system profile, so it needs sudo. home.shellAliases lands in the
+  # Mirror the WSL `rebuild` alias (modules/wsl.nix). The helper invokes sudo
+  # after reading the user's local.nix, so $HOME resolves correctly. home.shellAliases lands in the
   # home-manager-managed bash/zsh rc files (home/shell.nix).
-  home.shellAliases.rebuild = "sudo ${config.home.homeDirectory}/oss/nixos-config/scripts/rebuild-local.sh macbook";
+  home.shellAliases.rebuild = "${config.home.homeDirectory}/oss/nixos-config/scripts/rebuild-local.sh macbook";
 }

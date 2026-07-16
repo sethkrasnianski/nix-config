@@ -8,8 +8,8 @@ trap 'rm -f "$PROFILE"' EXIT
 
 run_plugin() {
   OPENCODE_LOCAL_LLM_PROFILE="$PROFILE" node - "$PLUGIN" <<'NODE'
-const plugin = require(process.argv[2]);
 (async () => {
+  const { default: plugin } = await import(process.argv[2]);
   const hooks = await plugin({});
   const config = {
     model: "github-copilot/gpt-5.6-luna",
@@ -25,17 +25,17 @@ const plugin = require(process.argv[2]);
 NODE
 }
 
-printf '{"enable":false,"model":"qwen3-coder:30b","contextLength":65536,"agents":["selected"]}\n' >"$PROFILE"
+printf '{"ollama":{"enable":false,"model":"qwen3-coder:30b","contextLength":65536},"agents":{"selected":{"model":"ollama/qwen3-coder:30b"}}}\n' >"$PROFILE"
 disabled="$(run_plugin)"
 [[ "$disabled" == *'"model":"github-copilot/gpt-5.6-luna"'* ]]
 [[ "$disabled" != *'"ollama"'* ]]
 
-printf '{"enable":true,"model":"qwen3-coder:30b","contextLength":65536,"agents":["selected"]}\n' >"$PROFILE"
+printf '{"ollama":{"enable":true,"model":"qwen3-coder:30b","contextLength":65536},"agents":{"selected":{"model":"ollama/qwen3-coder:30b"}}}\n' >"$PROFILE"
 enabled="$(run_plugin)"
 [[ "$enabled" == *'"ollama"'* ]]
 [[ "$enabled" == *'"model":"ollama/qwen3-coder:30b"'* ]]
 [[ "$enabled" == *'"context":65536'* ]]
-[[ "$enabled" == *'"selected":{"options":{},"description":"keep","model"'* ]]
+[[ "$enabled" == *'"selected":{"options":{},"description":"keep","model":"ollama/qwen3-coder:30b"'* ]]
 [[ "$enabled" == *'"untouched":{"model":"cloud/model"'* ]]
 [[ "$enabled" == *'"untouched":{"model":"cloud/model","options":{"reasoningEffort":"max"}}'* ]]
 

@@ -1,8 +1,6 @@
 ---
 description: Guarded history finalization and publication agent. It only invokes auto-history-finalize; it cannot edit, commit, or run raw Git history mutations.
 mode: subagent
-model: github-copilot/gpt-5.6-terra
-reasoningEffort: medium
 color: "#f59f00"
 permission:
   edit: deny

@@ -1,8 +1,6 @@
 ---
 description: Planning subagent for initial approval and bounded post-approval plan adjustments. Writes only its .auto artifact.
 mode: subagent
-model: github-copilot/claude-fable-5
-reasoningEffort: max
 color: "#ff9d4d"
 permission:
   edit: allow

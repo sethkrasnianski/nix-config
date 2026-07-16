@@ -62,7 +62,7 @@ in
   # Shortcuts to rebuild this WSL host in either mode. Both aliases exist in
   # both builds, so you can always flip back (e.g. run `rebuild` while headless).
   environment.shellAliases = {
-    rebuild = "sudo ${flakePath}/scripts/rebuild-local.sh nixos";
-    rebuild-headless = "sudo ${flakePath}/scripts/rebuild-local.sh nixos-headless";
+    rebuild = "${flakePath}/scripts/rebuild-local.sh nixos";
+    rebuild-headless = "${flakePath}/scripts/rebuild-local.sh nixos-headless";
   };
 }
