@@ -7,8 +7,15 @@ local_input_dir=$(mktemp -d "${TMPDIR:-/tmp}/nixos-config-local.XXXXXX")
 trap 'rm -rf "$local_input_dir"' EXIT
 
 case "$target" in
-  nixos|nixos-headless|nixos-default) command=nixos-rebuild ;;
-  macbook) command=darwin-rebuild ;;
+  nixos|nixos-headless|nixos-default)
+    command=nixos-rebuild
+    flake="$repo#$target"
+    ;;
+  # darwin-rebuild runs as root, which cannot open this user's Git checkout.
+  macbook)
+    command=darwin-rebuild
+    flake="path:$repo#$target"
+    ;;
   *) printf 'unknown target: %s\n' "$target" >&2; exit 2 ;;
 esac
 
@@ -20,7 +27,7 @@ else
 fi
 
 if [ -n "$override_input" ]; then
-  sudo "$command" switch --flake "$repo#$target" --override-input local-config "$override_input"
+  sudo "$command" switch --flake "$flake" --override-input local-config "$override_input"
   exit $?
 fi
-sudo "$command" switch --flake "$repo#$target"
+sudo "$command" switch --flake "$flake"

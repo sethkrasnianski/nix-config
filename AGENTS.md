@@ -28,7 +28,7 @@ darwin module and nix-homebrew for the GUI apps nixpkgs can't build on darwin).
 
 - Apply changes: `rebuild` (= `sudo nixos-rebuild switch --flake ~/oss/nixos-config#nixos`);
   `rebuild-headless` for the headless variant. On the Mac, `rebuild` =
-  `sudo darwin-rebuild switch --flake ~/oss/nixos-config#macbook`.
+  `sudo darwin-rebuild switch --flake path:/Users/sethkrasnianski/oss/nixos-config#macbook`.
 - Check without switching — all four outputs must evaluate:
   `nix eval .#nixosConfigurations.<name>.config.system.build.toplevel.drvPath --raw`
   and `nix eval .#darwinConfigurations.macbook.system.drvPath --raw`

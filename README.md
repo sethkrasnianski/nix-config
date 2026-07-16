@@ -223,13 +223,13 @@ the handful of GUI apps nixpkgs can't build on darwin (see
    via nix-homebrew:
 
    ```sh
-   sudo nix run nix-darwin -- switch --flake ~/oss/nixos-config#macbook
+   sudo nix run nix-darwin -- switch --flake "path:$HOME/oss/nixos-config#macbook"
    ```
 
    Pre-existing dotfiles (macOS ships a default `.zshrc`) are moved aside via
    `backupFileExtension = "hm-bak"` (`hosts/macbook.nix`).
 4. Thereafter just `rebuild` (aliased in `home/darwin.nix`), or the full
-   `sudo darwin-rebuild switch --flake ~/oss/nixos-config#macbook`.
+   `sudo darwin-rebuild switch --flake "path:$HOME/oss/nixos-config#macbook"`.
 
 Apple's `/bin/zsh` stays the login shell and sources the home-manager rc
 files — no `chsh` needed. Doom Emacs bootstraps the same way as on Linux

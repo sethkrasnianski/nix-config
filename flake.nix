@@ -104,7 +104,7 @@
       # nixpkgs can't build on darwin. Per-machine facts (username,
       # hostPlatform, stateVersion) live in hosts/macbook.nix; the shared
       # darwin system config in modules/darwin.nix. Apply on the Mac:
-      #   sudo darwin-rebuild switch --flake ~/oss/nixos-config#macbook
+      #   sudo darwin-rebuild switch --flake path:/Users/sethkrasnianski/oss/nixos-config#macbook
       darwinConfigurations = {
         macbook = nix-darwin.lib.darwinSystem {
           modules = [
