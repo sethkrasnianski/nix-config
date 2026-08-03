@@ -6,6 +6,9 @@ result-*
 *.swp
 .DS_Store
 
+# direnv's machine-local environment and cached flake state
+.direnv/
+
 # Claude Code local project state (worktrees, local settings)
 .claude/
 
