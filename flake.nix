@@ -52,6 +52,22 @@
       localConfigModule = import local-config.outPath;
     in
     {
+      devShells =
+        nixpkgs.lib.genAttrs
+          [
+            "aarch64-darwin"
+            "x86_64-linux"
+          ]
+          (
+            system:
+            let
+              pkgs = import nixpkgs { inherit system; };
+            in
+            {
+              default = pkgs.mkShell { };
+            }
+          );
+
       nixosConfigurations = {
         # WSL host, graphical (GNOME). This is the default.
         nixos = nixpkgs.lib.nixosSystem {
