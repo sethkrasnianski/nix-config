@@ -57,6 +57,7 @@ Flake-based NixOS configuration with four outputs:
 └── agents/                         # tool-agnostic agent config (~/.agents links here)
     ├── mcp.json                    # shared MCP servers (Claude picks up via --mcp-config alias)
     └── skills/
+        ├── code-search/SKILL.md    # skill: semantic and literal code search
         ├── new-project/SKILL.md    # skill: bootstrap a new project (flake, direnv, AGENTS.md, docs)
         ├── handoff/SKILL.md        # skill: compact the conversation into a handoff doc for another agent
         └── tickets/SKILL.md        # skill: durable ticket board and per-ticket implementation plans
