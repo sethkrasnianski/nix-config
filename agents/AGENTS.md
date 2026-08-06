@@ -10,7 +10,11 @@ this repo's `agents/AGENTS.md`; each agent CLI reads it through an alias into
 - Begin bug fixes by reproducing the issue. Prefer an end-to-end reproduction that closely matches the affected user experience.
 - Hold end-to-end tests to a high visual standard, including pixel-level accuracy. If an unrelated visual defect is clearly apparent, consider addressing it as a separate atomic fix.
 - Treat lint errors, test failures, and flaky tests as engineering defects that require resolution. When unrelated failures surface, consider addressing them as a separate atomic fix.
-- When finalizing a plan, include instructions to commit the changes of a plan atomically based on the designated unit of work.
+- Finalize plans as atomic, independently reviewable units of work. Each unit must
+  include its verification, precise staging, and commit step before the next unit
+  begins. Never include unrelated pre-existing changes in a plan commit. Before
+  reporting the plan complete, run `git status` and confirm no planned changes
+  remain staged or unstaged.
 
 ## Code Search
 
