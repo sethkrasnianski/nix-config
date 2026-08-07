@@ -69,12 +69,15 @@
   '';
 
   # Mullvad VPN. The daemon + CLI are system-level (a NixOS service, not a
-  # home-manager package); the GUI ships in the same package and appears only
-  # on graphical hosts — headless hosts still get a working daemon and
-  # `mullvad` CLI. (On macOS Mullvad is a Homebrew cask; see modules/darwin.nix.)
+  # home-manager package); `gui.enable` installs the separate GUI package
+  # alongside it on every host — headless hosts still get a working daemon
+  # and `mullvad` CLI, they just have no display to run the GUI on. (Upstream
+  # split the daemon and GUI into separate packages; `package` now defaults
+  # to the daemon-only `pkgs.mullvad`.) (On macOS Mullvad is a Homebrew cask;
+  # see modules/darwin.nix.)
   services.mullvad-vpn = {
     enable = true;
-    package = pkgs.mullvad-vpn;
+    gui.enable = true;
   };
 
   # Base CLI tools, kept system-wide so root and system scripts have them too.
