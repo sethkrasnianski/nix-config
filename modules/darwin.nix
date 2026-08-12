@@ -14,6 +14,10 @@
     "flakes"
   ];
 
+  # Packages not in nixpkgs (currently just prime-agent) — shared with
+  # modules/common.nix via the same file, never duplicated.
+  nixpkgs.overlays = [ (import ../pkgs/overlay.nix) ];
+
   # Unfree allowlist for the Mac. home-manager.useGlobalPkgs (hosts/macbook.nix)
   # makes this cover home.packages too. KEEP IN SYNC with the copy in
   # modules/common.nix — the NixOS hosts maintain their own list, and the two

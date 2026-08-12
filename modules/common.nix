@@ -11,6 +11,10 @@
     "flakes"
   ];
 
+  # Packages not in nixpkgs (currently just prime-agent) — shared with
+  # modules/darwin.nix via the same file, never duplicated.
+  nixpkgs.overlays = [ (import ../pkgs/overlay.nix) ];
+
   # Tell NixOS it's ok to install these packages despite unfree license.
   # home-manager.useGlobalPkgs below makes this cover home.packages too.
   # KEEP IN SYNC with the copy in modules/darwin.nix (the macOS host has its
