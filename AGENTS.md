@@ -11,7 +11,8 @@ darwin module and nix-homebrew for the GUI apps nixpkgs can't build on darwin).
 - `flake.nix` — inputs: nixpkgs (nixos-unstable), nixos-wsl, home-manager, nix-darwin, nix-homebrew (all pinned by `flake.lock`)
 - `.github/workflows/update-flake-lock.yml` — weekly `flake.lock` update PR; evaluates all four outputs before opening it
 - `hosts/` — per-host: hostname/`hostPlatform`, `system.stateVersion`, home-manager user wiring (`macbook.nix` is the nix-darwin host)
-- `modules/` — system-level shared config: NixOS (`common.nix`, `desktop.nix`, `wsl.nix`) and darwin (`darwin.nix` — the macOS counterpart to `common.nix`: nix settings, unfree allowlist, fonts, base CLI tools, Homebrew; never imported by a NixOS host, and vice versa)
+- `pkgs/` — packages not in nixpkgs (currently `prime-agent/`, a `buildNpmPackage` derivation for Prime Agent's pinned release tarball); `overlay.nix` is imported by both `modules/common.nix` and `modules/darwin.nix` so it's never duplicated
+- `modules/` — system-level shared config: NixOS (`common.nix`, `desktop.nix`, `wsl.nix`) and darwin (`darwin.nix` — the macOS counterpart to `common.nix`: nix settings, overlays, unfree allowlist, fonts, base CLI tools, Homebrew; never imported by a NixOS host, and vice versa)
 - `home/` — per-user home-manager config (git, ssh, shell, direnv, neovim, emacs);
   `default.nix` is the shared core, `linux.nix`/`darwin.nix` the per-platform
   entrypoints (NixOS hosts import `linux.nix`; `hosts/macbook.nix` imports
@@ -19,10 +20,10 @@ darwin module and nix-homebrew for the GUI apps nixpkgs can't build on darwin).
   system layer moved to `hosts/macbook.nix` + `modules/darwin.nix`. Two unfree
   allowlists — `modules/common.nix` (NixOS) and `modules/darwin.nix` (macOS) —
   must be kept in sync.
-- `doom/`, `claude/settings.json`, `agents/`, `opencode/` — Doom Emacs, Claude
-  Code, tool-agnostic agent config, and OpenCode-specific agents/commands/skills,
-  live-symlinked into `$HOME` (`home/default.nix`); edits apply without a
-  rebuild
+- `doom/`, `claude/settings.json`, `prime/settings.json`, `agents/`, `opencode/`
+  — Doom Emacs, Claude Code, Prime Agent, tool-agnostic agent config, and
+  OpenCode-specific agents/commands/skills, live-symlinked into `$HOME`
+  (`home/default.nix`); edits apply without a rebuild
 
 ## Working in this repo
 
@@ -43,6 +44,11 @@ darwin module and nix-homebrew for the GUI apps nixpkgs can't build on darwin).
 - Commits: imperative subject plus a body explaining why; no AI-attribution lines.
 - After editing `doom/init.el` or `doom/packages.el`, run `doom sync`
   (`config.el` changes don't need it).
+- To bump Prime Agent's pinned version: update `version` and `src.hash` in
+  `pkgs/prime-agent/default.nix` (hash from upstream's published
+  `releases/vX.Y.Z/SHA256SUMS`), regenerate `package.json` and
+  `package-lock.json` the same way as the existing ones (see that
+  derivation's header comment), and refresh `npmDepsHash`.
 - When adding, removing, or moving files under `modules/`, `home/`, or `hosts/`,
   update the Layout tree in `README.md` in the same commit — it duplicates this
   section's file listing and drifts silently otherwise.
@@ -54,7 +60,8 @@ darwin module and nix-homebrew for the GUI apps nixpkgs can't build on darwin).
   agent-config dir). Claude Code consumes them only through an alias —
   `~/.claude/skills` → `~/.agents/skills` (`home/default.nix`). Wire any new
   agent CLI the same way: give it an alias into `~/.agents`, never a copy, so
-  no configuration is ever duplicated.
+  no configuration is ever duplicated. Prime Agent is the one exception so
+  far — it globs `~/.agents/skills/` itself, so it needs no alias at all.
 - A skill is a directory containing a `SKILL.md`: YAML frontmatter with `name`
   and `description` (the description is what triggers invocation — write it
   for matching), followed by the instructions.

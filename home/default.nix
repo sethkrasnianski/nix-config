@@ -45,6 +45,7 @@ in
   # Ghostty is installed by programs.ghostty (home/ghostty.nix).
   home.packages = with pkgs; [
     opencode
+    prime-agent
     doctl
     gh
 
@@ -59,9 +60,10 @@ in
 
   # Doom Emacs reads its user config from ~/.config/doom; point that at the
   # real config (init.el / config.el / packages.el) tracked in this repo
-  # (doom/). Claude Code's and OpenCode's global settings are tracked here too
-  # (claude/, opencode/); OpenCode's agents, commands, and skills are linked
-  # individually so its other state remains mutable.
+  # (doom/). Claude Code's, OpenCode's, and Prime Agent's global settings are
+  # tracked here too (claude/, opencode/, prime/); OpenCode's agents,
+  # commands, and skills are linked individually so its other state remains
+  # mutable.
   # mkOutOfStoreSymlink links to the checkout itself, so edits take effect
   # without a rebuild.
   home.file.".config/doom".source = config.lib.file.mkOutOfStoreSymlink "${flakePath}/doom";
@@ -79,6 +81,8 @@ in
     config.lib.file.mkOutOfStoreSymlink "${flakePath}/opencode/skills";
   home.file.".config/opencode/plugins/local-llm-routing.js".source =
     config.lib.file.mkOutOfStoreSymlink "${flakePath}/opencode/plugins/local-llm-routing.js";
+  home.file.".prime/agent/settings.json".source =
+    config.lib.file.mkOutOfStoreSymlink "${flakePath}/prime/settings.json";
   home.file.".config/opencode/local-agents.json" = {
     text = builtins.toJSON (
       {
@@ -108,17 +112,22 @@ in
   # Tool-agnostic agent config (skills) — source of truth in agents/, exposed
   # at ~/.agents. Claude Code doesn't read ~/.agents natively, so it's proxied
   # with an alias: ~/.claude/skills → ~/.agents/skills. Other agent CLIs get
-  # their own alias; never copy skills into a tool-specific directory.
+  # their own alias; never copy skills into a tool-specific directory. Prime
+  # Agent is the exception that proves the rule: it globs ~/.agents/skills
+  # itself (a first-class skill location for it), so it needs no alias here.
   home.file.".agents".source = config.lib.file.mkOutOfStoreSymlink "${flakePath}/agents";
   home.file.".claude/skills".source =
     config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.agents/skills";
 
   # Global agent instructions — single source of truth in agents/AGENTS.md,
   # aliased into each tool's expected path. Claude Code reads ~/.claude/CLAUDE.md;
-  # opencode reads ~/.config/opencode/AGENTS.md. Both point at ~/.agents so the
-  # instructions are never duplicated and edits apply without a rebuild.
+  # opencode reads ~/.config/opencode/AGENTS.md; Prime Agent reads
+  # ~/.prime/agent/AGENTS.md. All three point at ~/.agents so the instructions
+  # are never duplicated and edits apply without a rebuild.
   home.file.".claude/CLAUDE.md".source =
     config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.agents/AGENTS.md";
   home.file.".config/opencode/AGENTS.md".source =
+    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.agents/AGENTS.md";
+  home.file.".prime/agent/AGENTS.md".source =
     config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.agents/AGENTS.md";
 }

@@ -17,8 +17,11 @@ Flake-based NixOS configuration with four outputs:
 │   └── update-flake-lock.yml       # weekly lock-update PR, validated by evaluating all four outputs
 ├── flake.nix                       # inputs + nixosConfigurations.{nixos,nixos-headless,nixos-default} + darwinConfigurations.macbook
 ├── flake.lock                      # pinned input revisions — the reproducibility guarantee
+├── pkgs/
+│   ├── overlay.nix                 # packages not in nixpkgs (imported by modules/common.nix + modules/darwin.nix)
+│   └── prime-agent/                # buildNpmPackage derivation for Prime Agent (pinned release tarball)
 ├── modules/
-│   ├── common.nix                  # shared (NixOS): nix settings, packages, unfree, zsh, fonts
+│   ├── common.nix                  # shared (NixOS): nix settings, overlays, packages, unfree, zsh, fonts
 │   ├── desktop.nix                 # GNOME + Steam (shared by both NixOS hosts)
 │   ├── wsl.nix                     # WSL-only: wsl.enable, opencode overlay, rebuild aliases (imported by the nixos host)
 │   ├── darwin.nix                  # macOS system layer: nix settings, unfree, fonts, CLI tools, Homebrew (nix-darwin)
@@ -42,6 +45,8 @@ Flake-based NixOS configuration with four outputs:
 ├── doom/                           # private Doom Emacs config (~/.config/doom links here)
 ├── claude/
 │   └── settings.json               # global Claude Code settings (~/.claude/settings.json links here)
+├── prime/
+│   └── settings.json               # global Prime Agent settings (~/.prime/agent/settings.json links here)
 ├── opencode/
 │   ├── opencode.jsonc              # global OpenCode settings
 │   ├── tui.json                     # global OpenCode UI theme
@@ -355,6 +360,24 @@ configuration, and exposes its PR watcher and history finalizer in
 `~/.local/bin`. Improve the relevant file under `opencode/` and run the harness
 tests before evaluating the NixOS outputs.
 
+## Prime Agent
+
+[Prime Agent](https://github.com/PrimeIntellect-ai/prime-agent) isn't in
+nixpkgs or on the public npm registry — `pkgs/prime-agent/` builds it from
+upstream's pinned release tarball with `buildNpmPackage`; see that
+derivation's header comment for the packaging constraints (no lockfile
+upstream, a native `zeromq` dependency, and a known gap in zeromq's darwin
+prebuilts — read it before bumping the version). The overlay adding it to
+`pkgs` lives in `pkgs/overlay.nix`, imported by both `modules/common.nix` and
+`modules/darwin.nix`.
+
+Global settings are tracked in `prime/settings.json`; home-manager symlinks it
+to `~/.prime/agent/settings.json` (`mkOutOfStoreSymlink` in
+`home/default.nix`), the same pattern as Claude Code's and OpenCode's
+settings. Credentials (`/login`) stay in the untracked, mutable
+`~/.prime/agent/auth.json`. Unlike the other two tools, Prime Agent needs no
+skills alias — it reads `~/.agents/skills/` natively.
+
 ## Agent skills
 
 Shared agent skills are tool-agnostic and never duplicated per tool. The source of
@@ -362,8 +385,9 @@ truth is `agents/skills/<name>/SKILL.md` in this repo, exposed at `~/.agents`
 (the universal agent-config directory). Claude Code reads them through an
 alias — `~/.claude/skills` → `~/.agents/skills` — wired in `home/default.nix`;
 OpenCode's `tickets` entry similarly aliases `~/.agents/skills/tickets` into
-its global skill directory. Any other agent CLI gets its own alias into
-`~/.agents` the same way. Because
+its global skill directory. Prime Agent reads `~/.agents/skills/` directly, no
+alias needed. Any other agent CLI gets its own alias into `~/.agents` the same
+way. Because
 the links point at the checkout, adding or editing a skill takes effect
 without a rebuild.
 
