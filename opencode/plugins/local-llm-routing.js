@@ -15,13 +15,31 @@ function readProfile() {
   }
 }
 
+function applyAgentSettings(agent, settings, fields) {
+  for (const field of fields) {
+    if (!(field in settings)) continue;
+    if (settings[field] === null) delete agent[field];
+    else agent[field] = settings[field];
+  }
+
+  if ("reasoningEffort" in settings) {
+    if (settings.reasoningEffort === null) {
+      if (agent.options) delete agent.options.reasoningEffort;
+    } else {
+      agent.options = agent.options ?? {};
+      agent.options.reasoningEffort = settings.reasoningEffort;
+    }
+  }
+
+  if (typeof agent.model === "string" && agent.model.startsWith("ollama/")) {
+    if (agent.options) delete agent.options.reasoningEffort;
+  }
+}
+
 export default async function localLlmRouting() {
   return {
     config(config) {
       const profile = readProfile();
-      if (profile && "model" in profile) {
-        config.model = profile.model;
-      }
 
       const ollama = profile?.ollama;
       if (ollama?.enable) {
@@ -51,26 +69,16 @@ export default async function localLlmRouting() {
       }
 
       const agents = config.agent ?? (config.agent = {});
+      for (const name of ["build", "plan"]) {
+        const settings = profile?.builtInAgents?.[name];
+        if (!settings) continue;
+        const agent = agents[name] ?? (agents[name] = {});
+        applyAgentSettings(agent, settings, ["model"]);
+      }
+
       for (const [name, settings] of Object.entries(profile?.agents ?? {})) {
         const agent = agents[name] ?? (agents[name] = {});
-        for (const field of ["model", "variant", "temperature", "top_p"]) {
-          if (!(field in settings)) continue;
-          if (settings[field] === null) delete agent[field];
-          else agent[field] = settings[field];
-        }
-
-        if ("reasoningEffort" in settings) {
-          if (settings.reasoningEffort === null) {
-            if (agent.options) delete agent.options.reasoningEffort;
-          } else {
-            agent.options = agent.options ?? {};
-            agent.options.reasoningEffort = settings.reasoningEffort;
-          }
-        }
-
-        if (typeof settings.model === "string" && settings.model.startsWith("ollama/")) {
-          if (agent.options) delete agent.options.reasoningEffort;
-        }
+        applyAgentSettings(agent, settings, ["model", "variant", "temperature", "top_p"]);
       }
     },
   };

@@ -257,13 +257,35 @@ opencode.jsonc   base project config + disabled MCP stubs
 tui.json         global OpenCode TUI preferences
 ```
 
-Home Manager generates `~/.config/opencode/local-agents.json` from the selected
-`local.opencode.agents.provider` profile, merged with any host-local provider
-overrides. `local.opencode.model` is also written there when set and overlays
-the top-level `model`. The bundled plugin overlays only inference fields,
-leaving prompts, permissions, and other agent fields unchanged. Ollama is
-registered only when `local.llm.enable` is true. Restart OpenCode after changing
-this profile.
+Home Manager generates `~/.config/opencode/local-agents.json` with two separate
+overlays. `builtInAgents` contains optional `build` and `plan` settings for
+OpenCode's built-in Build and Plan agents. Each setting can carry `model` and
+`reasoningEffort`; the overlay never changes the top-level `model` or the
+static variants in `opencode.jsonc`. `agents` contains the selected custom-agent
+profile, merged with host-local overrides. The bundled plugin overlays only
+inference fields, leaving prompts, permissions, and other agent fields
+unchanged. `local.opencode.agents.provider` is a profile key, not an OpenCode
+provider declaration; `build` and `plan` are reserved for
+`local.opencode.build` and `.plan`.
+
+For example, the generated built-in overlay can contain:
+
+```json
+"builtInAgents": {
+  "build": { "model": "ollama/qwen3-coder:30b", "reasoningEffort": "high" },
+  "plan": { "model": "github-copilot/gpt-5.6-sol", "reasoningEffort": "xhigh" }
+}
+```
+
+The built-in Plan agent is separate from this repository's `/plan` command.
+`/plan` selects `auto-planner`, which writes the approved TDD plan for the
+`/auto` pipeline, so its model belongs in the custom-agent profile. The
+built-in Plan settings belong in `local.opencode.plan`.
+
+Changing `~/.config/nix/local.nix` requires `rebuild` followed by an OpenCode
+restart so Home Manager can regenerate this file. Direct edits to the linked
+`opencode/opencode.jsonc` or `plugins/local-llm-routing.js` require only an
+OpenCode restart. Ollama is registered only when `local.llm.enable` is true.
 
 ## Design notes
 

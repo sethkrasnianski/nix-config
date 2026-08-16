@@ -68,12 +68,12 @@ Flake-based NixOS configuration with four outputs:
         └── tickets/SKILL.md        # skill: durable ticket board and per-ticket implementation plans
 ```
 
-### OpenCode Provider Profiles
+### OpenCode Models And Profiles
 
 OpenCode agent inference uses the repository's `github-copilot` profile by
-default. To select or override a provider profile on one host, create
-`~/.config/nix/local.nix` and set fields under `local.opencode.agents`. The
-file is copied into the Nix store, so it must not contain secrets. For example:
+default. To select or override a profile, or to choose models for OpenCode's
+built-in Build and Plan agents, create `~/.config/nix/local.nix`. The file is
+copied into the Nix store, so it must not contain secrets. For example:
 
 ```nix
 { pkgs, ... }:
@@ -84,11 +84,21 @@ file is copied into the Nix store, so it must not contain secrets. For example:
     model = "qwen3-coder:30b";
   };
 
-  local.opencode.model = "ollama/qwen3-coder:30b";
+  local.opencode.build = {
+    model = "ollama/<model>";
+    reasoningEffort = "high";
+  };
+  local.opencode.plan = {
+    model = "github-copilot/<model>";
+    reasoningEffort = "xhigh";
+  };
   local.opencode.agents = {
-    provider = "local";
-    providers.local = {
-      auto-planner.model = "ollama/qwen3-coder:30b";
+    provider = "local-profile";
+    providers.local-profile = {
+      auto-researcher = {
+        model = "ollama/<model>";
+        reasoningEffort = "high";
+      };
       auto-reviewer = {
         model = "github-copilot/gpt-5.6-sol";
         reasoningEffort = "high";
@@ -98,24 +108,36 @@ file is copied into the Nix store, so it must not contain secrets. For example:
 }
 ```
 
+`local.opencode.build` and `.plan` configure OpenCode's built-in Build and Plan
+agents. Each accepts `model` and `reasoningEffort`. They are separate from
+custom-agent profiles and do not override the top-level `model` in
+`opencode.jsonc`; static variants in that file remain active. Do not put
+`build` or `plan` under `local.opencode.agents.providers`.
+
 Switch profiles by changing `provider`; host-local profile entries merge onto
-the repository profile of the same name. Set `local.opencode.model` to override
-the top-level model in `opencode.jsonc`. `build` and `plan` can be added as
-agent profile names to override their built-in settings. Supported agent
-inference fields are `model`, `reasoningEffort`, `variant`, `temperature`, and
-`top_p`. Set one to `null` to remove the repository default. Prompts,
-descriptions, modes, colors, and permissions remain repository-owned. Use
-`rebuild` (or
+the repository profile of the same name. Here, `provider` is a profile key,
+not an OpenCode provider declaration. Custom profiles may configure repository
+agents such as `auto-researcher` and `auto-reviewer` with the inference fields
+`model`, `reasoningEffort`, `variant`, `temperature`, and `top_p`. Set one to
+`null` to remove the repository default. Prompts, descriptions, modes, colors,
+and permissions remain repository-owned. Use `rebuild` (or
 `rebuild-headless`) after creating the file. The rebuild helper automatically
 supplies it as the directory-shaped `local-config` input.
 Then run `ollama pull qwen3-coder:30b` once; rebuilds never download models.
 Check the service with `ollama ps` and `curl http://127.0.0.1:11434/v1/models`.
 
-OpenCode reads the generated profile at startup. Restart OpenCode after changing
-the profile or plugin. Any configured `ollama/...` agent model requires Ollama
-to be enabled and to match `local.llm.model`; downloaded model data remains
-until explicitly removed with `ollama rm <model>` (or by removing Ollama's data
-directory).
+The built-in Plan agent is distinct from this repository's `/plan` command:
+`/plan` invokes the custom `auto-planner`, which writes the TDD plan and asks
+for approval. The `auto-planner` profile is therefore configured under
+`local.opencode.agents.providers`, while the built-in Plan settings use
+`local.opencode.plan`.
+
+OpenCode reads the generated profile at startup. Changing `local.nix` requires
+a rebuild followed by an OpenCode restart. Direct edits to the repository's
+`opencode/opencode.jsonc` or routing plugin require only an OpenCode restart.
+Any configured `ollama/...` agent model requires Ollama to be enabled and to
+match `local.llm.model`; downloaded model data remains until explicitly removed
+with `ollama rm <model>` (or by removing Ollama's data directory).
 
 (The WSL host has no `hardware-configuration.nix` — `nixos-wsl` provides the
 root filesystem. Generate one only for a real non-WSL machine.)

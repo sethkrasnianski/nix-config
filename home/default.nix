@@ -4,9 +4,8 @@
 # — that carries the per-machine facts (stateVersion, username, ...).
 {
   config,
-  lib,
   pkgs,
-  localOpenCodeModel ? null,
+  localOpenCodeBuiltInAgents ? { },
   localOpenCodeAgents ? { },
   localLlm ? {
     enable = false;
@@ -84,15 +83,11 @@ in
   home.file.".prime/agent/settings.json".source =
     config.lib.file.mkOutOfStoreSymlink "${flakePath}/prime/settings.json";
   home.file.".config/opencode/local-agents.json" = {
-    text = builtins.toJSON (
-      {
-        agents = localOpenCodeAgents;
-        ollama = localLlm;
-      }
-      // lib.optionalAttrs (localOpenCodeModel != null) {
-        model = localOpenCodeModel;
-      }
-    );
+    text = builtins.toJSON ({
+      agents = localOpenCodeAgents;
+      builtInAgents = localOpenCodeBuiltInAgents;
+      ollama = localLlm;
+    });
   };
   home.file.".local/bin/auto-pr-watch" = {
     text = ''
