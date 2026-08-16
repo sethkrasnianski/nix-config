@@ -26,6 +26,15 @@ require install.sh 'plugins/*.js'
 require ../modules/local-llm-nixos.nix 'OLLAMA_NO_CLOUD'
 require ../flake.nix 'local-config'
 require ../modules/local-agents.nix 'local.opencode.agents'
-require ../modules/local-agents.nix 'local.opencode.model'
+require ../modules/local-agents.nix 'local.opencode.build'
+require ../modules/local-agents.nix 'local.opencode.plan'
+require ../modules/local-agents.nix 'localOpenCodeBuiltInAgents'
+require ../home/default.nix 'builtInAgents = localOpenCodeBuiltInAgents'
+require plugins/local-llm-routing.js 'profile?.builtInAgents'
+require plugins/local-llm-routing.js 'reasoningEffort'
+if grep -qF 'config.model = profile.model' "$ROOT/plugins/local-llm-routing.js"; then
+  printf 'local routing must not override the top-level OpenCode model\n' >&2
+  exit 1
+fi
 
 printf 'config contracts passed\n'
