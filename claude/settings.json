@@ -3,8 +3,8 @@
     "commit": "",
     "pr": ""
   },
-  "defaultMode": "auto",
   "model": "opusplan",
   "tui": "fullscreen",
-  "theme": "auto"
+  "theme": "auto",
+  "defaultMode": "auto"
 }
