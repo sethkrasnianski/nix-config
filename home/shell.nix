@@ -49,7 +49,7 @@ in
     # --color=tty). Keep these aliases Darwin-only so Linux retains its
     # system-provided dircolors setup.
     shellAliases =
-      if pkgs.stdenv.isDarwin then
+      if pkgs.stdenv.hostPlatform.isDarwin then
         {
           ls = "ls -G";
           l = "ls -alhG";

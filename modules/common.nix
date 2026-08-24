@@ -98,5 +98,5 @@
       unzip
     ]
     # macOS ships lsof by default; Linux does not, so pull it in there only.
-    ++ lib.optionals stdenv.isLinux [ lsof ];
+    ++ lib.optionals stdenv.hostPlatform.isLinux [ lsof ];
 }

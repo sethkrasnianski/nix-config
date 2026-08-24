@@ -15,26 +15,16 @@
 #   The three `@earendil-works/pi-*` entries resolve to R2 tarball URLs rather
 #   than the npm registry; fetchNpmDeps handles that transparently.
 # - `dist/` in the release tarball is already built — dontNpmBuild = true.
-# - The only native dependency is `zeromq` (Jupyter wire protocol), which
-#   ships prebuilt addons for every supported platform/libc/Node-ABI
-#   combination — no compiler needed. `npm rebuild` (part of npmConfigHook)
-#   re-triggers zeromq's own install script, which picks the matching prebuilt
-#   addon; verified this succeeds offline with nodejs_22 on x86_64-linux
-#   glibc. postInstall then deletes every prebuild except this platform's, so
+# - The only native dependency is `zeromq` (Jupyter wire protocol). `npm rebuild`
+#   (part of npmConfigHook) re-triggers zeromq's install script, which uses the
+#   shipped prebuild when one is compatible. Linux has a Node 22/ABI-127
+#   prebuild; Darwin has a Node 20/ABI-115 prebuild. Because zeromq uses
+#   node-addon-api, cmake-ts loads the Darwin ABI-115 addon under Node 22 too.
+#   postInstall then deletes every prebuild except this platform's, so
 #   autoPatchelfHook isn't run over foreign-arch/OS binaries and the closure
-#   isn't needlessly multiplied.
-# - KNOWN GAP: as of zeromq 6.6.0, upstream ships no darwin build for Node's
-#   ABI 127 (Node 22) — only ABI 115/72 (Node 20/18). Node 20 was removed from
-#   nixpkgs (EOL), so there is no nixpkgs nodejs that matches a darwin
-#   prebuilt addon today. `npm rebuild` on aarch64-darwin will likely fall
-#   back to zeromq's from-source cmake-ts build, which needs network + cmake/
-#   ninja/vcpkg — unavailable in the Nix sandbox — and fail. This has only
-#   been verified end-to-end on x86_64-linux (real build + `--version`/
-#   `--help`/`doctor` run); the darwin output only round-trips through `nix
-#   eval` (see README "macOS"), so this gap won't surface until an actual
-#   `darwin-rebuild switch`. If it does: wait for upstream's next zeromq
-#   prebuild, or add a from-source darwin build (nixpkgs zeromq + cmake +
-#   ninja, bypassing cmake-ts's vcpkg fetch).
+#   isn't needlessly multiplied. This has been verified end-to-end on
+#   x86_64-linux (real build + `--version`/`--help`/`doctor` run); the Darwin
+#   output should be checked with an actual `darwin-rebuild switch`.
 #
 # Bumping the version: update `version` and `src.hash` (from upstream's
 # published `releases/vX.Y.Z/SHA256SUMS`), then regenerate package.json +
@@ -73,16 +63,18 @@ buildNpmPackage rec {
   nativeBuildInputs = [
     makeWrapper
   ]
-  ++ lib.optionals stdenv.isLinux [ autoPatchelfHook ];
-  buildInputs = lib.optionals stdenv.isLinux [ stdenv.cc.cc.lib ];
+  ++ lib.optionals stdenv.hostPlatform.isLinux [ autoPatchelfHook ];
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [ stdenv.cc.cc.lib ];
 
   postInstall =
     let
       packageOut = "$out/lib/node_modules/prime-agent";
-      osDir = if stdenv.isLinux then "linux" else "darwin";
-      archDir = if stdenv.isAarch64 then "arm64" else "x64";
-      libc = if stdenv.isLinux then "glibc" else "libc"; # zeromq's own naming, not nixpkgs'
-      nodeAbi = "127"; # NODE_MODULE_VERSION for nodejs_22 above; bump alongside it
+      osDir = if stdenv.hostPlatform.isLinux then "linux" else "darwin";
+      archDir = if stdenv.hostPlatform.isAarch64 then "arm64" else "x64";
+      libc = if stdenv.hostPlatform.isLinux then "glibc" else "libc"; # zeromq's own naming, not nixpkgs'
+      # zeromq 6.6.0 has no Darwin ABI-127 prebuild. Its ABI-115 addon is
+      # node-addon-api based, so cmake-ts loads it with Node 22 as well.
+      nodeAbi = if stdenv.hostPlatform.isDarwin then "115" else "127";
       zeromqDir = "${packageOut}/node_modules/zeromq/build";
       zeromqAddon = "${zeromqDir}/${osDir}/${archDir}/node/${libc}-${nodeAbi}-Release/addon.node";
       koffiDir = "${packageOut}/node_modules/koffi/build/koffi";

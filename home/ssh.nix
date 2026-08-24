@@ -21,7 +21,7 @@
 {
   # ssh-agent as a systemd user service (Linux only; macOS uses the system
   # agent, see header).
-  services.ssh-agent.enable = pkgs.stdenv.isLinux;
+  services.ssh-agent.enable = pkgs.stdenv.hostPlatform.isLinux;
 
   # ~/.ssh/config. Per-system keys go in `settings.<host>` blocks later.
   programs.ssh = {

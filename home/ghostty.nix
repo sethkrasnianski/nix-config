@@ -14,7 +14,7 @@
 {
   programs.ghostty = {
     enable = true;
-    package = if pkgs.stdenv.isDarwin then pkgs.ghostty-bin else pkgs.ghostty;
+    package = if pkgs.stdenv.hostPlatform.isDarwin then pkgs.ghostty-bin else pkgs.ghostty;
 
     # Bind ctrl+v to paste, alongside Ghostty's default ctrl+shift+v, so a
     # Windows-style paste works out of the box. This shadows readline's
