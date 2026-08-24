@@ -82,6 +82,8 @@ copied into the Nix store, so it must not contain secrets. For example:
     enable = true;
     package = pkgs.ollama;
     model = "qwen3-coder:30b";
+    # Keep the ~21 GB model GPU-resident to avoid cold-load latency after idle.
+    keepAlive = "24h";
   };
 
   local.opencode.build = {
@@ -125,6 +127,17 @@ and permissions remain repository-owned. Use `rebuild` (or
 supplies it as the directory-shaped `local-config` input.
 Then run `ollama pull qwen3-coder:30b` once; rebuilds never download models.
 Check the service with `ollama ps` and `curl http://127.0.0.1:11434/v1/models`.
+
+Ollama unloads idle models after five minutes by default. A large model can take
+noticeable time to load again, so set `local.llm.keepAlive` when low first-token
+latency matters. This keeps the model's memory allocated until the interval
+expires. Unload it manually without deleting the download with:
+
+```sh
+ollama stop qwen3-coder:30b
+```
+
+Confirm it is no longer resident with `ollama ps`.
 
 The built-in Plan agent is distinct from this repository's `/plan` command:
 `/plan` invokes the custom `auto-planner`, which writes the TDD plan and asks
