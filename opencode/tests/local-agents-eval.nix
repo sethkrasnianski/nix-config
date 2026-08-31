@@ -68,26 +68,6 @@ let
   partialBuiltInAgents = partial.config.home-manager.extraSpecialArgs.localOpenCodeBuiltInAgents;
   empty = evalLocalAgents [ ];
   emptyBuiltInAgents = empty.config.home-manager.extraSpecialArgs.localOpenCodeBuiltInAgents;
-  home =
-    (flake.inputs.home-manager.lib.homeManagerConfiguration {
-      inherit pkgs;
-      modules = [
-        (import (root + "/home/default.nix"))
-        {
-          home.username = "test";
-          home.homeDirectory = "/tmp/nixos-config-local-agents-test";
-          home.stateVersion = "25.11";
-        }
-      ];
-      extraSpecialArgs = {
-        localOpenCodeAgents = selectedAgents;
-        localOpenCodeBuiltInAgents = selectedBuiltInAgents;
-        localLlm = {
-          enable = false;
-        };
-      };
-    }).config;
-  generated = builtins.fromJSON home.home.file.".config/opencode/local-agents.json".text;
   rejected = evalLocalAgents [
     {
       local.opencode.agents = {
@@ -129,8 +109,6 @@ assert
     };
   };
 assert emptyBuiltInAgents == { };
-assert generated.builtInAgents == selectedBuiltInAgents;
-assert generated.agents == selectedAgents;
 assert builtins.length rejectedAssertions == 2;
 assert builtins.any (
   assertion: lib.hasInfix "local.opencode.build" assertion.message

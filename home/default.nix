@@ -5,11 +5,6 @@
 {
   config,
   pkgs,
-  localOpenCodeBuiltInAgents ? { },
-  localOpenCodeAgents ? { },
-  localLlm ? {
-    enable = false;
-  },
   ...
 }:
 
@@ -61,8 +56,8 @@ in
   # real config (init.el / config.el / packages.el) tracked in this repo
   # (doom/). Claude Code's, OpenCode's, and Prime Agent's global settings are
   # tracked here too (claude/, opencode/, prime/); OpenCode's agents,
-  # commands, and skills are linked individually so its other state remains
-  # mutable.
+  # commands, skills, and runtime plugin are linked individually so its other
+  # state remains mutable. The plugin evaluates local.nix at startup.
   # mkOutOfStoreSymlink links to the checkout itself, so edits take effect
   # without a rebuild.
   home.file.".config/doom".source = config.lib.file.mkOutOfStoreSymlink "${flakePath}/doom";
@@ -82,13 +77,6 @@ in
     config.lib.file.mkOutOfStoreSymlink "${flakePath}/opencode/plugins/local-llm-routing.js";
   home.file.".prime/agent/settings.json".source =
     config.lib.file.mkOutOfStoreSymlink "${flakePath}/prime/settings.json";
-  home.file.".config/opencode/local-agents.json" = {
-    text = builtins.toJSON ({
-      agents = localOpenCodeAgents;
-      builtInAgents = localOpenCodeBuiltInAgents;
-      ollama = localLlm;
-    });
-  };
   home.file.".local/bin/auto-pr-watch" = {
     text = ''
       #!/bin/sh

@@ -251,24 +251,25 @@ skills/      address-pr-feedback, resolve-merge-conflicts, review-changes,
                                    every agent above instead of duplicated
                                    per-prompt
 plugins/     local-llm-routing.js — local agent inference overlay and Ollama provider
+local-profile.nix  startup evaluator for ~/.config/nix/local.nix
 scripts/     pr-watch.sh  (installed as `auto-pr-watch`)
 install.sh
 opencode.jsonc   base project config + disabled MCP stubs
 tui.json         global OpenCode TUI preferences
 ```
 
-Home Manager generates `~/.config/opencode/local-agents.json` with two separate
-overlays. `builtInAgents` contains optional `build` and `plan` settings for
-OpenCode's built-in Build and Plan agents. Each setting can carry `model` and
-`reasoningEffort`; the overlay never changes the top-level `model` or the
-static variants in `opencode.jsonc`. `agents` contains the selected custom-agent
-profile, merged with host-local overrides. The bundled plugin overlays only
-inference fields, leaving prompts, permissions, and other agent fields
-unchanged. `local.opencode.agents.provider` is a profile key, not an OpenCode
-provider declaration; `build` and `plan` are reserved for
-`local.opencode.build` and `.plan`.
+At startup, the bundled plugin evaluates `~/.config/nix/local.nix` through
+`local-profile.nix` and builds two overlays. `builtInAgents` contains optional
+`build` and `plan` settings for OpenCode's built-in Build and Plan agents. Each
+setting can carry `model` and `reasoningEffort`; the overlay never changes the
+top-level `model` or the static variants in `opencode.jsonc`. `agents` contains
+the selected custom-agent profile, merged with host-local overrides. The
+bundled plugin overlays only inference fields, leaving prompts, permissions,
+and other agent fields unchanged. `local.opencode.agents.provider` is a
+profile key, not an OpenCode provider declaration; `build` and `plan` are
+reserved for `local.opencode.build` and `.plan`.
 
-For example, the generated built-in overlay can contain:
+For example, the startup-generated built-in overlay can contain:
 
 ```json
 "builtInAgents": {
@@ -282,10 +283,13 @@ The built-in Plan agent is separate from this repository's `/plan` command.
 `/auto` pipeline, so its model belongs in the custom-agent profile. The
 built-in Plan settings belong in `local.opencode.plan`.
 
-Changing `~/.config/nix/local.nix` requires `rebuild` followed by an OpenCode
-restart so Home Manager can regenerate this file. Direct edits to the linked
-`opencode/opencode.jsonc` or `plugins/local-llm-routing.js` require only an
-OpenCode restart. Ollama is registered only when `local.llm.enable` is true.
+Changing OpenCode settings in `~/.config/nix/local.nix` requires only an
+OpenCode restart; no rebuild is needed. Direct edits to the linked
+`opencode/opencode.jsonc` or `plugins/local-llm-routing.js` have the same
+restart-only behavior. Changes to Ollama's system service settings still
+require a rebuild. If `local.nix` is absent, the repository defaults are used
+and Ollama is disabled. Ollama is registered only when `local.llm.enable` is
+true.
 
 ## Design notes
 
