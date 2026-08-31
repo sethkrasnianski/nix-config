@@ -65,7 +65,12 @@ Flake-based NixOS configuration with four outputs:
         ├── code-search/SKILL.md    # skill: semantic and literal code search
         ├── new-project/SKILL.md    # skill: bootstrap a new project (flake, direnv, AGENTS.md, docs)
         ├── handoff/SKILL.md        # skill: compact the conversation into a handoff doc for another agent
-        └── tickets/SKILL.md        # skill: durable ticket board and per-ticket implementation plans
+        └── tickets/                 # skill: GitHub Projects V2 Kanban ticket workflow
+            ├── SKILL.md
+            ├── contracts/kanban-v1.json
+            ├── fixtures/             # sanitized contract-verification fixtures
+            ├── scripts/project-contract.sh
+            └── tests/project-contract-test.sh
 ```
 
 ### OpenCode Models And Profiles
@@ -420,11 +425,14 @@ truth is `agents/skills/<name>/SKILL.md` in this repo, exposed at `~/.agents`
 (the universal agent-config directory). Claude Code reads them through an
 alias — `~/.claude/skills` → `~/.agents/skills` — wired in `home/default.nix`;
 OpenCode's `tickets` entry similarly aliases `~/.agents/skills/tickets` into
-its global skill directory. Prime Agent reads `~/.agents/skills/` directly, no
-alias needed. Any other agent CLI gets its own alias into `~/.agents` the same
-way. Because
-the links point at the checkout, adding or editing a skill takes effect
-without a rebuild.
+its global skill directory. The skill manages repository GitHub issues as items
+in an approved built-in Kanban project; it does not maintain a local
+`.projects/` board. Prime Agent reads `~/.agents/skills/` directly, no alias
+needed. Any other agent CLI gets its own alias into `~/.agents` the same way.
+Because the links point at the checkout, adding or editing a skill takes effect
+without a rebuild. The tickets skill resolves its verifier and Kanban contract
+from that global skill directory, so it can operate on repositories outside
+this checkout.
 
 MCP servers follow the same single-source-of-truth rule: they're defined in
 `agents/mcp.json` (exposed at `~/.agents/mcp.json`). Claude Code has no global

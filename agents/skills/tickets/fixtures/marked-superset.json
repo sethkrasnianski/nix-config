@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "pagination": {"complete": true},
+  "project": {
+    "id": "PVT_marked",
+    "number": 2,
+    "title": "Example Kanban",
+    "template": false,
+    "shortDescription": "User additions are allowed",
+    "readme": "Project notes\n\n<!-- github-projects-tickets: kanban-v1 -->",
+    "public": true,
+    "closed": false
+  },
+  "repositories": [
+    {"id": "R_fixture", "nameWithOwner": "octo/example"},
+    {"id": "R_extra", "nameWithOwner": "octo/other"}
+  ],
+  "fields": [
+    {
+      "__typename": "ProjectV2Field",
+      "id": "F_title",
+      "name": "Title",
+      "dataType": "TITLE",
+      "isIssueField": false
+    },
+    {
+      "__typename": "ProjectV2Field",
+      "id": "F_assignees",
+      "name": "Assignees",
+      "dataType": "ASSIGNEES",
+      "isIssueField": true
+    },
+    {
+      "__typename": "ProjectV2SingleSelectField",
+      "id": "F_status",
+      "name": "Status",
+      "dataType": "SINGLE_SELECT",
+      "isIssueField": false,
+      "options": [
+        {"id": "O_todo", "name": "Todo", "color": "GRAY", "description": ""},
+        {"id": "O_progress", "name": "In Progress", "color": "YELLOW", "description": ""},
+        {"id": "O_done", "name": "Done", "color": "GREEN", "description": ""}
+      ]
+    },
+    {
+      "__typename": "ProjectV2Field",
+      "id": "F_priority",
+      "name": "Priority",
+      "dataType": "NUMBER",
+      "isIssueField": false
+    }
+  ],
+  "views": [
+    {
+      "id": "V_board",
+      "number": 1,
+      "name": "Board",
+      "layout": "BOARD_LAYOUT",
+      "filter": "",
+      "fields": {
+        "nodes": [
+          {"__typename": "ProjectV2Field", "id": "F_title", "name": "Title", "dataType": "TITLE", "isIssueField": false},
+          {"__typename": "ProjectV2Field", "id": "F_assignees", "name": "Assignees", "dataType": "ASSIGNEES", "isIssueField": true},
+          {"__typename": "ProjectV2SingleSelectField", "id": "F_status", "name": "Status", "dataType": "SINGLE_SELECT", "isIssueField": false, "options": [{"id": "O_todo", "name": "Todo", "color": "GRAY", "description": ""}, {"id": "O_progress", "name": "In Progress", "color": "YELLOW", "description": ""}, {"id": "O_done", "name": "Done", "color": "GREEN", "description": ""}]}
+        ],
+        "pageInfo": {"hasNextPage": false, "endCursor": null}
+      },
+      "configuration": {"visibleFields": {"nodes": [], "pageInfo": {"hasNextPage": false, "endCursor": null}}},
+      "groupByFields": {"nodes": [{"__typename": "ProjectV2SingleSelectField", "id": "F_status", "name": "Status", "dataType": "SINGLE_SELECT", "isIssueField": false, "options": [{"id": "O_todo", "name": "Todo", "color": "GRAY", "description": ""}, {"id": "O_progress", "name": "In Progress", "color": "YELLOW", "description": ""}, {"id": "O_done", "name": "Done", "color": "GREEN", "description": ""}]}], "pageInfo": {"hasNextPage": false, "endCursor": null}},
+      "sortByFields": {"nodes": [{"direction": "ASC", "field": {"__typename": "ProjectV2Field", "id": "F_title", "name": "Title", "dataType": "TITLE", "isIssueField": false}}], "pageInfo": {"hasNextPage": false, "endCursor": null}},
+      "verticalGroupByFields": {"nodes": [], "pageInfo": {"hasNextPage": false, "endCursor": null}}
+    },
+    {
+      "id": "V_table",
+      "number": 2,
+      "name": "Table",
+      "layout": "TABLE_LAYOUT",
+      "filter": "",
+      "fields": {"nodes": [], "pageInfo": {"hasNextPage": false, "endCursor": null}},
+      "configuration": {"visibleFields": {"nodes": [], "pageInfo": {"hasNextPage": false, "endCursor": null}}},
+      "groupByFields": {"nodes": [], "pageInfo": {"hasNextPage": false, "endCursor": null}},
+      "sortByFields": {"nodes": [], "pageInfo": {"hasNextPage": false, "endCursor": null}},
+      "verticalGroupByFields": {"nodes": [], "pageInfo": {"hasNextPage": false, "endCursor": null}}
+    }
+  ],
+  "workflows": [
+    {"id": "W_add", "number": 1, "name": "Item added to project", "enabled": true}
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "pagination": {"complete": false},
+  "project": {"id": "PVT_incomplete", "number": 7, "title": "Example", "readme": null},
+  "repositories": [{"id": "R_fixture", "nameWithOwner": "octo/example"}],
+  "fields": [],
+  "views": [],
+  "workflows": []
+}

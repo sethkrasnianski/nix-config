@@ -1,0 +1,56 @@
+{
+  "contractVersion": "kanban-v1",
+  "fields": [
+    {"kind": "field", "name": "Assignees", "dataType": "ASSIGNEES", "isIssueField": true},
+    {
+      "kind": "single-select",
+      "name": "Status",
+      "dataType": "SINGLE_SELECT",
+      "isIssueField": false,
+      "options": [
+        {"name": "Done", "color": "GREEN", "description": ""},
+        {"name": "In Progress", "color": "YELLOW", "description": ""},
+        {"name": "Todo", "color": "GRAY", "description": ""}
+      ]
+    },
+    {"kind": "field", "name": "Title", "dataType": "TITLE", "isIssueField": false}
+  ],
+  "views": [
+    {
+      "name": "Board",
+      "layout": "BOARD_LAYOUT",
+      "filter": "",
+      "fields": [
+        {"kind": "field", "name": "Assignees", "dataType": "ASSIGNEES", "isIssueField": true},
+        {
+          "kind": "single-select",
+          "name": "Status",
+          "dataType": "SINGLE_SELECT",
+          "isIssueField": false,
+          "options": [
+            {"name": "Done", "color": "GREEN", "description": ""},
+            {"name": "In Progress", "color": "YELLOW", "description": ""},
+            {"name": "Todo", "color": "GRAY", "description": ""}
+          ]
+        },
+        {"kind": "field", "name": "Title", "dataType": "TITLE", "isIssueField": false}
+      ],
+      "groupByFields": [
+        {
+          "kind": "single-select",
+          "name": "Status",
+          "dataType": "SINGLE_SELECT",
+          "isIssueField": false,
+          "options": [
+            {"name": "Done", "color": "GREEN", "description": ""},
+            {"name": "In Progress", "color": "YELLOW", "description": ""},
+            {"name": "Todo", "color": "GRAY", "description": ""}
+          ]
+        }
+      ],
+      "sortByFields": [{"field": "Title", "direction": "ASC"}],
+      "verticalGroupByFields": []
+    }
+  ],
+  "workflows": [{"name": "Item added to project", "enabled": true}]
+}
