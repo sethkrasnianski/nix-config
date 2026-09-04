@@ -210,11 +210,29 @@ jq '.workflows += [{
   name: "Unexpected workflow",
   enabled: true
 }]' "$TEMP_DIR/marked-superset.json" >"$TEMP_DIR/extra-workflow.json"
+jq '.project.readme = "<!-- github-projects-tickets: not-kanban-v1 -->"' "$RAW" \
+  >"$TEMP_DIR/malformed-marker.json"
+jq --arg marker "$MARKER" '.project.readme = ($marker + "\n" + $marker)' \
+  "$RAW" >"$TEMP_DIR/duplicate-marker.json"
+jq '.fields += [{
+  __typename: "ProjectV2Field",
+  id: "field-personal-notes",
+  name: "Personal notes",
+  dataType: "TEXT",
+  isIssueField: false
+}]' "$RAW" >"$TEMP_DIR/customized-unmarked.json"
+jq '.fields |= map(
+  if .name == "Estimate" then .name = "Unrelated field" else . end
+)' "$RAW" >"$TEMP_DIR/unrelated-structure.json"
 assert_mode "$TEMP_DIR/marked-superset.json" marked-superset
 assert_rejected "$TEMP_DIR/altered-field.json"
 assert_rejected "$TEMP_DIR/altered-view.json"
 assert_rejected "$TEMP_DIR/altered-status-option.json"
 assert_rejected "$TEMP_DIR/altered-workflow.json"
 assert_rejected "$TEMP_DIR/extra-workflow.json"
+assert_rejected "$TEMP_DIR/malformed-marker.json"
+assert_rejected "$TEMP_DIR/duplicate-marker.json"
+assert_rejected "$TEMP_DIR/customized-unmarked.json"
+assert_rejected "$TEMP_DIR/unrelated-structure.json"
 
 printf 'project contract tests passed\n'
