@@ -87,6 +87,59 @@ assert_mode() {
     <<<"$result" >/dev/null || fail "$(basename "$snapshot") was not a valid $expected project"
 }
 
+run_capture() {
+  local stdout_file="$1" stderr_file="$2"
+  shift 2
+  set +e
+  "$@" >"$stdout_file" 2>"$stderr_file"
+  COMMAND_STATUS=$?
+  set -e
+}
+
+assert_error() {
+  local snapshot="$1" expected="$2" stdout_file="$TEMP_DIR/stdout" \
+    stderr_file="$TEMP_DIR/stderr"
+  run_capture "$stdout_file" "$stderr_file" bash "$SCRIPT" verify \
+    --contract "$CONTRACT" --snapshot "$snapshot" --repository "$REPOSITORY"
+  [[ "$COMMAND_STATUS" -ne 0 ]] || \
+    fail "$(basename "$snapshot") should be rejected"
+  [[ ! -s "$stdout_file" ]] || \
+    fail "$(basename "$snapshot") produced a structural result before its guard"
+  [[ "$(<"$stderr_file")" == "error: $expected" ]] || \
+    fail "$(basename "$snapshot") produced the wrong diagnostic"
+}
+
+assert_incomplete_pagination() {
+  local snapshot="$1" stdout_file="$TEMP_DIR/stdout" \
+    stderr_file="$TEMP_DIR/stderr" error_output
+  run_capture "$stdout_file" "$stderr_file" bash "$SCRIPT" verify \
+    --contract "$CONTRACT" --snapshot "$snapshot" --repository "$REPOSITORY"
+  [[ "$COMMAND_STATUS" -ne 0 ]] || \
+    fail "$(basename "$snapshot") should be rejected"
+  [[ ! -s "$stdout_file" ]] || \
+    fail "$(basename "$snapshot") produced a structural result before normalization"
+  error_output="$(<"$stderr_file")"
+  [[ "$error_output" == *"snapshot pagination is incomplete"* ]] || \
+    fail "$(basename "$snapshot") omitted the incomplete pagination diagnostic"
+  [[ "$error_output" == *"error: unable to normalize snapshot: $snapshot"* ]] || \
+    fail "$(basename "$snapshot") omitted the normalization failure"
+}
+
+jq '.repositories[0].nameWithOwner = "octo/other"' "$RAW" \
+  >"$TEMP_DIR/unrelated-repository.json"
+jq '.project.template = true' "$RAW" >"$TEMP_DIR/template.json"
+jq '.project.closed = true' "$RAW" >"$TEMP_DIR/closed.json"
+jq '.pagination.complete = false' "$RAW" \
+  >"$TEMP_DIR/incomplete-pagination.json"
+
+assert_error "$TEMP_DIR/unrelated-repository.json" \
+  "project is not linked to repository octo/example"
+assert_error "$TEMP_DIR/template.json" \
+  "organization project templates cannot be used as ticket boards"
+assert_error "$TEMP_DIR/closed.json" \
+  "closed projects cannot be used as ticket boards"
+assert_incomplete_pagination "$TEMP_DIR/incomplete-pagination.json"
+
 MARKER='<!-- github-projects-tickets: kanban-v1 -->'
 jq --arg marker "$MARKER" '
   .project.readme = $marker |
