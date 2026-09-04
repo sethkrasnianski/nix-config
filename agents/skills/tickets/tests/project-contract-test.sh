@@ -15,6 +15,11 @@ fail() {
   exit 1
 }
 
+if grep -Fq '### Capturing the first contract' "$ROOT/SKILL.md" || \
+  grep -Fq 'pending-canonical-capture' "$ROOT/SKILL.md"; then
+  fail "tickets skill still claims that kanban-v1 needs canonical capture"
+fi
+
 jq -e '
   .schemaVersion == 1 and
   .pagination.complete == true and
