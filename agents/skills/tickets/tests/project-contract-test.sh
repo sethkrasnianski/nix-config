@@ -2,6 +2,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+BASH="$(command -v bash)"
 SCRIPT="$ROOT/scripts/project-contract.sh"
 CONTRACT="$ROOT/contracts/kanban-v1.json"
 RAW="$ROOT/fixtures/kanban-v1.raw.json"
@@ -140,6 +141,141 @@ assert_rejected() {
     fail "$(basename "$snapshot") did not produce a structural rejection"
 }
 
+create_gh_double() {
+  local gh="$TEMP_DIR/bin/gh"
+  cat >"$gh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+FIXTURE="${GH_DOUBLE_FIXTURE:?}"
+LOG="${GH_DOUBLE_LOG:?}"
+MODE="${GH_DOUBLE_MODE:-snapshot}"
+
+if [[ "${1:-}" == api && "${2:-}" == graphql ]]; then
+  shift 2
+  query=''
+  login=''
+  number=''
+  id=''
+  repositories_cursor=''
+  fields_cursor=''
+  views_cursor=''
+  workflows_cursor=''
+
+  while (($#)); do
+    case "$1" in
+      -f)
+        key="${2%%=*}"
+        value="${2#*=}"
+        case "$key" in
+          query) query="$value" ;;
+          login) login="$value" ;;
+          repositoriesCursor) repositories_cursor="$value" ;;
+          fieldsCursor) fields_cursor="$value" ;;
+          viewsCursor) views_cursor="$value" ;;
+          workflowsCursor) workflows_cursor="$value" ;;
+        esac
+        shift 2
+        ;;
+      -F)
+        if [[ "$2" == *=* ]]; then
+          key="${2%%=*}"
+          value="${2#*=}"
+          shift 2
+        else
+          key="$2"
+          value="$3"
+          shift 3
+        fi
+        case "$key" in
+          number) number="$value" ;;
+          id) id="$value" ;;
+        esac
+        ;;
+      *)
+        shift
+        ;;
+    esac
+  done
+
+  if [[ "$query" == *"projectV2(number:"* ]]; then
+    jq -cn --arg owner "$login" --arg number "$number" \
+      '{kind: "project-id", owner: $owner, number: $number}' >>"$LOG"
+    printf '%s\n' '{"data":{"repositoryOwner":{"projectV2":{"id":"project-fixture"}}}}'
+    exit 0
+  fi
+
+  jq -cn \
+    --arg repositories_cursor "$repositories_cursor" \
+    --arg fields_cursor "$fields_cursor" \
+    --arg views_cursor "$views_cursor" \
+    --arg workflows_cursor "$workflows_cursor" \
+    '{kind: "snapshot", repositoriesCursor: $repositories_cursor,
+      fieldsCursor: $fields_cursor, viewsCursor: $views_cursor,
+      workflowsCursor: $workflows_cursor}' >>"$LOG"
+
+  jq -n --slurpfile source "$FIXTURE" \
+    --arg repositories_cursor "$repositories_cursor" \
+    --arg fields_cursor "$fields_cursor" \
+    --arg views_cursor "$views_cursor" \
+    --arg workflows_cursor "$workflows_cursor" \
+    --arg mode "$MODE" '
+    $source[0] as $source |
+    def page($items; $cursor; $size; $next):
+      if $cursor == "" then
+        {nodes: $items[0:$size],
+         pageInfo: {hasNextPage: (($items | length) > $size),
+                    endCursor: (if (($items | length) > $size)
+                                then $next else null end)}}
+      else
+        {nodes: $items[($size - 1):],
+         pageInfo: {hasNextPage: false, endCursor: null}}
+      end;
+    ($source.project + {
+      repositories: page($source.repositories; $repositories_cursor; 1;
+                         "repositories-page-2"),
+      fields: page($source.fields; $fields_cursor; 9; "fields-page-2"),
+      views: page($source.views; $views_cursor; 2; "views-page-2"),
+      workflows: page($source.workflows; $workflows_cursor; 4;
+                      "workflows-page-2")
+    }) as $node |
+    {data: {node: $node}} |
+    if $mode == "nested-pagination" then
+      .data.node.views[0].fields.pageInfo = {
+        hasNextPage: true, endCursor: "nested-page-2"
+      }
+    else . end
+  '
+  exit 0
+fi
+
+if [[ "${1:-}" == project && "${2:-}" == edit ]]; then
+  shift 2
+  number="$1"
+  shift
+  owner=''
+  readme=''
+  while (($#)); do
+    case "$1" in
+      --owner) owner="$2"; shift 2 ;;
+      --readme) readme="$2"; shift 2 ;;
+      *) shift ;;
+    esac
+  done
+  if [[ "$MODE" == "edit-fails" ]]; then
+    exit 1
+  fi
+  jq -cn --arg owner "$owner" --arg number "$number" --arg readme "$readme" \
+    '{kind: "edit", owner: $owner, number: $number, readme: $readme}' >>"$LOG"
+  exit 0
+fi
+
+printf 'unexpected gh invocation\n' >&2
+exit 1
+EOF
+  chmod +x "$gh"
+}
+
 jq '.repositories[0].nameWithOwner = "octo/other"' "$RAW" \
   >"$TEMP_DIR/unrelated-repository.json"
 jq '.project.template = true' "$RAW" >"$TEMP_DIR/template.json"
@@ -234,5 +370,34 @@ assert_rejected "$TEMP_DIR/malformed-marker.json"
 assert_rejected "$TEMP_DIR/duplicate-marker.json"
 assert_rejected "$TEMP_DIR/customized-unmarked.json"
 assert_rejected "$TEMP_DIR/unrelated-structure.json"
+
+SNAPSHOT_OUTPUT="$TEMP_DIR/snapshot.json"
+SNAPSHOT_LOG="$TEMP_DIR/snapshot.log"
+mkdir -p "$TEMP_DIR/bin"
+create_gh_double
+PATH="$TEMP_DIR/bin:$PATH" GH_DOUBLE_MODE=snapshot \
+  GH_DOUBLE_LOG="$SNAPSHOT_LOG" \
+  GH_DOUBLE_FIXTURE="$RAW" "$BASH" "$SCRIPT" snapshot \
+  --owner octo --number 15 --output "$SNAPSHOT_OUTPUT" || \
+  fail "snapshot should use a deterministic local GitHub double"
+
+jq -S -n -e --slurpfile actual "$SNAPSHOT_OUTPUT" \
+  --slurpfile expected "$RAW" '$actual[0] == $expected[0]' >/dev/null || \
+  fail "paginated snapshot did not match the sanitized raw fixture"
+jq -s -e '
+  length == 3 and
+  .[0].kind == "project-id" and
+  .[1].kind == "snapshot" and
+  .[1].repositoriesCursor == "" and
+  .[1].fieldsCursor == "" and
+  .[1].viewsCursor == "" and
+  .[1].workflowsCursor == "" and
+  .[2].kind == "snapshot" and
+  .[2].repositoriesCursor == "" and
+  .[2].fieldsCursor == "fields-page-2" and
+  .[2].viewsCursor == "views-page-2" and
+  .[2].workflowsCursor == "workflows-page-2"
+' "$SNAPSHOT_LOG" >/dev/null || \
+  fail "snapshot did not exercise independent pagination cursors"
 
 printf 'project contract tests passed\n'
