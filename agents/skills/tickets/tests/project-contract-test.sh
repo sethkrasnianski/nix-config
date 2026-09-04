@@ -415,4 +415,32 @@ run_capture "$TEMP_DIR/nested-stdout" "$TEMP_DIR/nested-stderr" env \
   "error: snapshot is incomplete: a nested view connection has another page" ]] || \
   fail "nested pagination produced the wrong diagnostic: $(<"$TEMP_DIR/nested-stderr")"
 
+ADOPTION_RAW="$TEMP_DIR/adoption-pristine.json"
+ADOPTION_LOG="$TEMP_DIR/adoption.log"
+ADOPTION_README='Existing project notes
+'
+EXPECTED_ADOPTION_README="Existing project notes"$'\n\n'"$MARKER"
+jq --arg readme "$ADOPTION_README" '.project.readme = $readme' "$RAW" \
+  >"$ADOPTION_RAW"
+run_capture "$TEMP_DIR/adoption-stdout" "$TEMP_DIR/adoption-stderr" env \
+  PATH="$TEMP_DIR/bin:$PATH" GH_DOUBLE_MODE=adopt \
+  GH_DOUBLE_LOG="$ADOPTION_LOG" GH_DOUBLE_FIXTURE="$ADOPTION_RAW" \
+  "$BASH" "$SCRIPT" adopt --owner octo --number 15 \
+  --repository "$REPOSITORY" --contract "$CONTRACT"
+[[ "$COMMAND_STATUS" -eq 0 ]] || \
+  fail "adoption of a pristine project should succeed"
+jq -e --arg marker "$MARKER" \
+  '.adopted == true and .contractVersion == "kanban-v1" and .marker == $marker' \
+  "$TEMP_DIR/adoption-stdout" >/dev/null || \
+  fail "adoption returned the wrong success result"
+jq -s -e --arg expected "$EXPECTED_ADOPTION_README" '
+  length == 4 and
+  .[0].kind == "project-id" and
+  .[1].kind == "snapshot" and
+  .[2].kind == "snapshot" and
+  .[3].kind == "edit" and
+  .[3].readme == $expected
+' "$ADOPTION_LOG" >/dev/null || \
+  fail "adoption did not preserve the README and perform one edit"
+
 printf 'project contract tests passed\n'
