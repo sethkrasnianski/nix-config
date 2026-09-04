@@ -77,4 +77,43 @@ external_result="$(
 [[ "$(jq -r '.mode' <<<"$external_result")" == pristine ]] || \
   fail "external-directory verification returned the wrong mode"
 
+assert_mode() {
+  local snapshot="$1" expected="$2" result
+  result="$(bash "$SCRIPT" verify --contract "$CONTRACT" \
+    --snapshot "$snapshot" --repository "$REPOSITORY")" || \
+    fail "$(basename "$snapshot") should be accepted"
+  jq -e --arg expected "$expected" \
+    '.valid == true and .mode == $expected and .contractVersion == "kanban-v1"' \
+    <<<"$result" >/dev/null || fail "$(basename "$snapshot") was not a valid $expected project"
+}
+
+MARKER='<!-- github-projects-tickets: kanban-v1 -->'
+jq --arg marker "$MARKER" '
+  .project.readme = $marker |
+  .fields += [{
+    __typename: "ProjectV2Field",
+    id: "field-personal-notes",
+    name: "Personal notes",
+    dataType: "TEXT",
+    isIssueField: false
+  }] |
+  .views += [{
+    id: "view-personal-notes",
+    number: 99,
+    name: "Personal notes",
+    layout: "TABLE_LAYOUT",
+    filter: "",
+    fields: {nodes: [], pageInfo: {hasNextPage: false, endCursor: null}},
+    configuration: {visibleFields: {
+      nodes: [], pageInfo: {hasNextPage: false, endCursor: null}
+    }},
+    groupByFields: {nodes: [], pageInfo: {hasNextPage: false, endCursor: null}},
+    sortByFields: {nodes: [], pageInfo: {hasNextPage: false, endCursor: null}},
+    verticalGroupByFields: {nodes: [], pageInfo: {
+      hasNextPage: false, endCursor: null
+    }}
+  }]
+' "$RAW" >"$TEMP_DIR/marked-superset.json"
+assert_mode "$TEMP_DIR/marked-superset.json" marked-superset
+
 printf 'project contract tests passed\n'
