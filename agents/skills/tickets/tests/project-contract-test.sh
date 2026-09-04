@@ -125,12 +125,33 @@ assert_incomplete_pagination() {
     fail "$(basename "$snapshot") omitted the normalization failure"
 }
 
+assert_rejected() {
+  local snapshot="$1" stdout_file="$TEMP_DIR/stdout" \
+    stderr_file="$TEMP_DIR/stderr" result
+  run_capture "$stdout_file" "$stderr_file" bash "$SCRIPT" verify \
+    --contract "$CONTRACT" --snapshot "$snapshot" --repository "$REPOSITORY"
+  [[ "$COMMAND_STATUS" -ne 0 ]] || \
+    fail "$(basename "$snapshot") should be rejected"
+  [[ ! -s "$stderr_file" ]] || \
+    fail "$(basename "$snapshot") failed before structural verification"
+  result="$(<"$stdout_file")"
+  jq -e '.valid == false and .mode == "rejected" and .contractVersion == "kanban-v1"' \
+    <<<"$result" >/dev/null || \
+    fail "$(basename "$snapshot") did not produce a structural rejection"
+}
+
 jq '.repositories[0].nameWithOwner = "octo/other"' "$RAW" \
   >"$TEMP_DIR/unrelated-repository.json"
 jq '.project.template = true' "$RAW" >"$TEMP_DIR/template.json"
 jq '.project.closed = true' "$RAW" >"$TEMP_DIR/closed.json"
 jq '.pagination.complete = false' "$RAW" \
   >"$TEMP_DIR/incomplete-pagination.json"
+jq '.fields |= map(select(.name != "Status"))' "$RAW" \
+  >"$TEMP_DIR/missing-status.json"
+jq '.fields |= map(
+  if .name == "Status" then .options |= map(select(.name != "Ready"))
+  else . end
+)' "$RAW" >"$TEMP_DIR/missing-status-option.json"
 
 assert_error "$TEMP_DIR/unrelated-repository.json" \
   "project is not linked to repository octo/example"
@@ -139,6 +160,8 @@ assert_error "$TEMP_DIR/template.json" \
 assert_error "$TEMP_DIR/closed.json" \
   "closed projects cannot be used as ticket boards"
 assert_incomplete_pagination "$TEMP_DIR/incomplete-pagination.json"
+assert_rejected "$TEMP_DIR/missing-status.json"
+assert_rejected "$TEMP_DIR/missing-status-option.json"
 
 MARKER='<!-- github-projects-tickets: kanban-v1 -->'
 jq --arg marker "$MARKER" '
