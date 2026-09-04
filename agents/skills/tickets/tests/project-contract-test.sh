@@ -241,7 +241,7 @@ if [[ "${1:-}" == api && "${2:-}" == graphql ]]; then
     }) as $node |
     {data: {node: $node}} |
     if $mode == "nested-pagination" then
-      .data.node.views[0].fields.pageInfo = {
+      .data.node.views.nodes[0].fields.pageInfo = {
         hasNextPage: true, endCursor: "nested-page-2"
       }
     else . end
@@ -399,5 +399,20 @@ jq -s -e '
   .[2].workflowsCursor == "workflows-page-2"
 ' "$SNAPSHOT_LOG" >/dev/null || \
   fail "snapshot did not exercise independent pagination cursors"
+
+NESTED_SNAPSHOT_OUTPUT="$TEMP_DIR/nested-snapshot.json"
+NESTED_SNAPSHOT_LOG="$TEMP_DIR/nested-snapshot.log"
+run_capture "$TEMP_DIR/nested-stdout" "$TEMP_DIR/nested-stderr" env \
+  PATH="$TEMP_DIR/bin:$PATH" GH_DOUBLE_MODE=nested-pagination \
+  GH_DOUBLE_LOG="$NESTED_SNAPSHOT_LOG" GH_DOUBLE_FIXTURE="$RAW" \
+  "$BASH" "$SCRIPT" snapshot --owner octo --number 15 \
+  --output "$NESTED_SNAPSHOT_OUTPUT"
+[[ "$COMMAND_STATUS" -ne 0 ]] || \
+  fail "nested pagination should be rejected"
+[[ ! -s "$TEMP_DIR/nested-stdout" ]] || \
+  fail "nested pagination produced a partial snapshot"
+[[ "$(<"$TEMP_DIR/nested-stderr")" == \
+  "error: snapshot is incomplete: a nested view connection has another page" ]] || \
+  fail "nested pagination produced the wrong diagnostic: $(<"$TEMP_DIR/nested-stderr")"
 
 printf 'project contract tests passed\n'
