@@ -443,4 +443,29 @@ jq -s -e --arg expected "$EXPECTED_ADOPTION_README" '
 ' "$ADOPTION_LOG" >/dev/null || \
   fail "adoption did not preserve the README and perform one edit"
 
+REJECTED_ADOPTION_RAW="$TEMP_DIR/adoption-rejected.json"
+REJECTED_ADOPTION_LOG="$TEMP_DIR/adoption-rejected.log"
+jq '.fields |= map(
+  if .name == "Estimate" then .dataType = "DATE" else . end
+)' "$RAW" >"$REJECTED_ADOPTION_RAW"
+run_capture "$TEMP_DIR/rejected-adoption-stdout" \
+  "$TEMP_DIR/rejected-adoption-stderr" env \
+  PATH="$TEMP_DIR/bin:$PATH" GH_DOUBLE_MODE=rejected-adopt \
+  GH_DOUBLE_LOG="$REJECTED_ADOPTION_LOG" \
+  GH_DOUBLE_FIXTURE="$REJECTED_ADOPTION_RAW" "$BASH" "$SCRIPT" adopt \
+  --owner octo --number 15 --repository "$REPOSITORY" \
+  --contract "$CONTRACT"
+[[ "$COMMAND_STATUS" -ne 0 ]] || \
+  fail "adoption of a structurally invalid project should fail"
+[[ ! -s "$TEMP_DIR/rejected-adoption-stdout" ]] || \
+  fail "rejected adoption exposed a verification result to the caller"
+[[ "$(<"$TEMP_DIR/rejected-adoption-stderr")" == \
+  "error: project is not an unmarked pristine Kanban project" ]] || \
+  fail "rejected adoption produced the wrong diagnostic"
+jq -s -e '
+  length == 3 and
+  all(.[]; .kind != "edit")
+' "$REJECTED_ADOPTION_LOG" >/dev/null || \
+  fail "rejected adoption edited the project"
+
 printf 'project contract tests passed\n'
