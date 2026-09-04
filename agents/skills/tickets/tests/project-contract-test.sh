@@ -152,6 +152,20 @@ jq '.fields |= map(
   if .name == "Status" then .options |= map(select(.name != "Ready"))
   else . end
 )' "$RAW" >"$TEMP_DIR/missing-status-option.json"
+jq '.fields |= map(
+  if .name == "Estimate" then .dataType = "DATE" else . end
+)' "$RAW" >"$TEMP_DIR/altered-field.json"
+jq '.views |= map(
+  if .name == "Backlog" then .filter = "status:Ready" else . end
+)' "$RAW" >"$TEMP_DIR/altered-view.json"
+jq '.fields |= map(
+  if .name == "Status" then
+    .options |= map(if .name == "Ready" then .color = "RED" else . end)
+  else . end
+)' "$RAW" >"$TEMP_DIR/altered-status-option.json"
+jq '.workflows |= map(
+  if .name == "Item closed" then .enabled = false else . end
+)' "$RAW" >"$TEMP_DIR/altered-workflow.json"
 
 assert_error "$TEMP_DIR/unrelated-repository.json" \
   "project is not linked to repository octo/example"
@@ -190,6 +204,17 @@ jq --arg marker "$MARKER" '
     }}
   }]
 ' "$RAW" >"$TEMP_DIR/marked-superset.json"
+jq '.workflows += [{
+  id: "workflow-unexpected",
+  number: 99,
+  name: "Unexpected workflow",
+  enabled: true
+}]' "$TEMP_DIR/marked-superset.json" >"$TEMP_DIR/extra-workflow.json"
 assert_mode "$TEMP_DIR/marked-superset.json" marked-superset
+assert_rejected "$TEMP_DIR/altered-field.json"
+assert_rejected "$TEMP_DIR/altered-view.json"
+assert_rejected "$TEMP_DIR/altered-status-option.json"
+assert_rejected "$TEMP_DIR/altered-workflow.json"
+assert_rejected "$TEMP_DIR/extra-workflow.json"
 
 printf 'project contract tests passed\n'
