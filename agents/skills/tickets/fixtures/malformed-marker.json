@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "pagination": {"complete": true},
-  "project": {"id": "PVT_malformed", "number": 6, "title": "Example", "readme": "<!-- github-projects-tickets: kanban-v0 -->"},
-  "repositories": [{"id": "R_fixture", "nameWithOwner": "octo/example"}],
-  "fields": [],
-  "views": [],
-  "workflows": []
-}
