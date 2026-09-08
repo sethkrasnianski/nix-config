@@ -25,8 +25,8 @@ jq -e '
   .pagination.complete == true and
   .project.template == false and
   .project.closed == false and
-  (.repositories | length) == 1 and
-  .repositories[0].nameWithOwner == "octo/example" and
+  (.repositories | length) == 2 and
+  any(.repositories[]; .nameWithOwner == "octo/example") and
   (.fields | length) == 18 and
   (.views | length) == 5 and
   (.workflows | length) == 7 and
@@ -204,18 +204,27 @@ if [[ "${1:-}" == api && "${2:-}" == graphql ]]; then
   done
 
   if [[ "$query" == *"projectV2(number:"* ]]; then
+    if [[ "$login" != octo || "$number" != 15 ]]; then
+      printf 'unexpected project lookup target\n' >&2
+      exit 1
+    fi
     jq -cn --arg owner "$login" --arg number "$number" \
       '{kind: "project-id", owner: $owner, number: $number}' >>"$LOG"
     printf '%s\n' '{"data":{"repositoryOwner":{"projectV2":{"id":"project-fixture"}}}}'
     exit 0
   fi
 
+  if [[ "$id" != project-fixture ]]; then
+    printf 'unexpected project snapshot target\n' >&2
+    exit 1
+  fi
   jq -cn \
+    --arg id "$id" \
     --arg repositories_cursor "$repositories_cursor" \
     --arg fields_cursor "$fields_cursor" \
     --arg views_cursor "$views_cursor" \
     --arg workflows_cursor "$workflows_cursor" \
-    '{kind: "snapshot", repositoriesCursor: $repositories_cursor,
+    '{kind: "snapshot", id: $id, repositoriesCursor: $repositories_cursor,
       fieldsCursor: $fields_cursor, viewsCursor: $views_cursor,
       workflowsCursor: $workflows_cursor}' >>"$LOG"
 
@@ -267,6 +276,10 @@ if [[ "${1:-}" == project && "${2:-}" == edit ]]; then
       *) shift ;;
     esac
   done
+  if [[ "$owner" != octo || "$number" != 15 ]]; then
+    printf 'unexpected project edit target\n' >&2
+    exit 1
+  fi
   if [[ "$MODE" == "edit-fails" ]]; then
     exit 1
   fi
@@ -281,7 +294,7 @@ EOF
   chmod +x "$gh"
 }
 
-jq '.repositories[0].nameWithOwner = "octo/other"' "$RAW" \
+jq '.repositories |= map(.nameWithOwner = "octo/other")' "$RAW" \
   >"$TEMP_DIR/unrelated-repository.json"
 jq '.project.template = true' "$RAW" >"$TEMP_DIR/template.json"
 jq '.project.closed = true' "$RAW" >"$TEMP_DIR/closed.json"
@@ -293,21 +306,6 @@ jq '.fields |= map(
   if .name == "Status" then .options |= map(select(.name != "Ready"))
   else . end
 )' "$RAW" >"$TEMP_DIR/missing-status-option.json"
-jq '.fields |= map(
-  if .name == "Estimate" then .dataType = "DATE" else . end
-)' "$RAW" >"$TEMP_DIR/altered-field.json"
-jq '.views |= map(
-  if .name == "Backlog" then .filter = "status:Ready" else . end
-)' "$RAW" >"$TEMP_DIR/altered-view.json"
-jq '.fields |= map(
-  if .name == "Status" then
-    .options |= map(if .name == "Ready" then .color = "RED" else . end)
-  else . end
-)' "$RAW" >"$TEMP_DIR/altered-status-option.json"
-jq '.workflows |= map(
-  if .name == "Item closed" then .enabled = false else . end
-)' "$RAW" >"$TEMP_DIR/altered-workflow.json"
-
 assert_error "$TEMP_DIR/unrelated-repository.json" \
   "project is not linked to repository octo/example"
 assert_error "$TEMP_DIR/template.json" \
@@ -345,6 +343,20 @@ jq --arg marker "$MARKER" '
     }}
   }]
 ' "$RAW" >"$TEMP_DIR/marked-superset.json"
+jq '.fields |= map(
+  if .name == "Estimate" then .dataType = "DATE" else . end
+)' "$TEMP_DIR/marked-superset.json" >"$TEMP_DIR/altered-field.json"
+jq '.views |= map(
+  if .name == "Backlog" then .filter = "status:Ready" else . end
+)' "$TEMP_DIR/marked-superset.json" >"$TEMP_DIR/altered-view.json"
+jq '.fields |= map(
+  if .name == "Status" then
+    .options |= map(if .name == "Ready" then .color = "RED" else . end)
+  else . end
+)' "$TEMP_DIR/marked-superset.json" >"$TEMP_DIR/altered-status-option.json"
+jq '.workflows |= map(
+  if .name == "Item closed" then .enabled = false else . end
+)' "$TEMP_DIR/marked-superset.json" >"$TEMP_DIR/altered-workflow.json"
 jq '.workflows += [{
   id: "workflow-unexpected",
   number: 99,
@@ -386,19 +398,24 @@ PATH="$TEMP_DIR/bin:$PATH" GH_DOUBLE_MODE=snapshot \
   --owner octo --number 15 --output "$SNAPSHOT_OUTPUT" || \
   fail "snapshot should use a deterministic local GitHub double"
 
-jq -S -n -e --slurpfile actual "$SNAPSHOT_OUTPUT" \
-  --slurpfile expected "$RAW" '$actual[0] == $expected[0]' >/dev/null || \
+if ! jq -S -n -e --slurpfile actual "$SNAPSHOT_OUTPUT" \
+  --slurpfile expected "$RAW" \
+  '($actual[0] | .repositories |= sort_by(.id)) ==
+   ($expected[0] | .repositories |= sort_by(.id))' >/dev/null; then
   fail "paginated snapshot did not match the sanitized raw fixture"
+fi
 jq -s -e '
   length == 3 and
   .[0].kind == "project-id" and
   .[1].kind == "snapshot" and
+  .[1].id == "project-fixture" and
   .[1].repositoriesCursor == "" and
   .[1].fieldsCursor == "" and
   .[1].viewsCursor == "" and
   .[1].workflowsCursor == "" and
   .[2].kind == "snapshot" and
-  .[2].repositoriesCursor == "" and
+  .[2].id == "project-fixture" and
+  .[2].repositoriesCursor == "repositories-page-2" and
   .[2].fieldsCursor == "fields-page-2" and
   .[2].viewsCursor == "views-page-2" and
   .[2].workflowsCursor == "workflows-page-2"
@@ -416,6 +433,8 @@ run_capture "$TEMP_DIR/nested-stdout" "$TEMP_DIR/nested-stderr" env \
   fail "nested pagination should be rejected"
 [[ ! -s "$TEMP_DIR/nested-stdout" ]] || \
   fail "nested pagination produced a partial snapshot"
+[[ ! -e "$NESTED_SNAPSHOT_OUTPUT" || ! -s "$NESTED_SNAPSHOT_OUTPUT" ]] || \
+  fail "nested pagination wrote a partial snapshot file"
 [[ "$(<"$TEMP_DIR/nested-stderr")" == \
   "error: snapshot is incomplete: a nested view connection has another page" ]] || \
   fail "nested pagination produced the wrong diagnostic: $(<"$TEMP_DIR/nested-stderr")"
@@ -434,16 +453,20 @@ run_capture "$TEMP_DIR/adoption-stdout" "$TEMP_DIR/adoption-stderr" env \
   --repository "$REPOSITORY" --contract "$CONTRACT"
 [[ "$COMMAND_STATUS" -eq 0 ]] || \
   fail "adoption of a pristine project should succeed"
-jq -e --arg marker "$MARKER" \
-  '.adopted == true and .contractVersion == "kanban-v1" and .marker == $marker' \
-  "$TEMP_DIR/adoption-stdout" >/dev/null || \
+jq -S -n -e --arg marker "$MARKER" \
+  --slurpfile result "$TEMP_DIR/adoption-stdout" \
+  '$result == [{adopted: true, contractVersion: "kanban-v1", marker: $marker}]' \
+  >/dev/null || \
   fail "adoption returned the wrong success result"
 jq -s -e --arg expected "$EXPECTED_ADOPTION_README" '
   length == 4 and
-  .[0].kind == "project-id" and
+  .[0].kind == "project-id" and .[0].owner == "octo" and .[0].number == "15" and
   .[1].kind == "snapshot" and
+  .[1].id == "project-fixture" and
   .[2].kind == "snapshot" and
+  .[2].id == "project-fixture" and
   .[3].kind == "edit" and
+  .[3].owner == "octo" and .[3].number == "15" and
   .[3].readme == $expected
 ' "$ADOPTION_LOG" >/dev/null || \
   fail "adoption did not preserve the README and perform one edit"

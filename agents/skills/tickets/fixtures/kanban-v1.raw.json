@@ -228,6 +228,10 @@
     {
       "id": "repository-fixture",
       "nameWithOwner": "octo/example"
+    },
+    {
+      "id": "repository-another-fixture",
+      "nameWithOwner": "octo/another-example"
     }
   ],
   "schemaVersion": 1,
