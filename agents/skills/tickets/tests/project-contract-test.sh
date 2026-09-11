@@ -245,10 +245,21 @@ if [[ "${1:-}" == api && "${2:-}" == graphql ]]; then
         {nodes: $items[($size - 1):],
          pageInfo: {hasNextPage: false, endCursor: null}}
       end;
+    def fields_page($items; $cursor):
+      if $cursor == "" then
+        {nodes: $items[0:9],
+         pageInfo: {hasNextPage: true, endCursor: "fields-page-2"}}
+      elif $cursor == "fields-page-2" then
+        {nodes: $items[8:17],
+         pageInfo: {hasNextPage: true, endCursor: "fields-page-3"}}
+      else
+        {nodes: $items[16:],
+         pageInfo: {hasNextPage: false, endCursor: null}}
+      end;
     ($source.project + {
       repositories: page($source.repositories; $repositories_cursor; 1;
                          "repositories-page-2"),
-      fields: page($source.fields; $fields_cursor; 9; "fields-page-2"),
+      fields: fields_page($source.fields; $fields_cursor),
       views: page($source.views; $views_cursor; 2; "views-page-2"),
       workflows: page($source.workflows; $workflows_cursor; 4;
                       "workflows-page-2")
@@ -405,7 +416,7 @@ if ! jq -S -n -e --slurpfile actual "$SNAPSHOT_OUTPUT" \
   fail "paginated snapshot did not match the sanitized raw fixture"
 fi
 jq -s -e '
-  length == 3 and
+  length == 4 and
   .[0].kind == "project-id" and
   .[1].kind == "snapshot" and
   .[1].id == "project-fixture" and
@@ -418,7 +429,13 @@ jq -s -e '
   .[2].repositoriesCursor == "repositories-page-2" and
   .[2].fieldsCursor == "fields-page-2" and
   .[2].viewsCursor == "views-page-2" and
-  .[2].workflowsCursor == "workflows-page-2"
+  .[2].workflowsCursor == "workflows-page-2" and
+  .[3].kind == "snapshot" and
+  .[3].id == "project-fixture" and
+  .[3].repositoriesCursor == "repositories-page-2" and
+  .[3].fieldsCursor == "fields-page-3" and
+  .[3].viewsCursor == "views-page-2" and
+  .[3].workflowsCursor == "workflows-page-2"
 ' "$SNAPSHOT_LOG" >/dev/null || \
   fail "snapshot did not exercise independent pagination cursors"
 
@@ -459,15 +476,17 @@ jq -S -n -e --arg marker "$MARKER" \
   >/dev/null || \
   fail "adoption returned the wrong success result"
 jq -s -e --arg expected "$EXPECTED_ADOPTION_README" '
-  length == 4 and
+  length == 5 and
   .[0].kind == "project-id" and .[0].owner == "octo" and .[0].number == "15" and
   .[1].kind == "snapshot" and
   .[1].id == "project-fixture" and
   .[2].kind == "snapshot" and
   .[2].id == "project-fixture" and
-  .[3].kind == "edit" and
-  .[3].owner == "octo" and .[3].number == "15" and
-  .[3].readme == $expected
+  .[3].kind == "snapshot" and .[3].id == "project-fixture" and
+  .[3].fieldsCursor == "fields-page-3" and
+  .[4].kind == "edit" and
+  .[4].owner == "octo" and .[4].number == "15" and
+  .[4].readme == $expected
 ' "$ADOPTION_LOG" >/dev/null || \
   fail "adoption did not preserve the README and perform one edit"
 
@@ -491,7 +510,7 @@ run_capture "$TEMP_DIR/rejected-adoption-stdout" \
   "error: project is not an unmarked pristine Kanban project" ]] || \
   fail "rejected adoption produced the wrong diagnostic"
 jq -s -e '
-  length == 3 and
+  length == 4 and
   all(.[]; .kind != "edit")
 ' "$REJECTED_ADOPTION_LOG" >/dev/null || \
   fail "rejected adoption edited the project"
