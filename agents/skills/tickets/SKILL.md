@@ -126,46 +126,6 @@ The public API does not expose historical source-template provenance. Matching
 the normalized contract is the strongest API-only check available, not proof
 of how the project was created. Do not claim stronger provenance.
 
-### Capturing the first contract
-
-The checked-in contract intentionally starts in
-`pending-canonical-capture` state and the helper rejects it. This prevents an
-empty or guessed contract from authorizing a project. To establish the
-contract, the user must first create a pristine built-in Kanban project in the
-GitHub web UI and provide its owner and number.
-
-1. Confirm in the UI that the project is untouched and linked to the target
-   repository.
-2. Capture a read-only snapshot:
-
-   ```sh
-   "$TICKETS_SKILL_DIR/scripts/project-contract.sh" snapshot \
-     --owner "$PROJECT_OWNER" --number "$PROJECT_NUMBER" \
-     --output "$TMPDIR/pristine-kanban.json"
-   ```
-
-3. Inspect the normalized snapshot and verify that pagination is complete:
-
-   ```sh
-   "$TICKETS_SKILL_DIR/scripts/project-contract.sh" normalize \
-     --input "$TMPDIR/pristine-kanban.json" --output -
-   ```
-
-4. Only after that confirmation, replace the pending contract:
-
-   ```sh
-   "$TICKETS_SKILL_DIR/scripts/project-contract.sh" capture-contract \
-     --snapshot "$TMPDIR/pristine-kanban.json" \
-     --output "$TICKETS_SKILL_DIR/contracts/kanban-v1.json"
-   ```
-
-5. Review the contract diff. Keep the version `kanban-v1`; a changed required
-   baseline needs a new version and a deliberate migration decision.
-
-Do not capture a project that was copied, customized, or selected only because
-it resembles Kanban. The helper can validate structure but cannot validate
-that user assertion.
-
 ## No-argument board view
 
 For a request to show or list tickets:

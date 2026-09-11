@@ -1,0 +1,1235 @@
+{
+  "fields": [
+    {
+      "__typename": "ProjectV2Field",
+      "dataType": "ASSIGNEES",
+      "id": "field-assignees",
+      "isIssueField": false,
+      "name": "Assignees"
+    },
+    {
+      "__typename": "ProjectV2Field",
+      "dataType": "CLOSED",
+      "id": "field-closed",
+      "isIssueField": false,
+      "name": "Closed"
+    },
+    {
+      "__typename": "ProjectV2Field",
+      "dataType": "CREATED",
+      "id": "field-created",
+      "isIssueField": false,
+      "name": "Created"
+    },
+    {
+      "__typename": "ProjectV2Field",
+      "dataType": "NUMBER",
+      "id": "field-estimate",
+      "isIssueField": false,
+      "name": "Estimate"
+    },
+    {
+      "__typename": "ProjectV2Field",
+      "dataType": "LABELS",
+      "id": "field-labels",
+      "isIssueField": false,
+      "name": "Labels"
+    },
+    {
+      "__typename": "ProjectV2Field",
+      "dataType": "LINKED_PULL_REQUESTS",
+      "id": "field-linked-pull-requests",
+      "isIssueField": false,
+      "name": "Linked pull requests"
+    },
+    {
+      "__typename": "ProjectV2Field",
+      "dataType": "MILESTONE",
+      "id": "field-milestone",
+      "isIssueField": false,
+      "name": "Milestone"
+    },
+    {
+      "__typename": "ProjectV2Field",
+      "dataType": "PARENT_ISSUE",
+      "id": "field-parent-issue",
+      "isIssueField": false,
+      "name": "Parent issue"
+    },
+    {
+      "__typename": "ProjectV2SingleSelectField",
+      "dataType": "SINGLE_SELECT",
+      "id": "field-priority",
+      "isIssueField": false,
+      "name": "Priority",
+      "options": [
+        {
+          "color": "RED",
+          "description": "",
+          "id": "option-priority-p0",
+          "name": "P0"
+        },
+        {
+          "color": "ORANGE",
+          "description": "",
+          "id": "option-priority-p1",
+          "name": "P1"
+        },
+        {
+          "color": "YELLOW",
+          "description": "",
+          "id": "option-priority-p2",
+          "name": "P2"
+        }
+      ]
+    },
+    {
+      "__typename": "ProjectV2Field",
+      "dataType": "REPOSITORY",
+      "id": "field-repository",
+      "isIssueField": false,
+      "name": "Repository"
+    },
+    {
+      "__typename": "ProjectV2Field",
+      "dataType": "REVIEWERS",
+      "id": "field-reviewers",
+      "isIssueField": false,
+      "name": "Reviewers"
+    },
+    {
+      "__typename": "ProjectV2SingleSelectField",
+      "dataType": "SINGLE_SELECT",
+      "id": "field-size",
+      "isIssueField": false,
+      "name": "Size",
+      "options": [
+        {
+          "color": "YELLOW",
+          "description": "",
+          "id": "option-size-l",
+          "name": "L"
+        },
+        {
+          "color": "RED",
+          "description": "",
+          "id": "option-size-m",
+          "name": "M"
+        },
+        {
+          "color": "PURPLE",
+          "description": "",
+          "id": "option-size-s",
+          "name": "S"
+        },
+        {
+          "color": "PINK",
+          "description": "",
+          "id": "option-size-xl",
+          "name": "XL"
+        },
+        {
+          "color": "GREEN",
+          "description": "",
+          "id": "option-size-xs",
+          "name": "XS"
+        }
+      ]
+    },
+    {
+      "__typename": "ProjectV2Field",
+      "dataType": "DATE",
+      "id": "field-start-date",
+      "isIssueField": false,
+      "name": "Start date"
+    },
+    {
+      "__typename": "ProjectV2SingleSelectField",
+      "dataType": "SINGLE_SELECT",
+      "id": "field-status",
+      "isIssueField": false,
+      "name": "Status",
+      "options": [
+        {
+          "color": "GREEN",
+          "description": "This item hasn't been started",
+          "id": "option-status-backlog",
+          "name": "Backlog"
+        },
+        {
+          "color": "ORANGE",
+          "description": "This has been completed",
+          "id": "option-status-done",
+          "name": "Done"
+        },
+        {
+          "color": "YELLOW",
+          "description": "This is actively being worked on",
+          "id": "option-status-in-progress",
+          "name": "In progress"
+        },
+        {
+          "color": "PURPLE",
+          "description": "This item is in review",
+          "id": "option-status-in-review",
+          "name": "In review"
+        },
+        {
+          "color": "BLUE",
+          "description": "This is ready to be picked up",
+          "id": "option-status-ready",
+          "name": "Ready"
+        }
+      ]
+    },
+    {
+      "__typename": "ProjectV2Field",
+      "dataType": "SUB_ISSUES_PROGRESS",
+      "id": "field-sub-issues-progress",
+      "isIssueField": false,
+      "name": "Sub-issues progress"
+    },
+    {
+      "__typename": "ProjectV2Field",
+      "dataType": "DATE",
+      "id": "field-target-date",
+      "isIssueField": false,
+      "name": "Target date"
+    },
+    {
+      "__typename": "ProjectV2Field",
+      "dataType": "TITLE",
+      "id": "field-title",
+      "isIssueField": false,
+      "name": "Title"
+    },
+    {
+      "__typename": "ProjectV2Field",
+      "dataType": "UPDATED",
+      "id": "field-updated",
+      "isIssueField": false,
+      "name": "Updated"
+    }
+  ],
+  "pagination": {
+    "complete": true
+  },
+  "project": {
+    "closed": false,
+    "id": "project-fixture",
+    "number": 15,
+    "public": false,
+    "readme": null,
+    "shortDescription": null,
+    "template": false,
+    "title": "Sanitized Kanban"
+  },
+  "repositories": [
+    {
+      "id": "repository-fixture",
+      "nameWithOwner": "octo/example"
+    },
+    {
+      "id": "repository-another-fixture",
+      "nameWithOwner": "octo/another-example"
+    }
+  ],
+  "schemaVersion": 1,
+  "views": [
+    {
+      "configuration": {
+        "visibleFields": {
+          "nodes": [],
+          "pageInfo": {
+            "endCursor": null,
+            "hasNextPage": false
+          }
+        }
+      },
+      "fields": {
+        "nodes": [
+          {
+            "__typename": "ProjectV2Field",
+            "dataType": "ASSIGNEES",
+            "id": "field-assignees",
+            "isIssueField": false,
+            "name": "Assignees"
+          },
+          {
+            "__typename": "ProjectV2Field",
+            "dataType": "NUMBER",
+            "id": "field-estimate",
+            "isIssueField": false,
+            "name": "Estimate"
+          },
+          {
+            "__typename": "ProjectV2Field",
+            "dataType": "LINKED_PULL_REQUESTS",
+            "id": "field-linked-pull-requests",
+            "isIssueField": false,
+            "name": "Linked pull requests"
+          },
+          {
+            "__typename": "ProjectV2SingleSelectField",
+            "dataType": "SINGLE_SELECT",
+            "id": "field-priority",
+            "isIssueField": false,
+            "name": "Priority",
+            "options": [
+              {
+                "color": "RED",
+                "description": "",
+                "id": "option-priority-p0",
+                "name": "P0"
+              },
+              {
+                "color": "ORANGE",
+                "description": "",
+                "id": "option-priority-p1",
+                "name": "P1"
+              },
+              {
+                "color": "YELLOW",
+                "description": "",
+                "id": "option-priority-p2",
+                "name": "P2"
+              }
+            ]
+          },
+          {
+            "__typename": "ProjectV2SingleSelectField",
+            "dataType": "SINGLE_SELECT",
+            "id": "field-size",
+            "isIssueField": false,
+            "name": "Size",
+            "options": [
+              {
+                "color": "YELLOW",
+                "description": "",
+                "id": "option-size-l",
+                "name": "L"
+              },
+              {
+                "color": "RED",
+                "description": "",
+                "id": "option-size-m",
+                "name": "M"
+              },
+              {
+                "color": "PURPLE",
+                "description": "",
+                "id": "option-size-s",
+                "name": "S"
+              },
+              {
+                "color": "PINK",
+                "description": "",
+                "id": "option-size-xl",
+                "name": "XL"
+              },
+              {
+                "color": "GREEN",
+                "description": "",
+                "id": "option-size-xs",
+                "name": "XS"
+              }
+            ]
+          },
+          {
+            "__typename": "ProjectV2SingleSelectField",
+            "dataType": "SINGLE_SELECT",
+            "id": "field-status",
+            "isIssueField": false,
+            "name": "Status",
+            "options": [
+              {
+                "color": "GREEN",
+                "description": "This item hasn't been started",
+                "id": "option-status-backlog",
+                "name": "Backlog"
+              },
+              {
+                "color": "ORANGE",
+                "description": "This has been completed",
+                "id": "option-status-done",
+                "name": "Done"
+              },
+              {
+                "color": "YELLOW",
+                "description": "This is actively being worked on",
+                "id": "option-status-in-progress",
+                "name": "In progress"
+              },
+              {
+                "color": "PURPLE",
+                "description": "This item is in review",
+                "id": "option-status-in-review",
+                "name": "In review"
+              },
+              {
+                "color": "BLUE",
+                "description": "This is ready to be picked up",
+                "id": "option-status-ready",
+                "name": "Ready"
+              }
+            ]
+          },
+          {
+            "__typename": "ProjectV2Field",
+            "dataType": "SUB_ISSUES_PROGRESS",
+            "id": "field-sub-issues-progress",
+            "isIssueField": false,
+            "name": "Sub-issues progress"
+          },
+          {
+            "__typename": "ProjectV2Field",
+            "dataType": "TITLE",
+            "id": "field-title",
+            "isIssueField": false,
+            "name": "Title"
+          }
+        ],
+        "pageInfo": {
+          "endCursor": null,
+          "hasNextPage": false
+        }
+      },
+      "filter": "",
+      "groupByFields": {
+        "nodes": [],
+        "pageInfo": {
+          "endCursor": null,
+          "hasNextPage": false
+        }
+      },
+      "id": "view-backlog",
+      "layout": "BOARD_LAYOUT",
+      "name": "Backlog",
+      "number": 1,
+      "sortByFields": {
+        "nodes": [
+          {
+            "direction": "ASC",
+            "field": {
+              "__typename": "ProjectV2SingleSelectField",
+              "dataType": "SINGLE_SELECT",
+              "id": "field-priority",
+              "isIssueField": false,
+              "name": "Priority",
+              "options": [
+                {
+                  "color": "RED",
+                  "description": "",
+                  "id": "option-priority-p0",
+                  "name": "P0"
+                },
+                {
+                  "color": "ORANGE",
+                  "description": "",
+                  "id": "option-priority-p1",
+                  "name": "P1"
+                },
+                {
+                  "color": "YELLOW",
+                  "description": "",
+                  "id": "option-priority-p2",
+                  "name": "P2"
+                }
+              ]
+            }
+          }
+        ],
+        "pageInfo": {
+          "endCursor": null,
+          "hasNextPage": false
+        }
+      },
+      "verticalGroupByFields": {
+        "nodes": [
+          {
+            "__typename": "ProjectV2SingleSelectField",
+            "dataType": "SINGLE_SELECT",
+            "id": "field-status",
+            "isIssueField": false,
+            "name": "Status",
+            "options": [
+              {
+                "color": "GREEN",
+                "description": "This item hasn't been started",
+                "id": "option-status-backlog",
+                "name": "Backlog"
+              },
+              {
+                "color": "ORANGE",
+                "description": "This has been completed",
+                "id": "option-status-done",
+                "name": "Done"
+              },
+              {
+                "color": "YELLOW",
+                "description": "This is actively being worked on",
+                "id": "option-status-in-progress",
+                "name": "In progress"
+              },
+              {
+                "color": "PURPLE",
+                "description": "This item is in review",
+                "id": "option-status-in-review",
+                "name": "In review"
+              },
+              {
+                "color": "BLUE",
+                "description": "This is ready to be picked up",
+                "id": "option-status-ready",
+                "name": "Ready"
+              }
+            ]
+          }
+        ],
+        "pageInfo": {
+          "endCursor": null,
+          "hasNextPage": false
+        }
+      }
+    },
+    {
+      "configuration": {
+        "visibleFields": {
+          "nodes": [],
+          "pageInfo": {
+            "endCursor": null,
+            "hasNextPage": false
+          }
+        }
+      },
+      "fields": {
+        "nodes": [
+          {
+            "__typename": "ProjectV2Field",
+            "dataType": "NUMBER",
+            "id": "field-estimate",
+            "isIssueField": false,
+            "name": "Estimate"
+          },
+          {
+            "__typename": "ProjectV2Field",
+            "dataType": "LINKED_PULL_REQUESTS",
+            "id": "field-linked-pull-requests",
+            "isIssueField": false,
+            "name": "Linked pull requests"
+          },
+          {
+            "__typename": "ProjectV2SingleSelectField",
+            "dataType": "SINGLE_SELECT",
+            "id": "field-priority",
+            "isIssueField": false,
+            "name": "Priority",
+            "options": [
+              {
+                "color": "RED",
+                "description": "",
+                "id": "option-priority-p0",
+                "name": "P0"
+              },
+              {
+                "color": "ORANGE",
+                "description": "",
+                "id": "option-priority-p1",
+                "name": "P1"
+              },
+              {
+                "color": "YELLOW",
+                "description": "",
+                "id": "option-priority-p2",
+                "name": "P2"
+              }
+            ]
+          },
+          {
+            "__typename": "ProjectV2SingleSelectField",
+            "dataType": "SINGLE_SELECT",
+            "id": "field-size",
+            "isIssueField": false,
+            "name": "Size",
+            "options": [
+              {
+                "color": "YELLOW",
+                "description": "",
+                "id": "option-size-l",
+                "name": "L"
+              },
+              {
+                "color": "RED",
+                "description": "",
+                "id": "option-size-m",
+                "name": "M"
+              },
+              {
+                "color": "PURPLE",
+                "description": "",
+                "id": "option-size-s",
+                "name": "S"
+              },
+              {
+                "color": "PINK",
+                "description": "",
+                "id": "option-size-xl",
+                "name": "XL"
+              },
+              {
+                "color": "GREEN",
+                "description": "",
+                "id": "option-size-xs",
+                "name": "XS"
+              }
+            ]
+          },
+          {
+            "__typename": "ProjectV2Field",
+            "dataType": "SUB_ISSUES_PROGRESS",
+            "id": "field-sub-issues-progress",
+            "isIssueField": false,
+            "name": "Sub-issues progress"
+          },
+          {
+            "__typename": "ProjectV2Field",
+            "dataType": "TITLE",
+            "id": "field-title",
+            "isIssueField": false,
+            "name": "Title"
+          }
+        ],
+        "pageInfo": {
+          "endCursor": null,
+          "hasNextPage": false
+        }
+      },
+      "filter": "assignee:@me",
+      "groupByFields": {
+        "nodes": [],
+        "pageInfo": {
+          "endCursor": null,
+          "hasNextPage": false
+        }
+      },
+      "id": "view-my-items",
+      "layout": "TABLE_LAYOUT",
+      "name": "My items",
+      "number": 2,
+      "sortByFields": {
+        "nodes": [],
+        "pageInfo": {
+          "endCursor": null,
+          "hasNextPage": false
+        }
+      },
+      "verticalGroupByFields": {
+        "nodes": [],
+        "pageInfo": {
+          "endCursor": null,
+          "hasNextPage": false
+        }
+      }
+    },
+    {
+      "configuration": {
+        "visibleFields": {
+          "nodes": [],
+          "pageInfo": {
+            "endCursor": null,
+            "hasNextPage": false
+          }
+        }
+      },
+      "fields": {
+        "nodes": [
+          {
+            "__typename": "ProjectV2Field",
+            "dataType": "ASSIGNEES",
+            "id": "field-assignees",
+            "isIssueField": false,
+            "name": "Assignees"
+          },
+          {
+            "__typename": "ProjectV2Field",
+            "dataType": "NUMBER",
+            "id": "field-estimate",
+            "isIssueField": false,
+            "name": "Estimate"
+          },
+          {
+            "__typename": "ProjectV2Field",
+            "dataType": "LINKED_PULL_REQUESTS",
+            "id": "field-linked-pull-requests",
+            "isIssueField": false,
+            "name": "Linked pull requests"
+          },
+          {
+            "__typename": "ProjectV2SingleSelectField",
+            "dataType": "SINGLE_SELECT",
+            "id": "field-size",
+            "isIssueField": false,
+            "name": "Size",
+            "options": [
+              {
+                "color": "YELLOW",
+                "description": "",
+                "id": "option-size-l",
+                "name": "L"
+              },
+              {
+                "color": "RED",
+                "description": "",
+                "id": "option-size-m",
+                "name": "M"
+              },
+              {
+                "color": "PURPLE",
+                "description": "",
+                "id": "option-size-s",
+                "name": "S"
+              },
+              {
+                "color": "PINK",
+                "description": "",
+                "id": "option-size-xl",
+                "name": "XL"
+              },
+              {
+                "color": "GREEN",
+                "description": "",
+                "id": "option-size-xs",
+                "name": "XS"
+              }
+            ]
+          },
+          {
+            "__typename": "ProjectV2SingleSelectField",
+            "dataType": "SINGLE_SELECT",
+            "id": "field-status",
+            "isIssueField": false,
+            "name": "Status",
+            "options": [
+              {
+                "color": "GREEN",
+                "description": "This item hasn't been started",
+                "id": "option-status-backlog",
+                "name": "Backlog"
+              },
+              {
+                "color": "ORANGE",
+                "description": "This has been completed",
+                "id": "option-status-done",
+                "name": "Done"
+              },
+              {
+                "color": "YELLOW",
+                "description": "This is actively being worked on",
+                "id": "option-status-in-progress",
+                "name": "In progress"
+              },
+              {
+                "color": "PURPLE",
+                "description": "This item is in review",
+                "id": "option-status-in-review",
+                "name": "In review"
+              },
+              {
+                "color": "BLUE",
+                "description": "This is ready to be picked up",
+                "id": "option-status-ready",
+                "name": "Ready"
+              }
+            ]
+          },
+          {
+            "__typename": "ProjectV2Field",
+            "dataType": "SUB_ISSUES_PROGRESS",
+            "id": "field-sub-issues-progress",
+            "isIssueField": false,
+            "name": "Sub-issues progress"
+          },
+          {
+            "__typename": "ProjectV2Field",
+            "dataType": "TITLE",
+            "id": "field-title",
+            "isIssueField": false,
+            "name": "Title"
+          }
+        ],
+        "pageInfo": {
+          "endCursor": null,
+          "hasNextPage": false
+        }
+      },
+      "filter": "",
+      "groupByFields": {
+        "nodes": [
+          {
+            "__typename": "ProjectV2SingleSelectField",
+            "dataType": "SINGLE_SELECT",
+            "id": "field-priority",
+            "isIssueField": false,
+            "name": "Priority",
+            "options": [
+              {
+                "color": "RED",
+                "description": "",
+                "id": "option-priority-p0",
+                "name": "P0"
+              },
+              {
+                "color": "ORANGE",
+                "description": "",
+                "id": "option-priority-p1",
+                "name": "P1"
+              },
+              {
+                "color": "YELLOW",
+                "description": "",
+                "id": "option-priority-p2",
+                "name": "P2"
+              }
+            ]
+          }
+        ],
+        "pageInfo": {
+          "endCursor": null,
+          "hasNextPage": false
+        }
+      },
+      "id": "view-priority-board",
+      "layout": "BOARD_LAYOUT",
+      "name": "Priority board",
+      "number": 3,
+      "sortByFields": {
+        "nodes": [],
+        "pageInfo": {
+          "endCursor": null,
+          "hasNextPage": false
+        }
+      },
+      "verticalGroupByFields": {
+        "nodes": [
+          {
+            "__typename": "ProjectV2SingleSelectField",
+            "dataType": "SINGLE_SELECT",
+            "id": "field-status",
+            "isIssueField": false,
+            "name": "Status",
+            "options": [
+              {
+                "color": "GREEN",
+                "description": "This item hasn't been started",
+                "id": "option-status-backlog",
+                "name": "Backlog"
+              },
+              {
+                "color": "ORANGE",
+                "description": "This has been completed",
+                "id": "option-status-done",
+                "name": "Done"
+              },
+              {
+                "color": "YELLOW",
+                "description": "This is actively being worked on",
+                "id": "option-status-in-progress",
+                "name": "In progress"
+              },
+              {
+                "color": "PURPLE",
+                "description": "This item is in review",
+                "id": "option-status-in-review",
+                "name": "In review"
+              },
+              {
+                "color": "BLUE",
+                "description": "This is ready to be picked up",
+                "id": "option-status-ready",
+                "name": "Ready"
+              }
+            ]
+          }
+        ],
+        "pageInfo": {
+          "endCursor": null,
+          "hasNextPage": false
+        }
+      }
+    },
+    {
+      "configuration": {
+        "visibleFields": {
+          "nodes": [],
+          "pageInfo": {
+            "endCursor": null,
+            "hasNextPage": false
+          }
+        }
+      },
+      "fields": {
+        "nodes": [
+          {
+            "__typename": "ProjectV2Field",
+            "dataType": "ASSIGNEES",
+            "id": "field-assignees",
+            "isIssueField": false,
+            "name": "Assignees"
+          },
+          {
+            "__typename": "ProjectV2SingleSelectField",
+            "dataType": "SINGLE_SELECT",
+            "id": "field-status",
+            "isIssueField": false,
+            "name": "Status",
+            "options": [
+              {
+                "color": "GREEN",
+                "description": "This item hasn't been started",
+                "id": "option-status-backlog",
+                "name": "Backlog"
+              },
+              {
+                "color": "ORANGE",
+                "description": "This has been completed",
+                "id": "option-status-done",
+                "name": "Done"
+              },
+              {
+                "color": "YELLOW",
+                "description": "This is actively being worked on",
+                "id": "option-status-in-progress",
+                "name": "In progress"
+              },
+              {
+                "color": "PURPLE",
+                "description": "This item is in review",
+                "id": "option-status-in-review",
+                "name": "In review"
+              },
+              {
+                "color": "BLUE",
+                "description": "This is ready to be picked up",
+                "id": "option-status-ready",
+                "name": "Ready"
+              }
+            ]
+          },
+          {
+            "__typename": "ProjectV2Field",
+            "dataType": "TITLE",
+            "id": "field-title",
+            "isIssueField": false,
+            "name": "Title"
+          }
+        ],
+        "pageInfo": {
+          "endCursor": null,
+          "hasNextPage": false
+        }
+      },
+      "filter": "",
+      "groupByFields": {
+        "nodes": [],
+        "pageInfo": {
+          "endCursor": null,
+          "hasNextPage": false
+        }
+      },
+      "id": "view-roadmap",
+      "layout": "ROADMAP_LAYOUT",
+      "name": "Roadmap",
+      "number": 4,
+      "sortByFields": {
+        "nodes": [],
+        "pageInfo": {
+          "endCursor": null,
+          "hasNextPage": false
+        }
+      },
+      "verticalGroupByFields": {
+        "nodes": [],
+        "pageInfo": {
+          "endCursor": null,
+          "hasNextPage": false
+        }
+      }
+    },
+    {
+      "configuration": {
+        "visibleFields": {
+          "nodes": [],
+          "pageInfo": {
+            "endCursor": null,
+            "hasNextPage": false
+          }
+        }
+      },
+      "fields": {
+        "nodes": [
+          {
+            "__typename": "ProjectV2Field",
+            "dataType": "NUMBER",
+            "id": "field-estimate",
+            "isIssueField": false,
+            "name": "Estimate"
+          },
+          {
+            "__typename": "ProjectV2Field",
+            "dataType": "LINKED_PULL_REQUESTS",
+            "id": "field-linked-pull-requests",
+            "isIssueField": false,
+            "name": "Linked pull requests"
+          },
+          {
+            "__typename": "ProjectV2SingleSelectField",
+            "dataType": "SINGLE_SELECT",
+            "id": "field-priority",
+            "isIssueField": false,
+            "name": "Priority",
+            "options": [
+              {
+                "color": "RED",
+                "description": "",
+                "id": "option-priority-p0",
+                "name": "P0"
+              },
+              {
+                "color": "ORANGE",
+                "description": "",
+                "id": "option-priority-p1",
+                "name": "P1"
+              },
+              {
+                "color": "YELLOW",
+                "description": "",
+                "id": "option-priority-p2",
+                "name": "P2"
+              }
+            ]
+          },
+          {
+            "__typename": "ProjectV2SingleSelectField",
+            "dataType": "SINGLE_SELECT",
+            "id": "field-size",
+            "isIssueField": false,
+            "name": "Size",
+            "options": [
+              {
+                "color": "YELLOW",
+                "description": "",
+                "id": "option-size-l",
+                "name": "L"
+              },
+              {
+                "color": "RED",
+                "description": "",
+                "id": "option-size-m",
+                "name": "M"
+              },
+              {
+                "color": "PURPLE",
+                "description": "",
+                "id": "option-size-s",
+                "name": "S"
+              },
+              {
+                "color": "PINK",
+                "description": "",
+                "id": "option-size-xl",
+                "name": "XL"
+              },
+              {
+                "color": "GREEN",
+                "description": "",
+                "id": "option-size-xs",
+                "name": "XS"
+              }
+            ]
+          },
+          {
+            "__typename": "ProjectV2Field",
+            "dataType": "DATE",
+            "id": "field-start-date",
+            "isIssueField": false,
+            "name": "Start date"
+          },
+          {
+            "__typename": "ProjectV2SingleSelectField",
+            "dataType": "SINGLE_SELECT",
+            "id": "field-status",
+            "isIssueField": false,
+            "name": "Status",
+            "options": [
+              {
+                "color": "GREEN",
+                "description": "This item hasn't been started",
+                "id": "option-status-backlog",
+                "name": "Backlog"
+              },
+              {
+                "color": "ORANGE",
+                "description": "This has been completed",
+                "id": "option-status-done",
+                "name": "Done"
+              },
+              {
+                "color": "YELLOW",
+                "description": "This is actively being worked on",
+                "id": "option-status-in-progress",
+                "name": "In progress"
+              },
+              {
+                "color": "PURPLE",
+                "description": "This item is in review",
+                "id": "option-status-in-review",
+                "name": "In review"
+              },
+              {
+                "color": "BLUE",
+                "description": "This is ready to be picked up",
+                "id": "option-status-ready",
+                "name": "Ready"
+              }
+            ]
+          },
+          {
+            "__typename": "ProjectV2Field",
+            "dataType": "SUB_ISSUES_PROGRESS",
+            "id": "field-sub-issues-progress",
+            "isIssueField": false,
+            "name": "Sub-issues progress"
+          },
+          {
+            "__typename": "ProjectV2Field",
+            "dataType": "DATE",
+            "id": "field-target-date",
+            "isIssueField": false,
+            "name": "Target date"
+          },
+          {
+            "__typename": "ProjectV2Field",
+            "dataType": "TITLE",
+            "id": "field-title",
+            "isIssueField": false,
+            "name": "Title"
+          }
+        ],
+        "pageInfo": {
+          "endCursor": null,
+          "hasNextPage": false
+        }
+      },
+      "filter": "",
+      "groupByFields": {
+        "nodes": [
+          {
+            "__typename": "ProjectV2SingleSelectField",
+            "dataType": "SINGLE_SELECT",
+            "id": "field-status",
+            "isIssueField": false,
+            "name": "Status",
+            "options": [
+              {
+                "color": "GREEN",
+                "description": "This item hasn't been started",
+                "id": "option-status-backlog",
+                "name": "Backlog"
+              },
+              {
+                "color": "ORANGE",
+                "description": "This has been completed",
+                "id": "option-status-done",
+                "name": "Done"
+              },
+              {
+                "color": "YELLOW",
+                "description": "This is actively being worked on",
+                "id": "option-status-in-progress",
+                "name": "In progress"
+              },
+              {
+                "color": "PURPLE",
+                "description": "This item is in review",
+                "id": "option-status-in-review",
+                "name": "In review"
+              },
+              {
+                "color": "BLUE",
+                "description": "This is ready to be picked up",
+                "id": "option-status-ready",
+                "name": "Ready"
+              }
+            ]
+          }
+        ],
+        "pageInfo": {
+          "endCursor": null,
+          "hasNextPage": false
+        }
+      },
+      "id": "view-team-items",
+      "layout": "TABLE_LAYOUT",
+      "name": "Team items",
+      "number": 5,
+      "sortByFields": {
+        "nodes": [],
+        "pageInfo": {
+          "endCursor": null,
+          "hasNextPage": false
+        }
+      },
+      "verticalGroupByFields": {
+        "nodes": [],
+        "pageInfo": {
+          "endCursor": null,
+          "hasNextPage": false
+        }
+      }
+    }
+  ],
+  "workflows": [
+    {
+      "enabled": true,
+      "id": "workflow-auto-add-sub-issues-to-project",
+      "name": "Auto-add sub-issues to project",
+      "number": 1
+    },
+    {
+      "enabled": true,
+      "id": "workflow-auto-add-to-project",
+      "name": "Auto-add to project",
+      "number": 2
+    },
+    {
+      "enabled": true,
+      "id": "workflow-auto-close-issue",
+      "name": "Auto-close issue",
+      "number": 3
+    },
+    {
+      "enabled": true,
+      "id": "workflow-item-added-to-project",
+      "name": "Item added to project",
+      "number": 4
+    },
+    {
+      "enabled": true,
+      "id": "workflow-item-closed",
+      "name": "Item closed",
+      "number": 5
+    },
+    {
+      "enabled": true,
+      "id": "workflow-pull-request-linked-to-issue",
+      "name": "Pull request linked to issue",
+      "number": 6
+    },
+    {
+      "enabled": true,
+      "id": "workflow-pull-request-merged",
+      "name": "Pull request merged",
+      "number": 7
+    }
+  ]
+}
