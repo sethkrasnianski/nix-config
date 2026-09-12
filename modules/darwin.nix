@@ -48,6 +48,7 @@
   # modules/common.nix installs on NixOS. User-facing apps live in home/.
   environment.systemPackages = with pkgs; [
     nixfmt
+    awscli2
     wget
     fd
     jq

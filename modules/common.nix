@@ -90,6 +90,7 @@
     with pkgs;
     [
       nixfmt
+      awscli2
       wget
       fd
       jq
