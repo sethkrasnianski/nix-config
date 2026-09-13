@@ -49,6 +49,7 @@
   environment.systemPackages = with pkgs; [
     nixfmt
     awscli2
+    gws
     wget
     fd
     jq
