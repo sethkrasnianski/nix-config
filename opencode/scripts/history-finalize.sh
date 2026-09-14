@@ -87,15 +87,19 @@ prepare_locked() {
   RECOVERY_REF="refs/auto-agent/recovery/${BRANCH//\//--}/$(date -u +%Y%m%d%H%M%S)"
   git update-ref "$RECOVERY_REF" "$OLD_HEAD"
   git rebase "$BASE_SHA"
-  BOOTSTRAP_SHA="$(git log --reverse --format=%H --grep="^chore: bootstrap $BRANCH$" "$BASE_SHA..HEAD" | head -n 1 || true)"
+  REBASED_TREE="$(git rev-parse 'HEAD^{tree}')"
+  BOOTSTRAP_SHA="$(git log --format='%H %s' "$BASE_SHA..HEAD" | sed -n 's/^\([^ ]*\) chore: bootstrap .*/\1/p')"
   if [ -n "$BOOTSTRAP_SHA" ]; then
-    # The bootstrap commit is known harness metadata. Replaying its descendants
-    # drops only that commit and preserves intentional empty commits.
-    git rebase --onto "$BASE_SHA" "$BOOTSTRAP_SHA"
-    GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash "$BASE_SHA"
-  else
-    GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash "$BASE_SHA"
+    [[ "$BOOTSTRAP_SHA" != *$'\n'* ]] || die "ambiguous bootstrap commits"
+    [ "$(git show -s --format=%P "$BOOTSTRAP_SHA")" = "$BASE_SHA" ] || die "bootstrap must be an empty first commit"
+    git diff --quiet "$BASE_SHA" "$BOOTSTRAP_SHA" || die "bootstrap must be an empty first commit"
+    # Force replay even on an up-to-date base; skip only the verified empty
+    # bootstrap, preserving real changes and other intentional empty commits.
+    git rebase --force-rebase --onto "$BASE_SHA" "$BOOTSTRAP_SHA"
   fi
+  GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash "$BASE_SHA"
+  [ -z "$(git log --format=%s "$BASE_SHA..HEAD" | sed -n '/^chore: bootstrap /p')" ] || die "bootstrap survived finalization"
+  [ "$(git rev-parse 'HEAD^{tree}')" = "$REBASED_TREE" ] || die "finalization changed the rebased tree"
   NEW_HEAD="$(git rev-parse HEAD)"
   bash -lc "$TEST_COMMAND"
   write_state "$STATE_DIR" base "$BASE" base_sha "$BASE_SHA" old_head "$OLD_HEAD" new_head "$NEW_HEAD" remote_sha "$REMOTE_SHA" recovery_ref "$RECOVERY_REF" test "$TEST_COMMAND" test_result passed
