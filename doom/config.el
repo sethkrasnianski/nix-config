@@ -216,6 +216,10 @@ selection, e.g. `@server.py#L20-35'.  A single-line selection yields `@file#L20'
 (use-package! agent-shell
   :defer t
   :config
+  ;; WSL delegates system sleep to Windows, and its logind D-Bus service does
+  ;; not authorize Emacs' sleep-inhibit request.
+  (when (getenv "WSL_DISTRO_NAME")
+    (setq agent-shell-inhibit-system-sleep nil))
   ;; Reuse the existing Claude subscription login. To use an API key instead:
   ;;   (agent-shell-anthropic-make-authentication :api-key "sk-ant-...")
   (setq agent-shell-anthropic-authentication
