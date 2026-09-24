@@ -42,6 +42,7 @@ in
     prime-agent
     doctl
     gh
+    signal-desktop
 
     # unfree — allowed on NixOS via modules/common.nix and on macOS via
     # modules/darwin.nix (both use useGlobalPkgs, so the predicate reaches

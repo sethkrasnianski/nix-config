@@ -182,6 +182,7 @@ on NixOS (a `programs.*` / `services.*` module rather than home-manager).
 | Spotify | ✅ | ✅ | nix, global — `home/default.nix` |
 | Obsidian | ✅ | ✅ | nix, global — `home/default.nix` |
 | doctl | ✅ | ✅ | nix, global — `home/default.nix` |
+| Signal | ✅ `signal-desktop` | ✅ `signal-desktop` | nix, global — `home/default.nix` |
 | VLC | ✅ `vlc` | ✅ `vlc-bin` | nix, per-platform entrypoint |
 | WhatsApp | ✅ `karere` (GTK4) | ✅ `whatsapp-for-mac` | nix, per-platform entrypoint |
 | Firefox | ✅ `firefox` | ✅ `firefox-bin` | nix, per-platform entrypoint |
