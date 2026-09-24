@@ -32,7 +32,6 @@
       "obsidian"
       "slack"
       "spotify"
-      "teams"
       "whatsapp-for-mac"
     ];
 

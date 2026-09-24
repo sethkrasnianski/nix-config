@@ -45,8 +45,8 @@ in
   # be declared here. This is reset to exactly the below on every
   # `darwin-rebuild switch`, so manual reordering won't persist.
   #
-  # Paths: nix-installed GUI apps (firefox-bin, ghostty, slack, teams, spotify)
-  # are linked into ~/Applications/Home Manager Apps/; Messages is an Apple app
+  # Paths: nix-installed GUI apps (firefox-bin, ghostty, slack, spotify) are
+  # linked into ~/Applications/Home Manager Apps/; Messages is an Apple app
   # under /System/Applications. Confirm the exact .app leaf names on the Mac
   # (`ls ~/Applications/Home\ Manager\ Apps/`) — a wrong name shows a "?" tile.
   system.defaults.dock = {
@@ -57,7 +57,6 @@ in
       { app = "/Users/${username}/Applications/Home Manager Apps/Firefox.app"; }
       { app = "/Users/${username}/Applications/Home Manager Apps/Ghostty.app"; }
       { app = "/Users/${username}/Applications/Home Manager Apps/Slack.app"; }
-      { app = "/Users/${username}/Applications/Home Manager Apps/Microsoft Teams.app"; }
       { app = "/System/Applications/Messages.app"; }
       { app = "/Users/${username}/Applications/Home Manager Apps/Spotify.app"; }
     ];
