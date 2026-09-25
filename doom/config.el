@@ -99,6 +99,11 @@
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type t)
 
+;; Remove this setting to re-enable Markdown linting once a checker is installed.
+(after! flycheck
+  (setq flycheck-global-modes
+        '(not markdown-mode gfm-mode markdown-ts-mode gfm-view-mode)))
+
 ;;; Soften diff highlighting.
 ;; agent-shell's inline diffs (and any `diff-mode' buffer) inherit Emacs'
 ;; default `diff-added'/`diff-removed' (and their `-refine-' word-level)
