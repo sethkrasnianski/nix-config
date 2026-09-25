@@ -34,6 +34,61 @@
 ;; `load-theme' function. This is the default:
 (setq doom-theme 'one-dark)
 
+;;; COMPAT: one-themes uses nil for unset colors in some one-dark faces, which
+;;; newer Emacs versions warn about while registering the theme. Remove this
+;;; block once upstream uses `unspecified' for those attributes.
+(defun +one-dark--face-spec-p (spec)
+  "Return non-nil if SPEC is a list of face display specifications."
+  (and (consp spec)
+       (cl-every
+        (lambda (display-spec)
+          (and (consp display-spec)
+               (consp (cdr display-spec))
+               (let ((attributes (cadr display-spec)))
+                 (and (listp attributes)
+                      (or (null attributes)
+                          (keywordp (car attributes)))))))
+        spec)))
+
+(defun +one-dark--unspecify-nil-colors (spec)
+  "Replace nil foreground/background values in a one-dark face SPEC."
+  (if (+one-dark--face-spec-p spec)
+      (mapcar
+       (lambda (display-spec)
+         (if (and (consp display-spec) (consp (cdr display-spec)))
+             (let ((attributes (copy-sequence (cadr display-spec))))
+               (when (listp attributes)
+                 (let ((tail attributes))
+                   (while (consp tail)
+                     (when (and (memq (car tail) '(:foreground :background))
+                                (null (cadr tail)))
+                       (setcar (cdr tail) 'unspecified))
+                     (setq tail (cddr tail)))))
+               (cons (car display-spec)
+                     (cons attributes (cddr display-spec))))
+           display-spec))
+       spec)
+    spec))
+
+(defun +one-dark--compat-set-faces (set-faces theme &rest specs)
+  "Normalize nil colors only in THEME's face registrations."
+  (if (eq theme 'one-dark)
+      (apply set-faces theme
+             (mapcar
+              (lambda (entry)
+                (if (and (consp entry)
+                         (consp (cdr entry))
+                         (+one-dark--face-spec-p (cadr entry)))
+                    (cons (car entry)
+                          (cons (+one-dark--unspecify-nil-colors
+                                 (cadr entry))
+                                (cddr entry)))
+                  entry))
+              specs))
+    (apply set-faces theme specs)))
+
+(advice-add #'custom-theme-set-faces :around #'+one-dark--compat-set-faces)
+
 ;; Load grammars provided declaratively by Nix. The environment variable keeps
 ;; this live-linked Doom config independent of a store path.
 (when-let ((treesit-load-path (getenv "EMACS_TREESIT_LOAD_PATH")))
