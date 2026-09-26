@@ -264,9 +264,19 @@ the handful of GUI apps nixpkgs can't build on darwin (see
 (nix settings, unfree allowlist, fonts, base CLI tools, Homebrew) lives in
 `modules/darwin.nix`. `home/darwin.nix` is the home entrypoint.
 
-1. Install Nix (e.g. the [Determinate installer](https://determinate.systems/nix-installer/),
-   which enables flakes; with the upstream installer add
-   `experimental-features = nix-command flakes` to `/etc/nix/nix.conf`).
+1. Install Nix with the official multi-user installer:
+
+   ```sh
+   sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon
+   ```
+
+   Before the first nix-darwin run, enable flakes in `/etc/nix/nix.conf`:
+
+   ```sh
+   printf '%s\n' 'experimental-features = nix-command flakes' | sudo tee -a /etc/nix/nix.conf
+   ```
+
+   `modules/darwin.nix` keeps this setting managed after the initial bootstrap.
 2. Clone this repo to `~/oss/nixos-config` — the live symlinks and the
    `rebuild` alias assume that path.
 3. First run (nix-darwin isn't installed yet) — this also installs Homebrew
