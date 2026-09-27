@@ -76,6 +76,8 @@ in
     config.lib.file.mkOutOfStoreSymlink "${flakePath}/opencode/skills";
   home.file.".config/opencode/plugins/local-llm-routing.js".source =
     config.lib.file.mkOutOfStoreSymlink "${flakePath}/opencode/plugins/local-llm-routing.js";
+  home.file.".config/opencode/plugins/redact-credentials.js".source =
+    config.lib.file.mkOutOfStoreSymlink "${flakePath}/opencode/plugins/redact-credentials.js";
   home.file.".prime/agent/settings.json".source =
     config.lib.file.mkOutOfStoreSymlink "${flakePath}/prime/settings.json";
   home.file.".local/bin/auto-pr-watch" = {

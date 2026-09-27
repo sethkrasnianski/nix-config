@@ -34,6 +34,8 @@ require local-profile.nix 'localConfigPath'
 require plugins/local-llm-routing.js 'execFileSync'
 require plugins/local-llm-routing.js 'profile?.builtInAgents'
 require plugins/local-llm-routing.js 'reasoningEffort'
+require plugins/redact-credentials.js 'tool.execute.after'
+require ../home/default.nix 'plugins/redact-credentials.js'
 if grep -qF 'local-agents.json' "$ROOT/../home/default.nix"; then
   printf 'Home Manager must not generate the OpenCode local profile\n' >&2
   exit 1

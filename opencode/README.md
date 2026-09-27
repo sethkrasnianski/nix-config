@@ -251,6 +251,7 @@ skills/      address-pr-feedback, resolve-merge-conflicts, review-changes,
                                    every agent above instead of duplicated
                                    per-prompt
 plugins/     local-llm-routing.js — local agent inference overlay and Ollama provider
+              redact-credentials.js — redact the active GitHub MCP credential from tool results
 local-profile.nix  startup evaluator for ~/.config/nix/local.nix
 scripts/     pr-watch.sh  (installed as `auto-pr-watch`)
 install.sh
@@ -290,6 +291,27 @@ restart-only behavior. Changes to Ollama's system service settings still
 require a rebuild. If `local.nix` is absent, the repository defaults are used
 and Ollama is disabled. Ollama is registered only when `local.llm.enable` is
 true.
+
+## Tool-result credential redaction
+
+The global `plugins/redact-credentials.js` plugin reads `GITHUB_MCP_PAT` from
+the OpenCode process environment and replaces every exact occurrence with
+`[REDACTED]` in the result's `output` and string values in `metadata` before the
+tool result is returned to the model. This keeps `opencode debug config`
+available while leaving the surrounding configuration readable. The hook
+skips an unset or empty credential and never logs it.
+
+An isolated OpenCode 1.18.30 test session used a local mock model to run
+`opencode debug config` with a fake credential. The model's follow-up request
+and the final persisted tool part/export were redacted. The session event table
+still contained a raw matching streamed event, and with a low output limit the
+full `tool-output` truncation file retained the raw Authorization value. The
+after hook therefore does not provide clean local persistence; it mutates the
+result only after those streamed events and files may have been written. If
+clean local persistence is required, an earlier interception point must also
+cover session-event writes and truncation-file creation. The test did not alter
+`opencode debug config` behavior. Restart OpenCode after installing the plugin;
+plugins are loaded at startup.
 
 ## Design notes
 
