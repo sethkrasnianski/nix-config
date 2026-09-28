@@ -244,9 +244,9 @@ it up as part of its research pass.
 agents/      auto.md + 7 auto-*.md subagents (see table above)
 agent-defaults.nix  repository-owned model and inference defaults
 commands/    /auto, /research, /plan, /implement, /auto-init
-skills/      address-pr-feedback, resolve-merge-conflicts, review-changes,
-              frontend-design
-             tdd-loop, atomic-commits, worktree-workflow
+skills/      address-pr-feedback, prune-worktrees,
+              resolve-merge-conflicts, review-changes, frontend-design,
+              tdd-loop, atomic-commits, worktree-workflow
                                  — this harness's own doctrine, shared by
                                    every agent above instead of duplicated
                                    per-prompt
