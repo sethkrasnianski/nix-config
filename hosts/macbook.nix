@@ -46,16 +46,17 @@ in
   # `darwin-rebuild switch`, so manual reordering won't persist.
   #
   # Paths: nix-installed GUI apps (firefox-bin, ghostty, slack, signal-desktop,
-  # spotify) are linked into ~/Applications/Home Manager Apps/; Messages is an
-  # Apple app under /System/Applications. Confirm the exact .app leaf names on
-  # the Mac (`ls ~/Applications/Home\ Manager\ Apps/`) — a wrong name shows a
-  # "?" tile.
+  # spotify) are linked into ~/Applications/Home Manager Apps/; Homebrew casks
+  # such as Claude install into /Applications; Messages is an Apple app under
+  # /System/Applications. Confirm the exact .app leaf names on the Mac — a
+  # wrong name shows a "?" tile.
   system.defaults.dock = {
     # Leave the area before the Downloads divider to macOS's recent apps.
     show-recents = true;
 
     persistent-apps = [
       { app = "/Users/${username}/Applications/Home Manager Apps/Firefox.app"; }
+      { app = "/Applications/Claude.app"; }
       { app = "/Users/${username}/Applications/Home Manager Apps/Ghostty.app"; }
       { app = "/Users/${username}/Applications/Home Manager Apps/Slack.app"; }
       { app = "/Users/${username}/Applications/Home Manager Apps/Signal.app"; }
