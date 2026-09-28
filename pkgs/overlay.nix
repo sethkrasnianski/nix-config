@@ -42,7 +42,7 @@ final: prev: {
         owner = "NixOS";
         repo = "nixpkgs";
         rev = "d4448fee6bab71511ac36747a98a2aad35544852";
-      }) { inherit (prev) system; };
+      }) { system = prev.stdenv.hostPlatform.system; };
       version = "1.18.33";
       src = final.fetchFromGitHub {
         owner = "anomalyco";
