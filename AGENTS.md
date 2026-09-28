@@ -10,9 +10,10 @@ darwin module and nix-homebrew for the GUI apps nixpkgs can't build on darwin).
 
 - `flake.nix` — inputs: nixpkgs (nixos-unstable), nixos-wsl, home-manager, nix-darwin, nix-homebrew (all pinned by `flake.lock`)
 - `.github/workflows/update-flake-lock.yml` — weekly `flake.lock` update PR; evaluates all four outputs before opening it
+- `.github/workflows/update-synergy3.yml` — weekly Synergy 3 version/hash PR; validates both installers and evaluates all four outputs
 - `hosts/` — per-host: hostname/`hostPlatform`, `system.stateVersion`, home-manager user wiring (`macbook.nix` is the nix-darwin host)
-- `pkgs/` — packages not in nixpkgs (currently `prime-agent/`, a `buildNpmPackage` derivation for Prime Agent's pinned release tarball); `overlay.nix` is imported by both `modules/common.nix` and `modules/darwin.nix` so it's never duplicated
-- `modules/` — system-level shared config: NixOS (`common.nix`, `desktop.nix`, `wsl.nix`) and darwin (`darwin.nix` — the macOS counterpart to `common.nix`: nix settings, overlays, unfree allowlist, fonts, base CLI tools, Homebrew; never imported by a NixOS host, and vice versa)
+- `pkgs/` — packages not in nixpkgs: `prime-agent/` (Prime Agent's pinned release tarball) and `synergy3/` (version-pinned Linux Flatpak and Apple Silicon DMG); `overlay.nix` is imported by both `modules/common.nix` and `modules/darwin.nix` so it's never duplicated
+- `modules/` — system-level shared config: NixOS (`common.nix`, `desktop.nix`, `synergy3.nix`, `wsl.nix`) and darwin (`darwin.nix` — the macOS counterpart to `common.nix`: nix settings, overlays, unfree allowlist, fonts, base CLI tools, Homebrew; never imported by a NixOS host, and vice versa)
 - `home/` — per-user home-manager config (git, ssh, shell, direnv, neovim, emacs);
   `default.nix` is the shared core, `linux.nix`/`darwin.nix` the per-platform
   entrypoints (NixOS hosts import `linux.nix`; `hosts/macbook.nix` imports
@@ -49,6 +50,9 @@ darwin module and nix-homebrew for the GUI apps nixpkgs can't build on darwin).
   `releases/vX.Y.Z/SHA256SUMS`), regenerate `package.json` and
   `package-lock.json` the same way as the existing ones (see that
   derivation's header comment), and refresh `npmDepsHash`.
+- Synergy 3's installer version and hashes live in `pkgs/synergy3/pinned.nix`;
+  `.github/scripts/update-synergy3.sh` refreshes both platform artifacts using
+  short-lived guest tokens, and the weekly workflow opens a reviewable PR.
 - When adding, removing, or moving files under `modules/`, `home/`, or `hosts/`,
   update the Layout tree in `README.md` in the same commit — it duplicates this
   section's file listing and drifts silently otherwise.

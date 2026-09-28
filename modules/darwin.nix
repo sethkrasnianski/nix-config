@@ -14,14 +14,14 @@
     "flakes"
   ];
 
-  # Packages not in nixpkgs (currently just prime-agent) — shared with
+  # Packages not in nixpkgs (Prime Agent and Synergy 3) — shared with
   # modules/common.nix via the same file, never duplicated.
   nixpkgs.overlays = [ (import ../pkgs/overlay.nix) ];
 
   # Unfree allowlist for the Mac. home-manager.useGlobalPkgs (hosts/macbook.nix)
   # makes this cover home.packages too. KEEP IN SYNC with the copy in
   # modules/common.nix — the NixOS hosts maintain their own list, and the two
-  # drift silently otherwise.
+  # drift silently otherwise. synergy3 is the pinned Apple Silicon DMG package.
   nixpkgs.config.allowUnfreePredicate =
     pkg:
     builtins.elem (lib.getName pkg) [
@@ -32,6 +32,7 @@
       "obsidian"
       "slack"
       "spotify"
+      "synergy3"
       "whatsapp-for-mac"
     ];
 

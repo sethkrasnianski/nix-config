@@ -1,0 +1,69 @@
+# Weekly Synergy 3 installer update. The updater fetches guest tokens at run
+# time, hashes the Linux Flatpak and Apple Silicon DMG, and changes only the
+# pinned manifest. All outputs and both installer derivations are validated
+# before an update PR is opened.
+
+name: Update Synergy 3
+
+on:
+  schedule:
+    - cron: "0 10 * * 1" # Mondays 10:00 UTC, after the flake-lock workflow
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: DeterminateSystems/nix-installer-action@v16
+
+      - name: Refresh Synergy version and installer hashes
+        run: bash .github/scripts/update-synergy3.sh
+
+      - name: Evaluate all outputs
+        run: |
+          for output in nixos nixos-headless nixos-default; do
+            echo "::group::$output"
+            nix eval ".#nixosConfigurations.$output.config.system.build.toplevel.drvPath" --raw
+            echo "::endgroup::"
+          done
+          echo "::group::macbook"
+          nix eval ".#darwinConfigurations.macbook.system.drvPath" --raw
+          echo "::endgroup::"
+
+      - name: Build and validate both pinned installers
+        run: |
+          package=$(nix build .#nixosConfigurations.nixos.pkgs.synergy3 --no-link --print-out-paths)
+          bundle="$package/share/synergy3/synergy-$(nix eval --raw .#nixosConfigurations.nixos.pkgs.synergy3.version)-linux-noble-x86_64.flatpak"
+          repo=$(mktemp -d "$RUNNER_TEMP/synergy3-flatpak.XXXXXX")
+          nix run .#nixosConfigurations.nixos.pkgs.ostree -- init --repo="$repo" --mode=archive-z2
+          nix run .#nixosConfigurations.nixos.pkgs.flatpak -- build-import-bundle "$repo" "$bundle"
+          ref=$(nix run .#nixosConfigurations.nixos.pkgs.ostree -- refs --repo="$repo")
+          test "$ref" = "app/com.symless.synergy/x86_64/master"
+          nix build .#nixosConfigurations.nixos.pkgs.synergy3.passthru.macosInstaller --no-link
+          # The app bundle is unpacked on Linux too; allow its macOS-only meta
+          # platform for this architecture-independent DMG extraction check.
+          NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 nix build --impure .#nixosConfigurations.nixos.pkgs.synergy3.passthru.macosPackage --no-link
+
+      - name: Open or update the PR
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: synergy3-updates
+          delete-branch: true
+          author: Seth Krasnianski <1910114+sethkrasnianski@users.noreply.github.com>
+          committer: Seth Krasnianski <1910114+sethkrasnianski@users.noreply.github.com>
+          commit-message: |
+            Update Synergy 3
+
+            Refresh the pinned Linux Flatpak and Apple Silicon DMG checksums.
+          title: Update Synergy 3
+          body: |
+            Automated update of the Synergy 3 version and pinned installer hashes.
+            The Linux bundle and macOS DMG were fetched, hash-checked, and
+            validated, and all four system outputs evaluated before this PR
+            was opened. After merging, the next rebuild installs the update.

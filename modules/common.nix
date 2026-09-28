@@ -11,7 +11,7 @@
     "flakes"
   ];
 
-  # Packages not in nixpkgs (currently just prime-agent) — shared with
+  # Packages not in nixpkgs (Prime Agent and Synergy 3) — shared with
   # modules/darwin.nix via the same file, never duplicated.
   nixpkgs.overlays = [ (import ../pkgs/overlay.nix) ];
 
@@ -19,7 +19,8 @@
   # home-manager.useGlobalPkgs below makes this cover home.packages too.
   # KEEP IN SYNC with the copy in modules/darwin.nix (the macOS host has its
   # own list); the two drift silently otherwise. steam/steam-unwrapped are for
-  # programs.steam (modules/desktop.nix); parsec-bin for home/linux.nix.
+  # programs.steam (modules/desktop.nix); parsec-bin for home/linux.nix;
+  # synergy3 for the pinned Flatpak/DMG integration.
   nixpkgs.config.allowUnfreePredicate =
     pkg:
     builtins.elem (lib.getName pkg) [
@@ -30,6 +31,7 @@
       "spotify"
       "steam"
       "steam-unwrapped"
+      "synergy3"
     ];
 
   # NOTE: system.stateVersion is intentionally NOT set here — it is per-host

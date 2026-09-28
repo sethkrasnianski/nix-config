@@ -3,6 +3,7 @@
 # duplicated, same rule as everything else in this repo.
 final: prev: {
   prime-agent = final.callPackage ./prime-agent { };
+  synergy3 = final.callPackage ./synergy3 { };
 
   # Our nixpkgs pin lags Claude Code releases. Its derivation takes its version
   # and platform checksums from one overridable `manifest` argument, so swapping
