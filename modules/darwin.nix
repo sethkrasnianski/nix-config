@@ -58,7 +58,7 @@
   ];
 
   # Declarative Homebrew for the macOS GUI apps nixpkgs can't build on darwin
-  # (Parsec, Steam, Mullvad, GIMP — see homebrew.casks below). nix-homebrew
+  # (Claude, Parsec, Steam, Mullvad, GIMP — see homebrew.casks below). nix-homebrew
   # manages the Homebrew installation itself; the owning `user` is set in
   # hosts/macbook.nix. The homebrew module declares the casks and reconciles
   # them on `darwin-rebuild switch` — cleanup = "uninstall" removes any cask no
@@ -81,13 +81,15 @@
   nix-homebrew.enable = true;
   homebrew = {
     enable = true;
-    # The GUI apps nixpkgs can't build on darwin. Their Linux counterparts are
-    # nix-managed: parsec-bin (home/linux.nix), programs.steam and
+    # The GUI apps nixpkgs can't build on darwin. Claude Desktop is installed
+    # only on this Mac. The Linux counterparts of the other apps are nix-managed:
+    # parsec-bin (home/linux.nix), programs.steam and
     # services.mullvad-vpn (modules/desktop.nix, modules/common.nix), gimp
     # (home/linux.nix — nixpkgs' gimp has no darwin build). The PhotoGIMP
     # overlay (home/photogimp.nix) applies to this cask the same as to the
     # Linux package.
     casks = [
+      "claude"
       "parsec"
       "steam"
       "mullvad-vpn"
