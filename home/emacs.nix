@@ -1,6 +1,7 @@
 # Emacs + Doom. The editor itself is declarative; Doom manages its own
 # packages with straight.el, so the framework is bootstrapped imperatively
-# once (see the README "Emacs (Doom)" section):
+# once, *before* ever launching Emacs (see the README "Emacs (Doom)" section
+# for why order matters here):
 #
 #   git clone --depth 1 https://github.com/doomemacs/doomemacs ~/.config/emacs
 #   doom install

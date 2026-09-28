@@ -372,19 +372,26 @@ terminal). X11 apps still work directly on WSLg as usual.
 
 ## Emacs (Doom)
 
-`modules/emacs.nix` installs the latest Emacs from nixpkgs and puts Doom's CLI
+`home/emacs.nix` installs the latest Emacs from nixpkgs and puts Doom's CLI
 (`~/.config/emacs/bin`) on PATH. The private Doom config
 (`init.el` / `config.el` / `packages.el`) lives in `doom/` in this repo, and
 home-manager symlinks `~/.config/doom` to it (`mkOutOfStoreSymlink` in
 `home/default.nix`), so those files are the single source of truth.
 
 Doom itself manages its own packages, so the framework is bootstrapped
-**once**, imperatively, after the first rebuild:
+**once**, imperatively, after the first rebuild — do this *before* ever
+launching Emacs:
 
 ```sh
 git clone --depth 1 https://github.com/doomemacs/doomemacs ~/.config/emacs
 doom install        # ~/.config/emacs/bin is already on PATH (new shell)
 ```
+
+Emacs prefers `~/.emacs.d` over the XDG `~/.config/emacs` when both exist, so
+launching Emacs even once before this clone creates an empty `~/.emacs.d`
+that silently shadows Doom on every subsequent launch (you'll get the stock
+Emacs splash screen instead of the Doom dashboard). If that happens, `rmdir
+~/.emacs.d` (it only succeeds if the directory is empty) and relaunch.
 
 Day-to-day: edit files in `doom/`; run `doom sync` after changing
 `init.el` or `packages.el` (plain `config.el` changes don't need it).
