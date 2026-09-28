@@ -33,22 +33,32 @@ final: prev: {
     };
   };
 
-  # opencode 1.18.30 as built on our pinned nixpkgs crashes every prompt with
-  # "Unexpected server error" (TypeError in SystemPrompt.environment) —
-  # Bun 1.4.2 code-splitting regression, https://github.com/NixOS/nixpkgs/issues/563241.
-  # Fixed in nixpkgs by https://github.com/NixOS/nixpkgs/pull/564101, merged
-  # 2026-09-18, but not yet in the nixos-unstable channel we track. Pull just
-  # this one package from the fix commit until our nixpkgs pin catches up
-  # (binary-cache hit, no local rebuild). Drop this override once a routine
-  # `nix flake update` advances past that commit.
+  # Keep the OpenCode packaging fix from nixpkgs PR #564101 (Bun's regression
+  # in code splitting broke prompts), while advancing to upstream 1.18.33 ahead
+  # of our nixpkgs pin. The node_modules output hash is for this release's lockfile.
   opencode =
-    (import
-      (builtins.fetchTree {
+    let
+      fixedNixpkgs = import (builtins.fetchTree {
         type = "github";
         owner = "NixOS";
         repo = "nixpkgs";
         rev = "d4448fee6bab71511ac36747a98a2aad35544852";
-      })
-      { inherit (prev) system; }
-    ).opencode;
+      }) { inherit (prev) system; };
+      version = "1.18.33";
+      src = final.fetchFromGitHub {
+        owner = "anomalyco";
+        repo = "opencode";
+        tag = "v${version}";
+        hash = "sha256-x1ZG4/zsL1/EfpelNByRMi5mSHumXfmoq/LPQ3+jhrc=";
+      };
+    in
+    fixedNixpkgs.opencode.overrideAttrs (old: {
+      inherit version src;
+      passthru = old.passthru // {
+        node_modules = old.passthru.node_modules.overrideAttrs (_: {
+          inherit version src;
+          outputHash = "sha256-3QJzASZSJfWqbFpbxzIQ/ZRRaFX8KAF4Jd2BI6v9e+s=";
+        });
+      };
+    });
 }
