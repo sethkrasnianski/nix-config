@@ -91,6 +91,7 @@
     [
       nixfmt
       awscli2
+      teleport
       gws
       wget
       fd

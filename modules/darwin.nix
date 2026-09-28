@@ -48,6 +48,7 @@
   environment.systemPackages = with pkgs; [
     nixfmt
     awscli2
+    teleport
     gws
     wget
     fd
