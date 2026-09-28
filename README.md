@@ -13,16 +13,22 @@ Flake-based NixOS configuration with four outputs:
 
 ```
 .
-├── .github/workflows/
-│   └── update-flake-lock.yml       # weekly lock-update PR, validated by evaluating all four outputs
+├── .github/
+│   ├── scripts/
+│   │   └── update-synergy3.sh      # discovers latest release, fetches guest tokens, hashes Linux + macOS installers
+│   └── workflows/
+│       ├── update-flake-lock.yml   # weekly lock-update PR, validated by evaluating all four outputs
+│       └── update-synergy3.yml     # weekly pinned version/hash PR, validates both installers + all outputs
 ├── flake.nix                       # inputs + nixosConfigurations.{nixos,nixos-headless,nixos-default} + darwinConfigurations.macbook
 ├── flake.lock                      # pinned input revisions — the reproducibility guarantee
 ├── pkgs/
 │   ├── overlay.nix                 # packages not in nixpkgs (imported by modules/common.nix + modules/darwin.nix)
-│   └── prime-agent/                # buildNpmPackage derivation for Prime Agent (pinned release tarball)
+│   ├── prime-agent/                # buildNpmPackage derivation for Prime Agent (pinned release tarball)
+│   └── synergy3/                   # pinned Flatpak/DMG installers with hash-verified guest-token fetching
 ├── modules/
 │   ├── common.nix                  # shared (NixOS): nix settings, overlays, packages, unfree, zsh, fonts
 │   ├── desktop.nix                 # GNOME + Steam (shared by both NixOS hosts)
+│   ├── synergy3.nix                # system Flatpak install/update (all NixOS hosts, including hosts without Home Manager users)
 │   ├── wsl.nix                     # WSL-only: wsl.enable, opencode overlay, rebuild aliases (imported by the nixos host)
 │   ├── darwin.nix                  # macOS system layer: nix settings, unfree, fonts, CLI tools, Homebrew (nix-darwin)
 │   ├── local-agents.nix             # typed host-local OpenCode agent inference overrides
@@ -30,8 +36,8 @@ Flake-based NixOS configuration with four outputs:
 │   ├── local-llm-nixos.nix         # NixOS Ollama service wiring
 │   └── local-llm-darwin.nix        # nix-darwin launchd wiring
 ├── hosts/
-│   ├── nixos-wsl.nix               # WSL host  = common + desktop + wsl (nixos / nixos-headless outputs)
-│   ├── nixos-default.nix           # non-WSL host = common + desktop + nixos-default-hardware
+│   ├── nixos-wsl.nix               # WSL host  = common + desktop + synergy3 + wsl (nixos / nixos-headless outputs)
+│   ├── nixos-default.nix           # non-WSL host = common + desktop + synergy3 + nixos-default-hardware
 │   ├── nixos-default-hardware.nix  # PLACEHOLDER — replace via nixos-generate-config
 │   └── macbook.nix                 # macOS host = darwin.nix + home-manager module (darwinConfigurations.macbook)
 ├── home/                           # per-user home-manager config
@@ -183,6 +189,7 @@ on NixOS (a `programs.*` / `services.*` module rather than home-manager).
 | Obsidian | ✅ | ✅ | nix, global — `home/default.nix` |
 | doctl | ✅ | ✅ | nix, global — `home/default.nix` |
 | Signal | ✅ `signal-desktop` | ✅ `signal-desktop` | nix, global — `home/default.nix` |
+| Synergy 3 | ✅ Flatpak bundle | ✅ Apple Silicon DMG | pinned custom package; NixOS activation / `home/darwin.nix` |
 | VLC | ✅ `vlc` | ✅ `vlc-bin` | nix, per-platform entrypoint |
 | WhatsApp | ✅ `karere` (GTK4) | ✅ `whatsapp-for-mac` | nix, per-platform entrypoint |
 | Firefox | ✅ `firefox` | ✅ `firefox-bin` | nix, per-platform entrypoint |
@@ -198,6 +205,21 @@ WhatsApp on Linux is the third-party `karere` GTK4 client (there is no official
 Linux client); on macOS it's the official `whatsapp-for-mac`. The Homebrew
 casks (`parsec`, `steam`, `mullvad-vpn`, `gimp`) are declared in
 `modules/darwin.nix`.
+
+Synergy 3's release and per-platform installer hashes are pinned in
+`pkgs/synergy3/pinned.nix`. The weekly
+`.github/workflows/update-synergy3.yml` workflow obtains fresh guest download
+tokens, hashes the Linux Flatpak bundle and Apple Silicon DMG, validates both
+installers, evaluates all four outputs, and opens a review PR. After merging,
+the next rebuild updates the installed app. On NixOS, the system Flatpak module
+installs the bundle and its runtime and exposes its desktop entry; on macOS,
+Home Manager links `Synergy.app` into `~/Applications/Home Manager Apps/`.
+macOS will still ask for the user's Accessibility permission after the first
+launch; approve Synergy in System Settings → Privacy & Security → Accessibility.
+
+The NixOS-WSL build installs Synergy inside the Linux guest. To control the
+Windows desktop itself, install Synergy on Windows as well: the WSL app cannot
+inject input into its Windows host.
 
 ### GIMP (PhotoGIMP)
 
@@ -468,7 +490,7 @@ repo, and no other process inherits it.
 
 ## Update pinned inputs
 
-Updates arrive as a weekly PR: `.github/workflows/update-flake-lock.yml` runs
+Flake input updates arrive as a weekly PR: `.github/workflows/update-flake-lock.yml` runs
 `nix flake update` every Monday, evaluates all three outputs against the new
 lock, and opens/refreshes a PR on the `flake-updates` branch only if they
 pass. Review, merge, then `rebuild` — nothing lands on the machine
@@ -476,6 +498,10 @@ unattended. Security fixes in pinned inputs only reach the system through
 this loop, so don't let the PRs pile up. The workflow needs the repo setting
 "Allow GitHub Actions to create and approve pull requests"
 (Settings → Actions → General).
+
+Synergy 3 version and installer updates are proposed separately by
+`.github/workflows/update-synergy3.yml` on the same weekly cadence. Review and
+merge that PR before rebuilding to install the new pinned release.
 
 Manual update, when you don't want to wait for Monday:
 

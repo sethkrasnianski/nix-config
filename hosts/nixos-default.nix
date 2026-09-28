@@ -5,6 +5,7 @@
   imports = [
     ../modules/common.nix
     ../modules/desktop.nix
+    ../modules/synergy3.nix
     ./nixos-default-hardware.nix
   ];
 
