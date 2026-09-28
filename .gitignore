@@ -11,6 +11,7 @@ result-*
 
 # Claude Code local project state (worktrees, local settings)
 .claude/
+agents/skills/synced/
 
 # agent-shell session transcripts — session logs can capture sensitive
 # content; ignored here (tracked) so fresh clones are protected too, not
