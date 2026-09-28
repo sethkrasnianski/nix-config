@@ -4,30 +4,29 @@
 final: prev: {
   prime-agent = final.callPackage ./prime-agent { };
 
-  # claude-code 2.1.280 added Claude Opus 5.5 (`claude-opus-5-5`); our nixpkgs pin
-  # still carries 2.1.276, so the model is not offered. The derivation takes its
-  # version and download checksums from one overridable `manifest` argument, and
-  # the package.nix at our pin is identical to nixos-unstable's — so swapping just
-  # the manifest is equivalent to taking the newer package, without fetching a
-  # second nixpkgs tree. Values copied verbatim from upstream's published
-  # https://downloads.claude.ai/claude-code-releases/2.1.283/manifest.zst.json.
-  # Drop this override once a routine `nix flake update` reaches claude-code 2.1.283.
+  # Our nixpkgs pin lags Claude Code releases. Its derivation takes its version
+  # and platform checksums from one overridable `manifest` argument, so swapping
+  # just the manifest is equivalent to taking the newer package without fetching
+  # another nixpkgs tree. Values are from Anthropic's compressed release manifest
+  # (the plain manifest has different checksums):
+  # https://downloads.claude.ai/claude-code-releases/2.1.284/manifest.zst.json.
+  # Drop this override once a routine `nix flake update` reaches claude-code 2.1.284.
   claude-code = prev.claude-code.override {
     manifest = {
-      version = "2.1.283";
+      version = "2.1.284";
       platforms = {
         # keys are "${hostPlatform.node.platform}-${hostPlatform.node.arch}"
         linux-x64 = {
           binary = "claude.zst";
-          checksum = "94345861e88be3d67a8393494f98f5b1c67604c14ccd4ef3c7a51e3643fa25eb";
+          checksum = "5021d631dacbd516603a779b3cf2463085470417a838b6a0835f77fa44d23f0a";
         };
         linux-arm64 = {
           binary = "claude.zst";
-          checksum = "7ff80952f5cf74fa593432ec19fc7bef1b4461b365092fe2b6c6060d4fbad1ec";
+          checksum = "6e31b86de3952594441b4ef91c1f5079c1385b0169a9df351dd2762bb2336d23";
         };
         darwin-arm64 = {
           binary = "claude.zst";
-          checksum = "485d6883c023368800626e0d1f2e4382c3e1bdc760fae12cb2f6e3054f218eec";
+          checksum = "ed26ee9ccbf05b2dfa3c8abf52348b78b00274304824ad1eeaf9d88366fa70ae";
         };
       };
     };
