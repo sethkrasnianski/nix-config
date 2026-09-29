@@ -21,7 +21,8 @@
   # Unfree allowlist for the Mac. home-manager.useGlobalPkgs (hosts/macbook.nix)
   # makes this cover home.packages too. KEEP IN SYNC with the copy in
   # modules/common.nix — the NixOS hosts maintain their own list, and the two
-  # drift silently otherwise. synergy3 is the pinned Apple Silicon DMG package.
+  # drift silently otherwise. synergy3 is the pinned Apple Silicon DMG package,
+  # installed by modules/synergy3-darwin.nix.
   nixpkgs.config.allowUnfreePredicate =
     pkg:
     builtins.elem (lib.getName pkg) [

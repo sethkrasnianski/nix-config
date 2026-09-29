@@ -29,6 +29,7 @@ Flake-based NixOS configuration with four outputs:
 │   ├── common.nix                  # shared (NixOS): nix settings, overlays, packages, unfree, zsh, fonts
 │   ├── desktop.nix                 # GNOME + Steam (shared by both NixOS hosts)
 │   ├── synergy3.nix                # system Flatpak install/update (all NixOS hosts, including hosts without Home Manager users)
+│   ├── synergy3-darwin.nix         # macOS: copies the pinned Synergy.app to /Applications (path is hardcoded upstream)
 │   ├── wsl.nix                     # WSL-only: wsl.enable, opencode overlay, rebuild aliases (imported by the nixos host)
 │   ├── darwin.nix                  # macOS system layer: nix settings, unfree, fonts, CLI tools, Homebrew (nix-darwin)
 │   ├── local-agents.nix             # typed host-local OpenCode agent inference overrides
@@ -189,7 +190,7 @@ on NixOS (a `programs.*` / `services.*` module rather than home-manager).
 | Obsidian | ✅ | ✅ | nix, global — `home/default.nix` |
 | doctl | ✅ | ✅ | nix, global — `home/default.nix` |
 | Signal | ✅ `signal-desktop` | ✅ `signal-desktop` | nix, global — `home/default.nix` |
-| Synergy 3 | ✅ Flatpak bundle | ✅ Apple Silicon DMG | pinned custom package; NixOS activation / `home/darwin.nix` |
+| Synergy 3 | ✅ Flatpak bundle | ✅ Apple Silicon DMG | pinned custom package; NixOS activation (`modules/synergy3.nix`) / darwin activation (`modules/synergy3-darwin.nix`) |
 | VLC | ✅ `vlc` | ✅ `vlc-bin` | nix, per-platform entrypoint |
 | WhatsApp | ✅ `karere` (GTK4) | ✅ `whatsapp-for-mac` | nix, per-platform entrypoint |
 | Firefox | ✅ `firefox` | ✅ `firefox-bin` | nix, per-platform entrypoint |
@@ -213,7 +214,10 @@ tokens, hashes the Linux Flatpak bundle and Apple Silicon DMG, validates both
 installers, evaluates all four outputs, and opens a review PR. After merging,
 the next rebuild updates the installed app. On NixOS, the system Flatpak module
 installs the bundle and its runtime and exposes its desktop entry; on macOS,
-Home Manager links `Synergy.app` into `~/Applications/Home Manager Apps/`.
+darwin activation copies `Synergy.app` to `/Applications/`. Synergy hardcodes
+that path for its background service, so a Home Manager or Nix Apps link won't
+work; the copy is only replaced when the pinned build changes, and Synergy needs
+a relaunch afterwards to re-register its service.
 macOS will still ask for the user's Accessibility permission after the first
 launch; approve Synergy in System Settings → Privacy & Security → Accessibility.
 

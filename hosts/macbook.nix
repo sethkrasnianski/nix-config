@@ -10,7 +10,10 @@ let
   username = "sethkrasnianski";
 in
 {
-  imports = [ ../modules/darwin.nix ];
+  imports = [
+    ../modules/darwin.nix
+    ../modules/synergy3-darwin.nix
+  ];
 
   # Apple Silicon. Also pins the package set nix-darwin and home-manager
   # evaluate against (so darwinSystem needs no explicit `system` argument).

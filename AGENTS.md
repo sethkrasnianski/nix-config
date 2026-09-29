@@ -13,7 +13,7 @@ darwin module and nix-homebrew for the GUI apps nixpkgs can't build on darwin).
 - `.github/workflows/update-synergy3.yml` — weekly Synergy 3 version/hash PR; validates both installers and evaluates all four outputs
 - `hosts/` — per-host: hostname/`hostPlatform`, `system.stateVersion`, home-manager user wiring (`macbook.nix` is the nix-darwin host)
 - `pkgs/` — packages not in nixpkgs: `prime-agent/` (Prime Agent's pinned release tarball) and `synergy3/` (version-pinned Linux Flatpak and Apple Silicon DMG); `overlay.nix` is imported by both `modules/common.nix` and `modules/darwin.nix` so it's never duplicated
-- `modules/` — system-level shared config: NixOS (`common.nix`, `desktop.nix`, `synergy3.nix`, `wsl.nix`) and darwin (`darwin.nix` — the macOS counterpart to `common.nix`: nix settings, overlays, unfree allowlist, fonts, base CLI tools, Homebrew; never imported by a NixOS host, and vice versa)
+- `modules/` — system-level shared config: NixOS (`common.nix`, `desktop.nix`, `synergy3.nix`, `wsl.nix`) and darwin (`synergy3-darwin.nix`, `darwin.nix` — the macOS counterpart to `common.nix`: nix settings, overlays, unfree allowlist, fonts, base CLI tools, Homebrew; never imported by a NixOS host, and vice versa)
 - `home/` — per-user home-manager config (git, ssh, shell, direnv, neovim, emacs);
   `default.nix` is the shared core, `linux.nix`/`darwin.nix` the per-platform
   entrypoints (NixOS hosts import `linux.nix`; `hosts/macbook.nix` imports

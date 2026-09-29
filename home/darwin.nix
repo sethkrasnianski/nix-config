@@ -29,7 +29,6 @@
     xcodes
     vlc-bin
     whatsapp-for-mac
-    synergy3
   ];
 
   # Mirror the WSL `rebuild` alias (modules/wsl.nix). The helper invokes sudo
