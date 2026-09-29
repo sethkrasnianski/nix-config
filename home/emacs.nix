@@ -30,6 +30,7 @@ in
     typescript # Provides tsserver, required by typescript-language-server
     typescript-language-server # :lang javascript (+lsp) TypeScript/JavaScript LSP
     shellcheck # :lang sh linting
+    pandoc # :lang markdown preview renderer (Doom sets it as markdown-command)
     claude-agent-acp # Claude ACP adapter for agent-shell (see doom/config.el)
     nil # :lang nix (+lsp) language server; formatting uses nixfmt (common.nix)
     yaml-language-server # :lang yaml (+lsp) language server
