@@ -16,14 +16,18 @@
   # bump on upgrades.
   home.stateVersion = "26.05";
 
-  # macOS builds of apps that nixpkgs makes for darwin. firefox-bin is the
-  # prebuilt Firefox (avoids a source compile on darwin); UTM is Mac-only;
+  # macOS builds of apps that nixpkgs makes for darwin. firefox-bin-unwrapped is
+  # the prebuilt Firefox (avoids a source compile on darwin). It is the
+  # unwrapped build on purpose: the firefox-bin wrapper's CFBundleExecutable is
+  # a bash script that execs the binary in a different store bundle, so the
+  # open-URL Apple Events LaunchServices sends never reach the process and every
+  # link opens a blank window. UTM is Mac-only;
   # Slack has no Linux package here. xcodes is the CLI that installs/switches
   # full Xcode versions — Xcode itself is not nix-installable (see README
   # "Xcode"). vlc-bin and whatsapp-for-mac are the darwin equivalents of vlc /
   # karere in home/linux.nix. Global apps live in home/default.nix.
   home.packages = with pkgs; [
-    firefox-bin
+    firefox-bin-unwrapped
     utm
     slack
     xcodes
