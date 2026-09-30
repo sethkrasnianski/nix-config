@@ -74,6 +74,7 @@ Flake-based NixOS configuration with four outputs:
         ├── new-project/SKILL.md    # skill: bootstrap a new project (flake, direnv, AGENTS.md, docs)
         ├── handoff/SKILL.md        # skill: compact the conversation into a handoff doc for another agent
         ├── explain-diff/SKILL.md   # skill: rich HTML explanation of a diff, branch, or PR
+        ├── please-continue/SKILL.md # skill: resume interrupted work after sleep or a stalled session
         └── tickets/                 # skill: GitHub Projects V2 Kanban ticket workflow
             ├── SKILL.md
             ├── contracts/kanban-v1.json
