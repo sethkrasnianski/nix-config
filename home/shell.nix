@@ -3,7 +3,7 @@
 # home.sessionPath) — bash because it's the login shell on the WSL host,
 # zsh for interactive use. Without this, those variables never load. Both
 # shells use the same minimal hostname/cwd prompt.
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 
 let
   # MCP servers for agent CLIs live in the tool-agnostic ~/.agents/mcp.json
@@ -57,9 +57,21 @@ in
         }
       else
         { };
-    initContent = ''
-      PROMPT=$'\e[38;2;159;226;191m%n\e[0m:%~$ '
-    ''
-    + claudeWithMcp;
+    initContent = lib.mkMerge [
+      (
+        ''
+          PROMPT=$'\e[38;2;159;226;191m%n\e[0m:%~$ '
+        ''
+        + claudeWithMcp
+      )
+      # Host-specific overrides. ~/.zshrc.local is untracked and per-machine.
+      # Ordered after every generated section (aliases, direnv hook) so it can
+      # override them. No-op if absent.
+      (lib.mkOrder 2000 ''
+        if [[ -r ~/.zshrc.local ]]; then
+          source ~/.zshrc.local
+        fi
+      '')
+    ];
   };
 }
