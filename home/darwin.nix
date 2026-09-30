@@ -33,7 +33,19 @@
     xcodes
     vlc-bin
     whatsapp-for-mac
+    # Container runtime for macOS: colima runs the Linux VM (start it with
+    # `colima start`; not autostarted), docker is the CLI that talks to it.
+    # Needed by the sonarqube MCP server and the Makefile image builds in
+    # morpheos-nucleus. The buildx/compose plugins are linked below.
+    colima
+    docker
   ];
+
+  # The docker CLI discovers plugins in ~/.docker/cli-plugins. Link them there
+  # rather than editing ~/.docker/config.json, which colima rewrites to add its
+  # docker context.
+  home.file.".docker/cli-plugins/docker-buildx".source = "${pkgs.docker-buildx}/bin/docker-buildx";
+  home.file.".docker/cli-plugins/docker-compose".source = "${pkgs.docker-compose}/bin/docker-compose";
 
   # Mirror the WSL `rebuild` alias (modules/wsl.nix). The helper invokes sudo
   # after reading the user's local.nix, so $HOME resolves correctly. home.shellAliases lands in the
