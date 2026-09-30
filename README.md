@@ -75,6 +75,9 @@ Flake-based NixOS configuration with four outputs:
         ├── handoff/SKILL.md        # skill: compact the conversation into a handoff doc for another agent
         ├── explain-diff/SKILL.md   # skill: rich HTML explanation of a diff, branch, or PR
         ├── please-continue/SKILL.md # skill: resume interrupted work after sleep or a stalled session
+        ├── ste-writing/             # skill: write prose in Simplified Technical English to remove AI slop
+        │   ├── SKILL.md
+        │   └── scripts/ste-lint.py  # mechanical STE checker (run via nix shell nixpkgs#python3)
         └── tickets/                 # skill: GitHub Projects V2 Kanban ticket workflow
             ├── SKILL.md
             ├── contracts/kanban-v1.json
