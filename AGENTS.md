@@ -75,6 +75,11 @@ darwin module and nix-homebrew for the GUI apps nixpkgs can't build on darwin).
   smallest relevant agent, command, or skill, preserve the approval/TDD/review
   boundaries, and run `opencode/tests/` before evaluating the flake outputs.
 
+- Host-specific agent instructions live outside the repo in
+  `~/.config/agents/AGENTS.local.md` (never committed). The shared
+  `agents/AGENTS.md` tells every agent CLI to read it when present, so no
+  per-tool wiring or rebuild is needed.
+
 ## Hard rules
 
 - No plaintext secrets, ever — no hashed passwords, tokens, or private keys in Nix

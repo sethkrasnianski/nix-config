@@ -24,3 +24,11 @@ finding implementations related to a known location. Do not try to resolve
 that external skill through the current project's `.agents/` directory. For a
 single known file or symbol, use the client's built-in file/content search
 directly instead of invoking the skill.
+
+## Host-specific instructions
+
+Each machine can have its own instructions, kept outside this repo. If the file
+`~/.config/agents/AGENTS.local.md` exists, read it at the start of the session
+and follow it as part of these instructions. Where it conflicts with the
+guidance above, the host file wins. If the file does not exist, continue
+without it; do not create it unless the user asks.
