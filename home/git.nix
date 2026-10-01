@@ -21,6 +21,9 @@
     # without the entry leaves transcripts one 'git add -A' from a commit.
     # Session logs are where a pasted token or env dump lands, so ignore them
     # globally (~/.config/git/ignore) across every repo on this environment.
-    ignores = [ ".agent-shell/" ];
+    ignores = [
+      ".agent-shell/"
+      ".claude/worktrees/*"
+    ];
   };
 }
