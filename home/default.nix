@@ -41,6 +41,7 @@ in
     opencode
     prime-agent
     doctl
+    google-cloud-sdk
     gh
     signal-desktop
 
