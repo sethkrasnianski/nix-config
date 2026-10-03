@@ -6,5 +6,7 @@
   "model": "opusplan",
   "tui": "fullscreen",
   "theme": "auto",
-  "defaultMode": "auto"
+  "defaultMode": "auto",
+  "agentPushNotifEnabled": true,
+  "inputNeededNotifEnabled": true
 }
