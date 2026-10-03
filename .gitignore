@@ -9,8 +9,10 @@ result-*
 # direnv's machine-local environment and cached flake state
 .direnv/
 
-# Claude Code local project state (worktrees, local settings)
-.claude/
+# Claude Code local project state (worktrees, local settings); the rest of
+# .claude/ (commands, agents, skills) is shareable and stays trackable
+.claude/settings.local.json
+.claude/worktrees/
 agents/skills/synced/
 
 # Host-specific agent instructions, never committed
