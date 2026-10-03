@@ -16,14 +16,10 @@
       # (the file `ignores` below writes) and inherit the system one instead.
       core.excludesFile = "${config.xdg.configHome}/git/ignore";
     };
-    # Machine-level backstop for agent-shell session transcripts: a repo's
-    # tracked .gitignore only covers that repo, so a fresh clone or a new repo
-    # without the entry leaves transcripts one 'git add -A' from a commit.
-    # Session logs are where a pasted token or env dump lands, so ignore them
-    # globally (~/.config/git/ignore) across every repo on this environment.
-    ignores = [
-      ".agent-shell/"
-      ".claude/worktrees/*"
-    ];
+    # Machine-level backstop: a repo's tracked .gitignore only covers that repo,
+    # so a fresh clone or a new repo without the entry leaves transcripts and
+    # local agent instructions one 'git add -A' from a commit. Written to
+    # ~/.config/git/ignore; the list is shared with /etc/gitignore.
+    ignores = import ../modules/git-ignores.nix;
   };
 }

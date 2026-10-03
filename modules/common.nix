@@ -63,16 +63,13 @@
   # single core.excludesFile, so setting it here in /etc/gitconfig makes the main
   # user resolve to /etc/gitignore too (home-manager leaves the key unset); to
   # keep the per-user ~/.config/git/ignore from home/git.nix independently usable,
-  # that module pins its own excludesFile back to the XDG path. Keeps agent-shell
-  # transcripts — where a pasted token or env dump can land — out of every working
-  # tree by default.
+  # that module pins its own excludesFile back to the XDG path. Both files carry
+  # the same patterns, from modules/git-ignores.nix.
   programs.git = {
     enable = true;
     config.core.excludesfile = "/etc/gitignore";
   };
-  environment.etc."gitignore".text = ''
-    .agent-shell/
-  '';
+  environment.etc."gitignore".text = lib.concatLines (import ./git-ignores.nix);
 
   # Mullvad VPN. The daemon + CLI are system-level (a NixOS service, not a
   # home-manager package); `gui.enable` installs the separate GUI package

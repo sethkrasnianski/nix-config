@@ -31,6 +31,7 @@ Flake-based NixOS configuration with four outputs:
 │   ├── synergy3.nix                # system Flatpak install/update (all NixOS hosts, including hosts without Home Manager users)
 │   ├── synergy3-darwin.nix         # macOS: copies the pinned Synergy.app to /Applications (path is hardcoded upstream)
 │   ├── wsl.nix                     # WSL-only: wsl.enable, opencode overlay, rebuild aliases (imported by the nixos host)
+│   ├── git-ignores.nix             # shared global git ignore list (data, used by common.nix + home/git.nix)
 │   ├── darwin.nix                  # macOS system layer: nix settings, unfree, fonts, CLI tools, Homebrew (nix-darwin)
 │   ├── local-agents.nix             # typed host-local OpenCode agent inference overrides
 │   ├── local-llm.nix               # optional host-local Ollama and OpenCode routing
