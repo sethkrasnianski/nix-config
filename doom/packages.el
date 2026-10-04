@@ -17,6 +17,8 @@
 (package! shell-maker)
 (package! acp)
 (package! agent-shell)
+(package! agent-shell-manager
+  :recipe (:host github :repo "jethrokuan/agent-shell-manager"))
 
 
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:

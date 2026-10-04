@@ -223,8 +223,9 @@ selection, e.g. `@server.py#L20-35'.  A single-line selection yields `@file#L20'
       (:prefix ("a" . "Actions")
        :desc "Embark act" "a" #'embark-act
        (:prefix ("s" . "agent-shell")
-        :desc "Default (Claude Code)" "s" #'agent-shell
-        :desc "opencode"              "d" #'agent-shell-opencode-start-agent)))
+         :desc "Default (Claude Code)" "s" #'agent-shell
+         :desc "opencode"              "d" #'agent-shell-opencode-start-agent
+         :desc "Manager"               "m" #'agent-shell-manager-toggle)))
 
 
 ;;; Sync the kill ring with the system clipboard (macOS and WSL).
