@@ -64,8 +64,9 @@ darwin module and nix-homebrew for the GUI apps nixpkgs can't build on darwin).
   agent-config dir). Claude Code consumes them only through an alias —
   `~/.claude/skills` → `~/.agents/skills` (`home/default.nix`). Wire any new
   agent CLI the same way: give it an alias into `~/.agents`, never a copy, so
-  no configuration is ever duplicated. Prime Agent is the one exception so
-  far — it globs `~/.agents/skills/` itself, so it needs no alias at all.
+  no configuration is ever duplicated. Prime Agent and Codex are the
+  exceptions so far — both glob `~/.agents/skills/` themselves, so they need
+  no alias at all.
 - A skill is a directory containing a `SKILL.md`: YAML frontmatter with `name`
   and `description` (the description is what triggers invocation — write it
   for matching), followed by the instructions.
