@@ -40,6 +40,7 @@ in
   home.packages = with pkgs; [
     opencode
     prime-agent
+    codex
     doctl
     google-cloud-sdk
     gh
