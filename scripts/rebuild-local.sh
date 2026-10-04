@@ -6,7 +6,7 @@ target=${1:?usage: rebuild-local.sh nixos|nixos-headless|nixos-default|macbook}
 # Canonicalize to the physical path: Nix's path: fetcher refuses input paths
 # whose ancestors are symlinks (macOS /tmp and $TMPDIR go through /var ->
 # private/var). A no-op where TMPDIR has no symlinked components (Linux).
-local_input_dir=$(mktemp -d "${TMPDIR:-/tmp}/nixos-config-local.XXXXXX")
+local_input_dir=$(mktemp -d "${TMPDIR:-/tmp}/nix-config-local.XXXXXX")
 local_input_dir=$(cd "$local_input_dir" && pwd -P)
 trap 'rm -rf "$local_input_dir"' EXIT
 

@@ -3,7 +3,7 @@
 { lib, ... }:
 
 let
-  flakePath = "/home/nixos/oss/nixos-config";
+  flakePath = "/home/nixos/oss/nix-config";
 in
 {
   wsl.enable = true;

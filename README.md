@@ -1,4 +1,4 @@
-# nixos-config
+# nix-config
 
 Flake-based NixOS configuration with four outputs:
 
@@ -250,13 +250,13 @@ platform's hash (the rebuild's hash-mismatch error reports the correct one).
 Graphical (GNOME desktop) — the default:
 
 ```sh
-sudo nixos-rebuild switch --flake ~/oss/nixos-config#nixos
+sudo nixos-rebuild switch --flake ~/oss/nix-config#nixos
 ```
 
 Headless (no desktop; GUI apps like Ghostty still work via WSLg):
 
 ```sh
-sudo nixos-rebuild switch --flake ~/oss/nixos-config#nixos-headless
+sudo nixos-rebuild switch --flake ~/oss/nix-config#nixos-headless
 ```
 
 Switch between them on demand by rebuilding with the other attribute — both are
@@ -280,7 +280,7 @@ built from this config yet (including right now). Run the full command once to
 install them:
 
 ```sh
-sudo nixos-rebuild switch --flake ~/oss/nixos-config#nixos
+sudo nixos-rebuild switch --flake ~/oss/nix-config#nixos
 ```
 
 After that, open a new shell and `rebuild` / `rebuild-headless` are available.
@@ -309,19 +309,19 @@ the handful of GUI apps nixpkgs can't build on darwin (see
    ```
 
    `modules/darwin.nix` keeps this setting managed after the initial bootstrap.
-2. Clone this repo to `~/oss/nixos-config` — the live symlinks and the
+2. Clone this repo to `~/oss/nix-config` — the live symlinks and the
    `rebuild` alias assume that path.
 3. First run (nix-darwin isn't installed yet) — this also installs Homebrew
    via nix-homebrew:
 
    ```sh
-   sudo nix run nix-darwin -- switch --flake "path:$HOME/oss/nixos-config#macbook"
+   sudo nix run nix-darwin -- switch --flake "path:$HOME/oss/nix-config#macbook"
    ```
 
    Pre-existing dotfiles (macOS ships a default `.zshrc`) are moved aside via
    `backupFileExtension = "hm-bak"` (`hosts/macbook.nix`).
 4. Thereafter just `rebuild` (aliased in `home/darwin.nix`), or the full
-   `sudo darwin-rebuild switch --flake "path:$HOME/oss/nixos-config#macbook"`.
+   `sudo darwin-rebuild switch --flake "path:$HOME/oss/nix-config#macbook"`.
 
 Apple's `/bin/zsh` stays the login shell and sources the home-manager rc
 files — no `chsh` needed. Doom Emacs bootstraps the same way as on Linux
@@ -518,7 +518,7 @@ Manual update, when you don't want to wait for Monday:
 ```sh
 nix flake update                 # all inputs
 nix flake update nixpkgs         # just one
-sudo nixos-rebuild switch --flake ~/oss/nixos-config#nixos
+sudo nixos-rebuild switch --flake ~/oss/nix-config#nixos
 ```
 
 Commit `flake.lock` after updating.
@@ -572,5 +572,5 @@ publishable.
 ## Reproduce from a remote
 
 ```sh
-sudo nixos-rebuild switch --flake github:<you>/nixos-config#nixos
+sudo nixos-rebuild switch --flake github:<you>/nix-config#nixos
 ```

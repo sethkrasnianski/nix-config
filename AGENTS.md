@@ -1,4 +1,4 @@
-# nixos-config
+# nix-config
 
 Flake-based NixOS config. Four outputs: `nixos` (WSL host, GNOME), `nixos-headless`
 (same WSL host, no desktop), `nixos-default` (non-WSL template) — where home-manager
@@ -28,9 +28,9 @@ darwin module and nix-homebrew for the GUI apps nixpkgs can't build on darwin).
 
 ## Working in this repo
 
-- Apply changes: `rebuild` (= `sudo nixos-rebuild switch --flake ~/oss/nixos-config#nixos`);
+- Apply changes: `rebuild` (= `sudo nixos-rebuild switch --flake ~/oss/nix-config#nixos`);
   `rebuild-headless` for the headless variant. On the Mac, `rebuild` =
-  `sudo darwin-rebuild switch --flake path:/Users/sethkrasnianski/oss/nixos-config#macbook`.
+  `sudo darwin-rebuild switch --flake path:/Users/sethkrasnianski/oss/nix-config#macbook`.
 - Check without switching — all four outputs must evaluate:
   `nix eval .#nixosConfigurations.<name>.config.system.build.toplevel.drvPath --raw`
   and `nix eval .#darwinConfigurations.macbook.system.drvPath --raw`

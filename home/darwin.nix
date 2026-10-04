@@ -50,5 +50,5 @@
   # Mirror the WSL `rebuild` alias (modules/wsl.nix). The helper invokes sudo
   # after reading the user's local.nix, so $HOME resolves correctly. home.shellAliases lands in the
   # home-manager-managed bash/zsh rc files (home/shell.nix).
-  home.shellAliases.rebuild = "${config.home.homeDirectory}/oss/nixos-config/scripts/rebuild-local.sh macbook";
+  home.shellAliases.rebuild = "${config.home.homeDirectory}/oss/nix-config/scripts/rebuild-local.sh macbook";
 }

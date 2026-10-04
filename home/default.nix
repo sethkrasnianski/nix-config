@@ -10,7 +10,7 @@
 
 let
   # The checkout of this repo, assumed at the same place on every machine.
-  flakePath = "${config.home.homeDirectory}/oss/nixos-config";
+  flakePath = "${config.home.homeDirectory}/oss/nix-config";
 in
 {
   imports = [
