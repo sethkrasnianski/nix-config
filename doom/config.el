@@ -224,6 +224,7 @@ selection, e.g. `@server.py#L20-35'.  A single-line selection yields `@file#L20'
        :desc "Embark act" "a" #'embark-act
        (:prefix ("s" . "agent-shell")
          :desc "Default (Claude Code)" "s" #'agent-shell
+         :desc "Codex"                 "c" #'agent-shell-openai-start-codex
          :desc "opencode"              "d" #'agent-shell-opencode-start-agent
          :desc "Manager"               "m" #'agent-shell-manager-toggle)))
 
@@ -269,11 +270,11 @@ selection, e.g. `@server.py#L20-35'.  A single-line selection yields `@file#L20'
   (setq interprogram-cut-function #'+wsl-clip))
 
 
-;;; agent-shell -- AI coding agents in Emacs over ACP, set up for Claude Code.
-;; The Claude ACP adapter (claude-agent-acp) is provided by modules/emacs.nix,
-;; plus a logged-in Claude CLI (run `claude` once outside Emacs to authenticate).
-;; Start a session with `M-x agent-shell-anthropic-start-claude-code' (or
-;; `M-x agent-shell', which defaults to Claude Code via the config below).
+;;; agent-shell -- AI coding agents in Emacs over ACP.
+;; The Claude and Codex ACP adapters are provided by home/emacs.nix. Log in to
+;; each CLI once outside Emacs to reuse its existing account credentials.
+;; Start Claude with `M-x agent-shell-anthropic-start-claude-code' and Codex
+;; with `M-x agent-shell-openai-start-codex'. `M-x agent-shell' defaults to Claude.
 (use-package! agent-shell
   :defer t
   :config
@@ -285,6 +286,9 @@ selection, e.g. `@server.py#L20-35'.  A single-line selection yields `@file#L20'
   ;;   (agent-shell-anthropic-make-authentication :api-key "sk-ant-...")
   (setq agent-shell-anthropic-authentication
         (agent-shell-anthropic-make-authentication :login t))
+  ;; Reuse the existing Codex CLI login.
+  (setq agent-shell-openai-authentication
+        (agent-shell-openai-make-authentication :login t))
   ;; Make `M-x agent-shell' default to Claude Code.
   (setq agent-shell-preferred-agent-config
         (agent-shell-anthropic-make-claude-code-config)))
