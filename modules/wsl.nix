@@ -1,6 +1,6 @@
 # WSL-specific configuration. Only imported by the WSL host; the nixos-wsl
 # module itself (which provides the `wsl.*` options) is added in flake.nix.
-{ lib, ... }:
+{ config, lib, ... }:
 
 let
   flakePath = "/home/nixos/oss/nix-config";
@@ -9,6 +9,10 @@ in
   wsl.enable = true;
   wsl.defaultUser = "nixos";
   # wsl.wslg.enable = true;
+
+  # WSL shells can outlive logind sessions. Keep the user manager and runtime
+  # directory available so Magit can start the Emacs server socket there.
+  users.users.${config.wsl.defaultUser}.linger = true;
 
   # NixOS-WSL defaults wheel to passwordless sudo. This host runs agent CLIs
   # that execute shell commands, so keep the password prompt as a tripwire
