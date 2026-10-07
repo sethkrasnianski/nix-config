@@ -8,6 +8,10 @@
       user = {
         name = "Seth Krasnianski";
         email = "1910114+sethkrasnianski@users.noreply.github.com";
+        # Never guess an identity from hostname/login: if the values above are
+        # ever missing, git errors instead of committing with a private address
+        # that GitHub would reject (GH007).
+        useConfigOnly = true;
       };
       init.defaultBranch = "main";
       # The system config (modules/common.nix) sets core.excludesFile to
