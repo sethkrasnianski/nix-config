@@ -33,31 +33,24 @@ final: prev: {
     };
   };
 
-  # Keep the OpenCode packaging fix from nixpkgs PR #564101 (Bun's regression
-  # in code splitting broke prompts), while advancing to upstream 1.18.33 ahead
-  # of our nixpkgs pin. The node_modules output hash is for this release's lockfile.
+  # Use the release ahead of our nixpkgs pin, which includes the Bun packaging fix.
+  # The node_modules output hash must match this release's lockfile.
   opencode =
     let
-      fixedNixpkgs = import (builtins.fetchTree {
-        type = "github";
-        owner = "NixOS";
-        repo = "nixpkgs";
-        rev = "d4448fee6bab71511ac36747a98a2aad35544852";
-      }) { system = prev.stdenv.hostPlatform.system; };
-      version = "1.18.33";
+      version = "1.18.35";
       src = final.fetchFromGitHub {
         owner = "anomalyco";
         repo = "opencode";
         tag = "v${version}";
-        hash = "sha256-x1ZG4/zsL1/EfpelNByRMi5mSHumXfmoq/LPQ3+jhrc=";
+        hash = "sha256-NM5AbX99hDW+oIojiHSRA+QDz27d8L/v42bwZY+6Imk=";
       };
     in
-    fixedNixpkgs.opencode.overrideAttrs (old: {
+    prev.opencode.overrideAttrs (old: {
       inherit version src;
       passthru = old.passthru // {
         node_modules = old.passthru.node_modules.overrideAttrs (_: {
           inherit version src;
-          outputHash = "sha256-3QJzASZSJfWqbFpbxzIQ/ZRRaFX8KAF4Jd2BI6v9e+s=";
+          outputHash = "sha256-cQLuGI8MBh9l8GisM2k5WXBcZrsdgrNsXUOsYzZVwYY=";
         });
       };
     });
