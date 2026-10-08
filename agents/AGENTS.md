@@ -15,6 +15,9 @@ this repo's `agents/AGENTS.md`; each agent CLI reads it through an alias into
   begins. Never include unrelated pre-existing changes in a plan commit. Before
   reporting the plan complete, run `git status` and confirm no planned changes
   remain staged or unstaged.
+- Prefer `<project-root>/.agents/worktrees/<worktree-name>` when creating Git
+  worktrees. Use the primary checkout as the project root. This gives all agent
+  harnesses a shared location for each project's worktrees.
 
 ## Code Search
 

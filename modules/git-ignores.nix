@@ -11,6 +11,7 @@
   # agent-shell session transcripts — a pasted token or env dump can land here.
   ".agent-shell/"
   ".claude/worktrees/*"
+  ".agents/worktrees/*"
   # Per-checkout, host-specific agent instructions.
   "CLAUDE.local.md"
   "AGENTS.local.md"
