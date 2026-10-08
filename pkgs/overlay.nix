@@ -33,6 +33,62 @@ final: prev: {
     };
   };
 
+  # Keep Linux's source build and update the wrapper and security metadata together.
+  # The source checksum comes from Mozilla's release SHA512SUMS.
+  firefox-unwrapped = prev.firefox-unwrapped.overrideAttrs (
+    finalAttrs: old: {
+      version = "157.0.1";
+      src = final.fetchurl {
+        url = "mirror://mozilla/firefox/releases/${finalAttrs.version}/source/firefox-${finalAttrs.version}.source.tar.xz";
+        sha512 = "c019202b2f87d25b3605bbf7266f3bb4d59745e48536f297d3f00cc3524a1cd2eba416a5a3cd0ecee6b0762d0f35bf3c5fcce286ebc7bc741263bebd0f102858";
+      };
+      passthru = old.passthru // {
+        inherit (finalAttrs) version;
+      };
+      meta = old.meta // {
+        changelog = "https://www.firefox.com/en-US/firefox/${finalAttrs.version}/releasenotes/";
+        identifiers = old.meta.identifiers // {
+          cpeParts = old.meta.identifiers.cpeParts // {
+            inherit (finalAttrs) version;
+          };
+          purlParts = old.meta.identifiers.purlParts // {
+            spec = "firefox@${finalAttrs.version}";
+          };
+        };
+      };
+    }
+  );
+
+  # Read the pinned Mozilla checksums to preserve every platform and locale choice.
+  # The inherited macOS package keeps the unwrapped, signed application bundle.
+  firefox-bin-unwrapped = prev.firefox-bin-unwrapped.override {
+    generated =
+      let
+        version = "157.0.1";
+        baseUrl = "https://archive.mozilla.org/pub/firefox/releases/${version}";
+        checksums = builtins.readFile (
+          builtins.fetchurl {
+            url = "${baseUrl}/SHA256SUMS";
+            sha256 = "16e808f33acfacfe6922ac182f1086faeb143970d61e2a11e55c422b8b33b316";
+          }
+        );
+        matches = builtins.filter (match: match != null) (
+          map (builtins.match "([0-9a-f]{64})  ((linux-[^/]+|mac)/([^/]+)/(firefox-.+[.]tar[.]xz|Firefox .+[.]dmg))") (
+            final.lib.splitString "\n" checksums
+          )
+        );
+      in
+      {
+        inherit version;
+        sources = map (match: {
+          url = "${baseUrl}/${builtins.elemAt match 1}";
+          sha256 = builtins.elemAt match 0;
+          arch = builtins.elemAt match 2;
+          locale = builtins.elemAt match 3;
+        }) matches;
+      };
+  };
+
   # Keep the nixpkgs sandbox wrapper, daemon patch, completions, and code-mode host.
   # This release still uses V8 150.4.0 from the pinned package.
   codex = prev.codex.overrideAttrs (
