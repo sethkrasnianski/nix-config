@@ -33,6 +33,7 @@ Flake-based NixOS configuration with four outputs:
 │   ├── wsl.nix                     # WSL-only: wsl.enable, opencode overlay, rebuild aliases (imported by the nixos host)
 │   ├── git-ignores.nix             # shared global git ignore list (data, used by common.nix + home/git.nix)
 │   ├── darwin.nix                  # macOS system layer: nix settings, unfree, fonts, CLI tools, Homebrew (nix-darwin)
+│   ├── primary-user.nix            # local.primaryUser option: macOS account name, overridable from ~/.config/nix/local.nix
 │   ├── local-agents.nix             # typed host-local OpenCode agent inference overrides
 │   ├── local-llm.nix               # optional host-local Ollama and OpenCode routing
 │   ├── local-llm-nixos.nix         # NixOS Ollama service wiring

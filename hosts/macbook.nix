@@ -2,15 +2,16 @@
 # Mirrors hosts/nixos-wsl.nix: this is where the per-machine facts live
 # (username, hostPlatform, stateVersion, home-manager wiring). Shared darwin
 # system config is in modules/darwin.nix.
-{ ... }:
+{ config, ... }:
 
 let
-  # CHANGE ME if the macOS account name differs — the single place the
-  # username is defined; everything else derives from it.
-  username = "sethkrasnianski";
+  # The single place the username is read (option: modules/primary-user.nix);
+  # everything else derives from it.
+  username = config.local.primaryUser;
 in
 {
   imports = [
+    ../modules/primary-user.nix
     ../modules/darwin.nix
     ../modules/synergy3-darwin.nix
   ];
