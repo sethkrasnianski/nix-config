@@ -40,7 +40,6 @@ in
   home.packages = with pkgs; [
     opencode
     prime-agent
-    codex
     doctl
     google-cloud-sdk
     gh
@@ -101,9 +100,8 @@ in
   # at ~/.agents. Claude Code doesn't read ~/.agents natively, so it's proxied
   # with an alias: ~/.claude/skills → ~/.agents/skills. Other agent CLIs get
   # their own alias; never copy skills into a tool-specific directory. Prime
-  # Agent and Codex are the exceptions that prove the rule: both glob
-  # ~/.agents/skills themselves (a first-class skill location for them), so
-  # they need no alias here.
+  # Agent is the exception that proves the rule: it globs ~/.agents/skills
+  # itself (a first-class skill location for it), so it needs no alias here.
   home.file.".agents".source = config.lib.file.mkOutOfStoreSymlink "${flakePath}/agents";
   home.file.".claude/skills".source =
     config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.agents/skills";
@@ -111,17 +109,12 @@ in
   # Global agent instructions — single source of truth in agents/AGENTS.md,
   # aliased into each tool's expected path. Claude Code reads ~/.claude/CLAUDE.md;
   # opencode reads ~/.config/opencode/AGENTS.md; Prime Agent reads
-  # ~/.prime/agent/AGENTS.md; Codex reads $CODEX_HOME/AGENTS.md (default
-  # ~/.codex). All four point at ~/.agents so the instructions are never
-  # duplicated and edits apply without a rebuild. Codex gets only the file, not
-  # all of ~/.codex, because it keeps mutable state there (auth.json,
-  # sessions, config.toml).
+  # ~/.prime/agent/AGENTS.md. All three point at ~/.agents so the
+  # instructions are never duplicated and edits apply without a rebuild.
   home.file.".claude/CLAUDE.md".source =
     config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.agents/AGENTS.md";
   home.file.".config/opencode/AGENTS.md".source =
     config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.agents/AGENTS.md";
   home.file.".prime/agent/AGENTS.md".source =
-    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.agents/AGENTS.md";
-  home.file.".codex/AGENTS.md".source =
     config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.agents/AGENTS.md";
 }
