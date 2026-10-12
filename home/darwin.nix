@@ -22,14 +22,13 @@
   # a bash script that execs the binary in a different store bundle, so the
   # open-URL Apple Events LaunchServices sends never reach the process and every
   # link opens a blank window. UTM is Mac-only;
-  # Slack has no Linux package here. xcodes is the CLI that installs/switches
+  # xcodes is the CLI that installs/switches
   # full Xcode versions — Xcode itself is not nix-installable (see README
   # "Xcode"). vlc-bin and whatsapp-for-mac are the darwin equivalents of vlc /
   # karere in home/linux.nix. Global apps live in home/default.nix.
   home.packages = with pkgs; [
     firefox-bin-unwrapped
     utm
-    slack
     xcodes
     vlc-bin
     whatsapp-for-mac

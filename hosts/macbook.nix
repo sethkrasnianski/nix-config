@@ -48,7 +48,7 @@ in
   # be declared here. This is reset to exactly the below on every
   # `darwin-rebuild switch`, so manual reordering won't persist.
   #
-  # Paths: nix-installed GUI apps (firefox-bin-unwrapped, ghostty, slack, signal-desktop,
+  # Paths: nix-installed GUI apps (firefox-bin-unwrapped, ghostty, signal-desktop,
   # spotify) are linked into ~/Applications/Home Manager Apps/; Homebrew casks
   # such as Claude install into /Applications; Messages is an Apple app under
   # /System/Applications. Confirm the exact .app leaf names on the Mac — a
@@ -61,7 +61,6 @@ in
       { app = "/Users/${username}/Applications/Home Manager Apps/Firefox.app"; }
       { app = "/Applications/Claude.app"; }
       { app = "/Users/${username}/Applications/Home Manager Apps/Ghostty.app"; }
-      { app = "/Users/${username}/Applications/Home Manager Apps/Slack.app"; }
       { app = "/Users/${username}/Applications/Home Manager Apps/Signal.app"; }
       { app = "/System/Applications/Messages.app"; }
       { app = "/Users/${username}/Applications/Home Manager Apps/Spotify.app"; }

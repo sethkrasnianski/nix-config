@@ -31,7 +31,6 @@
       "firefox-bin-unwrapped"
       "ngrok"
       "obsidian"
-      "slack"
       "spotify"
       "synergy3"
       "whatsapp-for-mac"
