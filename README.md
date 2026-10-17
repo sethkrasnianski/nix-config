@@ -23,7 +23,7 @@ Flake-based NixOS configuration with four outputs:
 ├── flake.lock                      # pinned input revisions — the reproducibility guarantee
 ├── pkgs/
 │   ├── overlay.nix                 # packages not in nixpkgs (imported by modules/common.nix + modules/darwin.nix)
-│   ├── prime-agent/                # buildNpmPackage derivation for Prime Agent (pinned release tarball)
+│   ├── prime-agent/                # pinned native Rust releases for Linux and Apple Silicon
 │   └── synergy3/                   # pinned Flatpak/DMG installers with hash-verified guest-token fetching
 ├── modules/
 │   ├── common.nix                  # shared (NixOS): nix settings, overlays, packages, unfree, zsh, fonts
