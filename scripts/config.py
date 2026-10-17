@@ -305,6 +305,17 @@ class Config:
     @staticmethod
     def snapshot_source(path, flags=()):
         Config.validate_repo(path)
+        shallow = (
+            run(
+                ["git", "-C", path, "rev-parse", "--is-shallow-repository"],
+                capture=True,
+            ).stdout.strip()
+            == "true"
+        )
+        uri = f"git+{Path(path).as_uri()}"
+        if shallow:
+            # Nix cannot calculate revCount from incomplete Git history.
+            uri += "?shallow=1"
         value = json.loads(
             run(
                 [
@@ -312,7 +323,7 @@ class Config:
                     "flake",
                     "prefetch",
                     "--json",
-                    f"git+{Path(path).as_uri()}",
+                    uri,
                     *flags,
                 ],
                 capture=True,
@@ -614,7 +625,7 @@ class Config:
 def main(argv=None):
     parser = argparse.ArgumentParser(
         prog="config",
-        description="Manage this host and its separate context repositories."
+        description="Manage this host and its separate context repositories.",
     )
     parser.add_argument(
         "--repo", type=Path, help="base repository (defaults to ~/oss/nix-config)"
