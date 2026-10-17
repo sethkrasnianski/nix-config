@@ -39,6 +39,7 @@ in
   # Ghostty is installed by programs.ghostty (home/ghostty.nix).
   home.packages = with pkgs; [
     opencode
+    pi-coding-agent
     prime-agent
     doctl
     google-cloud-sdk
@@ -105,15 +106,19 @@ in
   home.file.".agents".source = config.lib.file.mkOutOfStoreSymlink "${flakePath}/agents";
   home.file.".claude/skills".source =
     config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.agents/skills";
+  home.file.".pi/agent/skills".source =
+    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.agents/skills";
 
   # Global agent instructions — single source of truth in agents/AGENTS.md,
   # aliased into each tool's expected path. Claude Code reads ~/.claude/CLAUDE.md;
-  # opencode reads ~/.config/opencode/AGENTS.md; Prime Agent reads
-  # ~/.prime/agent/AGENTS.md. All three point at ~/.agents so the
+  # opencode reads ~/.config/opencode/AGENTS.md. Pi reads ~/.pi/agent/AGENTS.md,
+  # and Prime Agent reads ~/.prime/agent/AGENTS.md. All point at ~/.agents so the
   # instructions are never duplicated and edits apply without a rebuild.
   home.file.".claude/CLAUDE.md".source =
     config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.agents/AGENTS.md";
   home.file.".config/opencode/AGENTS.md".source =
+    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.agents/AGENTS.md";
+  home.file.".pi/agent/AGENTS.md".source =
     config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.agents/AGENTS.md";
   home.file.".prime/agent/AGENTS.md".source =
     config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.agents/AGENTS.md";

@@ -196,6 +196,7 @@ on NixOS (a `programs.*` / `services.*` module rather than home-manager).
 | Spotify | ✅ | ✅ | nix, global — `home/default.nix` |
 | Obsidian | ✅ | ✅ | nix, global — `home/default.nix` |
 | doctl | ✅ | ✅ | nix, global — `home/default.nix` |
+| Pi coding agent | ✅ `pi-coding-agent` | ✅ `pi-coding-agent` | nix, global — `home/default.nix` |
 | Signal | ✅ `signal-desktop` | ✅ `signal-desktop` | nix, global — `home/default.nix` |
 | Synergy 3 | ✅ Flatpak bundle | ✅ Apple Silicon DMG | pinned custom package; NixOS activation (`modules/synergy3.nix`) / darwin activation (`modules/synergy3-darwin.nix`) |
 | VLC | ✅ `vlc` | ✅ `vlc-bin` | nix, per-platform entrypoint |
@@ -453,6 +454,18 @@ configuration, and exposes its PR watcher and history finalizer in
 `~/.local/bin`. Improve the relevant file under `opencode/` and run the harness
 tests before evaluating the NixOS outputs.
 
+## Pi
+
+[Pi](https://pi.dev/) comes from the pinned nixpkgs package `pi-coding-agent`
+in `home/default.nix` on Linux and macOS. After a rebuild, run `pi` in a
+project directory and use `/login` to connect a provider.
+
+Home Manager links `~/.pi/agent/AGENTS.md` and `~/.pi/agent/skills` to the
+shared instructions and skills under `~/.agents`. Credentials, sessions,
+and user settings stay in the local, mutable `~/.pi/agent` directory.
+The nixpkgs package disables Pi telemetry and version checks by default.
+The flake lock controls package updates.
+
 ## Prime Agent
 
 [Prime Agent](https://github.com/PrimeIntellect-ai/prime-agent) isn't in
@@ -475,8 +488,9 @@ skills alias — it reads `~/.agents/skills/` natively.
 
 Shared agent skills are tool-agnostic and never duplicated per tool. The source of
 truth is `agents/skills/<name>/SKILL.md` in this repo, exposed at `~/.agents`
-(the universal agent-config directory). Claude Code reads them through an
-alias — `~/.claude/skills` → `~/.agents/skills` — wired in `home/default.nix`;
+(the universal agent-config directory). Claude Code and Pi read them through
+aliases in `home/default.nix`: `~/.claude/skills` and `~/.pi/agent/skills`
+both point to `~/.agents/skills`.
 OpenCode's `tickets` entry similarly aliases `~/.agents/skills/tickets` into
 its global skill directory. The skill manages repository GitHub issues as items
 in an approved built-in Kanban project; it does not maintain a local
