@@ -3,6 +3,7 @@
 # must NOT be imported here. Per-machine facts (username, hostPlatform,
 # stateVersion) live in hosts/macbook.nix.
 {
+  config,
   lib,
   pkgs,
   ...
@@ -101,4 +102,17 @@
       autoUpdate = false;
     };
   };
+
+  # Use a Claude-only Bundle pass to compare the installed app's version.
+  # This preserves a newer version from Claude's own updater.
+  system.activationScripts.homebrew.text = lib.mkIf config.homebrew.enable (
+    lib.mkAfter ''
+      echo "upgrading Claude Desktop..."
+      /usr/bin/sudo --user=${lib.escapeShellArg config.homebrew.user} --set-home \
+        /usr/bin/env HOMEBREW_AUTO_UPDATE_SECS=0 \
+        ${lib.escapeShellArg "${config.homebrew.prefix}/bin/brew"} bundle install --upgrade --file=- <<'CLAUDE_BREWFILE'
+      cask "claude", greedy: false
+      CLAUDE_BREWFILE
+    ''
+  );
 }

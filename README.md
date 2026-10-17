@@ -23,7 +23,7 @@ Flake-based NixOS configuration with four outputs:
 ├── flake.lock                      # pinned input revisions — the reproducibility guarantee
 ├── pkgs/
 │   ├── overlay.nix                 # packages not in nixpkgs (imported by modules/common.nix + modules/darwin.nix)
-│   ├── prime-agent/                # buildNpmPackage derivation for Prime Agent (pinned release tarball)
+│   ├── prime-agent/                # pinned native Rust releases for Linux and Apple Silicon
 │   └── synergy3/                   # pinned Flatpak/DMG installers with hash-verified guest-token fetching
 ├── modules/
 │   ├── common.nix                  # shared (NixOS): nix settings, overlays, packages, unfree, zsh, fonts
@@ -195,6 +195,7 @@ on NixOS (a `programs.*` / `services.*` module rather than home-manager).
 | --- | --- | --- | --- |
 | Spotify | ✅ | ✅ | nix, global — `home/default.nix` |
 | Obsidian | ✅ | ✅ | nix, global — `home/default.nix` |
+| Claude Desktop | — | ✅ | Homebrew cask, upgraded during Mac rebuilds — `modules/darwin.nix` |
 | doctl | ✅ | ✅ | nix, global — `home/default.nix` |
 | Pi coding agent | ✅ `pi-coding-agent` | ✅ `pi-coding-agent` | nix, global — `home/default.nix` |
 | Signal | ✅ `signal-desktop` | ✅ `signal-desktop` | nix, global — `home/default.nix` |
@@ -213,6 +214,10 @@ WhatsApp on Linux is the third-party `karere` GTK4 client (there is no official
 Linux client); on macOS it's the official `whatsapp-for-mac`. The Homebrew
 casks (`parsec`, `steam`, `mullvad-vpn`, `gimp`) are declared in
 `modules/darwin.nix`.
+
+The Mac rebuild also upgrades Claude Desktop through a separate Homebrew Bundle
+pass. It compares the installed app's version and preserves newer self-updated
+versions.
 
 Synergy 3's release and per-platform installer hashes are pinned in
 `pkgs/synergy3/pinned.nix`. The weekly
@@ -468,14 +473,16 @@ The flake lock controls package updates.
 
 ## Prime Agent
 
-[Prime Agent](https://github.com/PrimeIntellect-ai/prime-agent) isn't in
-nixpkgs or on the public npm registry — `pkgs/prime-agent/` builds it from
-upstream's pinned release tarball with `buildNpmPackage`; see that
-derivation's header comment for the packaging constraints (no lockfile
-upstream, a native `zeromq` dependency, and a known gap in zeromq's darwin
-prebuilts — read it before bumping the version). The overlay adding it to
-`pkgs` lives in `pkgs/overlay.nix`, imported by both `modules/common.nix` and
-`modules/darwin.nix`.
+[Prime Agent](https://github.com/PrimeIntellect-ai/prime-agent) is not in
+nixpkgs. `pkgs/prime-agent/` packages its pinned native Rust releases for
+Linux and Apple Silicon. To update it, change the version and both archive
+hashes from upstream's `releases/vX.Y.Z/SHA256SUMS`. The shared overlay in
+`pkgs/overlay.nix` exposes the package on both platforms.
+
+The package keeps the Python runtime assets beside the executable. Its
+package-local uv adapter uses Nix Python to create the kernel environment
+on first use. This avoids generic Python downloads that cannot run on NixOS.
+The Rust daemon uses a separate socket from older TypeScript installations.
 
 Global settings are tracked in `prime/settings.json`; home-manager symlinks it
 to `~/.prime/agent/settings.json` (`mkOutOfStoreSymlink` in
