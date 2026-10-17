@@ -32,6 +32,7 @@ in
   # System activation runs as root; options that act on a user (Homebrew,
   # defaults, ...) apply to this one. Required once homebrew.enable is set.
   system.primaryUser = username;
+  contexts.user = username;
 
   # Per-user config (dotfiles, user packages, shells) — see home/ at the repo
   # root. darwin.nix is the macOS home entrypoint; it carries the per-machine
