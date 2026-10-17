@@ -16,6 +16,7 @@
   # WSL default user from modules/wsl.nix). linux.nix is the NixOS entrypoint;
   # it carries the per-machine home.stateVersion.
   home-manager.users.nixos = import ../home/linux.nix;
+  contexts.user = "nixos";
 
   # Release this machine was first installed with. Do not bump on upgrades.
   system.stateVersion = "25.11";

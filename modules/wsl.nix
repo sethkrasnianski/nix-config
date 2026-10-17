@@ -2,9 +2,6 @@
 # module itself (which provides the `wsl.*` options) is added in flake.nix.
 { config, lib, ... }:
 
-let
-  flakePath = "/home/nixos/oss/nix-config";
-in
 {
   wsl.enable = true;
   wsl.defaultUser = "nixos";
@@ -31,10 +28,4 @@ in
   # The old `DISPLAY = "<host-ip>:0.0"` pattern is for a Windows-side X server
   # (VcXsrv) and breaks WSLg apps when none is running.
 
-  # Shortcuts to rebuild this WSL host in either mode. Both aliases exist in
-  # both builds, so you can always flip back (e.g. run `rebuild` while headless).
-  environment.shellAliases = {
-    rebuild = "${flakePath}/scripts/rebuild-local.sh nixos";
-    rebuild-headless = "${flakePath}/scripts/rebuild-local.sh nixos-headless";
-  };
 }

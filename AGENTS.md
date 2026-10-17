@@ -9,6 +9,10 @@ darwin module and nix-homebrew for the GUI apps nixpkgs can't build on darwin).
 ## Layout
 
 - `flake.nix` — inputs: nixpkgs (nixos-unstable), nixos-wsl, home-manager, nix-darwin, nix-homebrew (all pinned by `flake.lock`)
+- `lib/mk-host.nix`, `modules/contexts.nix`, `contexts/template/` — cross-platform host factory, context metadata, and the separate-repository template
+- `scripts/config.py`, `scripts/context_envrcs.py` — the `config` CLI, locked context compositions, and ownership-checked folder environments
+- `home/config.nix`, `home/contexts.nix`, `home/workspace.nix` — CLI packaging, context shell activation, and folder-scoped Git profiles
+- `tests/check.sh` — CLI, Nix/direnv, Git integration tests, and all four output evaluations
 - `.github/workflows/update-flake-lock.yml` — weekly `flake.lock` update PR; evaluates all four outputs before opening it
 - `.github/workflows/update-synergy3.yml` — weekly Synergy 3 version/hash PR; validates both installers and evaluates all four outputs
 - `hosts/` — per-host: hostname/`hostPlatform`, `system.stateVersion`, home-manager user wiring (`macbook.nix` is the nix-darwin host)
@@ -28,9 +32,12 @@ darwin module and nix-homebrew for the GUI apps nixpkgs can't build on darwin).
 
 ## Working in this repo
 
-- Apply changes: `rebuild` (= `sudo nixos-rebuild switch --flake ~/oss/nix-config#nixos`);
-  `rebuild-headless` for the headless variant. On the Mac, `rebuild` =
-  `sudo darwin-rebuild switch --flake path:/Users/sethkrasnianski/oss/nix-config#macbook`.
+- Apply changes with `config rebuild` or `rebuild`; use `rebuild-headless` for
+  headless WSL. These compose registered contexts and local.nix before activation.
+  Bootstrap the command with `./scripts/rebuild-local.sh <target>`.
+- Context repositories stay separate from this public repository. Register them
+  with `config contexts add <path>`. New files must be staged before evaluation.
+  A missing registered context stops a build. Use `config check` before rebuilding.
 - Check without switching — all four outputs must evaluate:
   `nix eval .#nixosConfigurations.<name>.config.system.build.toplevel.drvPath --raw`
   and `nix eval .#darwinConfigurations.macbook.system.drvPath --raw`
