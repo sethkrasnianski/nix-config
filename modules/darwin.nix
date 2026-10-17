@@ -3,6 +3,7 @@
 # must NOT be imported here. Per-machine facts (username, hostPlatform,
 # stateVersion) live in hosts/macbook.nix.
 {
+  config,
   lib,
   pkgs,
   ...
@@ -101,4 +102,15 @@
       autoUpdate = false;
     };
   };
+
+  # The bundle pass skips upgrades. Claude's self-updating cask needs --greedy.
+  # Refresh its metadata and upgrade it after the bundle installs the casks.
+  system.activationScripts.homebrew.text = lib.mkIf config.homebrew.enable (
+    lib.mkAfter ''
+      echo "upgrading Claude Desktop..."
+      /usr/bin/sudo --user=${lib.escapeShellArg config.homebrew.user} --set-home \
+        /usr/bin/env HOMEBREW_AUTO_UPDATE_SECS=0 \
+        ${lib.escapeShellArg "${config.homebrew.prefix}/bin/brew"} upgrade --cask --greedy claude
+    ''
+  );
 }

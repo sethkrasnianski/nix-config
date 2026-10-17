@@ -195,6 +195,7 @@ on NixOS (a `programs.*` / `services.*` module rather than home-manager).
 | --- | --- | --- | --- |
 | Spotify | ✅ | ✅ | nix, global — `home/default.nix` |
 | Obsidian | ✅ | ✅ | nix, global — `home/default.nix` |
+| Claude Desktop | — | ✅ | Homebrew cask, upgraded during Mac rebuilds — `modules/darwin.nix` |
 | doctl | ✅ | ✅ | nix, global — `home/default.nix` |
 | Pi coding agent | ✅ `pi-coding-agent` | ✅ `pi-coding-agent` | nix, global — `home/default.nix` |
 | Signal | ✅ `signal-desktop` | ✅ `signal-desktop` | nix, global — `home/default.nix` |
@@ -213,6 +214,9 @@ WhatsApp on Linux is the third-party `karere` GTK4 client (there is no official
 Linux client); on macOS it's the official `whatsapp-for-mac`. The Homebrew
 casks (`parsec`, `steam`, `mullvad-vpn`, `gimp`) are declared in
 `modules/darwin.nix`.
+
+The Mac rebuild also upgrades Claude Desktop through Homebrew. Its cask declares
+`auto_updates`, so activation uses `brew upgrade --cask --greedy claude`.
 
 Synergy 3's release and per-platform installer hashes are pinned in
 `pkgs/synergy3/pinned.nix`. The weekly
