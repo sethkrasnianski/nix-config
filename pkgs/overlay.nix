@@ -10,24 +10,25 @@ final: prev: {
   # just the manifest is equivalent to taking the newer package without fetching
   # another nixpkgs tree. Values are from Anthropic's compressed release manifest
   # (the plain manifest has different checksums):
-  # https://downloads.claude.ai/claude-code-releases/2.1.284/manifest.zst.json.
-  # Drop this override once a routine `nix flake update` reaches claude-code 2.1.284.
+  # nixpkgs-unstable f20cd90 packages this release with the same manifest.
+  # https://downloads.claude.ai/claude-code-releases/2.1.300/manifest.zst.json.
+  # Drop this override once a routine `nix flake update` reaches claude-code 2.1.300.
   claude-code = prev.claude-code.override {
     manifest = {
-      version = "2.1.284";
+      version = "2.1.300";
       platforms = {
         # keys are "${hostPlatform.node.platform}-${hostPlatform.node.arch}"
         linux-x64 = {
           binary = "claude.zst";
-          checksum = "5021d631dacbd516603a779b3cf2463085470417a838b6a0835f77fa44d23f0a";
+          checksum = "ca1608ae4e85017c5408c85a3778410add7dd796324acfd0eef3ad707268d5d6";
         };
         linux-arm64 = {
           binary = "claude.zst";
-          checksum = "6e31b86de3952594441b4ef91c1f5079c1385b0169a9df351dd2762bb2336d23";
+          checksum = "1f87b1a7838056aaf69c2b819c0b6b118ac713e0e2ba6c0a768aa531c7c5e8d0";
         };
         darwin-arm64 = {
           binary = "claude.zst";
-          checksum = "ed26ee9ccbf05b2dfa3c8abf52348b78b00274304824ad1eeaf9d88366fa70ae";
+          checksum = "5f19cc8fef7b1387f4b71691213b5aadc62d9157a78014287f3002ce8642cc23";
         };
       };
     };
@@ -113,16 +114,16 @@ final: prev: {
     }
   );
 
-  # Use the release ahead of our nixpkgs pin, which includes the Bun packaging fix.
-  # The node_modules output hash must match this release's lockfile.
+  # Use nixpkgs-unstable f20cd90's release and hashes ahead of our system pin.
+  # Keep the Bun packaging fix and match node_modules to this release's lockfile.
   opencode =
     let
-      version = "1.18.35";
+      version = "1.19.0";
       src = final.fetchFromGitHub {
         owner = "anomalyco";
         repo = "opencode";
         tag = "v${version}";
-        hash = "sha256-NM5AbX99hDW+oIojiHSRA+QDz27d8L/v42bwZY+6Imk=";
+        hash = "sha256-XL76Qpm4GEFEn7Pt7g84sx+djEKnlpTTZXRgXJF3NRs=";
       };
     in
     prev.opencode.overrideAttrs (old: {
@@ -130,7 +131,7 @@ final: prev: {
       passthru = old.passthru // {
         node_modules = old.passthru.node_modules.overrideAttrs (_: {
           inherit version src;
-          outputHash = "sha256-cQLuGI8MBh9l8GisM2k5WXBcZrsdgrNsXUOsYzZVwYY=";
+          outputHash = "sha256-RLHrfyBM6fMglKyEkdkW+Mmfzzr6q/U7R38goaQcIhA=";
         });
       };
     });
