@@ -13,7 +13,9 @@ being used — prefer its idioms over generic boilerplate.
 
 1. **flake.nix** — dev environment from nixpkgs: `devShells.default` with the
    stack's toolchain (runtime/compiler, package manager, LSP, formatter).
-2. **.envrc** — `use flake`; remind the user to run `direnv allow`.
+2. **.envrc** — `source_up_if_exists`, then `use flake`. The first line loads
+   parent context tools before the project environment. Omit it only when the
+   project should ignore parent contexts. Remind the user to run `direnv allow`.
 3. **AGENTS.md** — source of truth for agent instructions. Succinct initial
    instructions: what the project is, layout, build/test/run, conventions that
    prefer the idioms of the chosen language/technologies. Include standing

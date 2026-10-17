@@ -43,18 +43,8 @@ jobs:
             echo "NIX_UPDATE_LOG"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Evaluate all outputs
-        run: |
-          for output in nixos nixos-headless nixos-default; do
-            echo "::group::$output"
-            nix eval ".#nixosConfigurations.$output.config.system.build.toplevel.drvPath" --raw
-            echo "::endgroup::"
-          done
-          # The macOS output evaluates from Linux too (pure eval, no darwin
-          # builder), so validate it here alongside the NixOS ones.
-          echo "::group::macbook"
-          nix eval ".#darwinConfigurations.macbook.system.drvPath" --raw
-          echo "::endgroup::"
+      - name: Test contexts and evaluate all outputs
+        run: bash tests/check.sh
 
       - name: Open or update the PR
         uses: peter-evans/create-pull-request@v7
