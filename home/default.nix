@@ -1,7 +1,7 @@
 # Per-user (home-manager) configuration shared by every machine. Not imported
 # directly: each platform has a thin entrypoint — home/linux.nix (NixOS module,
-# applied by `rebuild`) and home/darwin.nix (standalone home-manager on macOS)
-# — that carries the per-machine facts (stateVersion, username, ...).
+# applied by `rebuild`) and home/darwin.nix (a nix-darwin module) — that
+# carries the per-machine state version. Hosts supply the user identity.
 {
   config,
   pkgs,
@@ -14,8 +14,11 @@ let
 in
 {
   imports = [
+    ./config.nix
+    ./contexts.nix
     ./direnv.nix
     ./git.nix
+    ./workspace.nix
     ./ssh.nix
     ./shell.nix
     ./neovim.nix

@@ -7,7 +7,7 @@
 # (useGlobalPkgs), so they are NOT set here — same as home/linux.nix. Setting
 # nixpkgs.* here would assert-fail under useGlobalPkgs, which is why the unfree
 # allowlist lives in modules/darwin.nix instead.
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 {
   imports = [ ./default.nix ];
@@ -46,8 +46,4 @@
   home.file.".docker/cli-plugins/docker-buildx".source = "${pkgs.docker-buildx}/bin/docker-buildx";
   home.file.".docker/cli-plugins/docker-compose".source = "${pkgs.docker-compose}/bin/docker-compose";
 
-  # Mirror the WSL `rebuild` alias (modules/wsl.nix). The helper invokes sudo
-  # after reading the user's local.nix, so $HOME resolves correctly. home.shellAliases lands in the
-  # home-manager-managed bash/zsh rc files (home/shell.nix).
-  home.shellAliases.rebuild = "${config.home.homeDirectory}/oss/nix-config/scripts/rebuild-local.sh macbook";
 }
