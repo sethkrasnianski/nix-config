@@ -12,7 +12,7 @@ darwin module and nix-homebrew for the GUI apps nixpkgs can't build on darwin).
 - `.github/workflows/update-flake-lock.yml` — weekly `flake.lock` update PR; evaluates all four outputs before opening it
 - `.github/workflows/update-synergy3.yml` — weekly Synergy 3 version/hash PR; validates both installers and evaluates all four outputs
 - `hosts/` — per-host: hostname/`hostPlatform`, `system.stateVersion`, home-manager user wiring (`macbook.nix` is the nix-darwin host)
-- `pkgs/` — packages not in nixpkgs: `prime-agent/` (Prime Agent's pinned release tarball) and `synergy3/` (version-pinned Linux Flatpak and Apple Silicon DMG); `overlay.nix` is imported by both `modules/common.nix` and `modules/darwin.nix` so it's never duplicated
+- `pkgs/` — packages not in nixpkgs: `prime-agent/` (pinned native Rust releases for Linux and Apple Silicon) and `synergy3/` (version-pinned Linux Flatpak and Apple Silicon DMG); `overlay.nix` is imported by both `modules/common.nix` and `modules/darwin.nix` so it's never duplicated
 - `modules/` — system-level shared config: NixOS (`common.nix`, `desktop.nix`, `synergy3.nix`, `wsl.nix`) and darwin (`synergy3-darwin.nix`, `primary-user.nix` (the macOS `local.primaryUser` option, default `sethkrasnianski`, overridable from `~/.config/nix/local.nix`), `darwin.nix` — the macOS counterpart to `common.nix`: nix settings, overlays, unfree allowlist, fonts, base CLI tools, Homebrew; never imported by a NixOS host, and vice versa)
 - `home/` — per-user home-manager config (git, ssh, shell, direnv, neovim, emacs);
   `default.nix` is the shared core, `linux.nix`/`darwin.nix` the per-platform
@@ -45,11 +45,10 @@ darwin module and nix-homebrew for the GUI apps nixpkgs can't build on darwin).
 - Commits: imperative subject plus a body explaining why; no AI-attribution lines.
 - After editing `doom/init.el` or `doom/packages.el`, run `doom sync`
   (`config.el` changes don't need it).
-- To bump Prime Agent's pinned version: update `version` and `src.hash` in
-  `pkgs/prime-agent/default.nix` (hash from upstream's published
-  `releases/vX.Y.Z/SHA256SUMS`), regenerate `package.json` and
-  `package-lock.json` the same way as the existing ones (see that
-  derivation's header comment), and refresh `npmDepsHash`.
+- To bump Prime Agent's pinned version: update `version` and both platform
+  hashes in `pkgs/prime-agent/default.nix`. Use the native release hashes from
+  upstream's published `releases/vX.Y.Z/SHA256SUMS`. Build and check the Linux
+  package, and verify the Apple Silicon archive checksum.
 - Synergy 3's installer version and hashes live in `pkgs/synergy3/pinned.nix`;
   `.github/scripts/update-synergy3.sh` refreshes both platform artifacts using
   short-lived guest tokens, and the weekly workflow opens a reviewable PR.
