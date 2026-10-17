@@ -472,14 +472,16 @@ The flake lock controls package updates.
 
 ## Prime Agent
 
-[Prime Agent](https://github.com/PrimeIntellect-ai/prime-agent) isn't in
-nixpkgs or on the public npm registry — `pkgs/prime-agent/` builds it from
-upstream's pinned release tarball with `buildNpmPackage`; see that
-derivation's header comment for the packaging constraints (no lockfile
-upstream, a native `zeromq` dependency, and a known gap in zeromq's darwin
-prebuilts — read it before bumping the version). The overlay adding it to
-`pkgs` lives in `pkgs/overlay.nix`, imported by both `modules/common.nix` and
-`modules/darwin.nix`.
+[Prime Agent](https://github.com/PrimeIntellect-ai/prime-agent) is not in
+nixpkgs. `pkgs/prime-agent/` packages its pinned native Rust releases for
+Linux and Apple Silicon. To update it, change the version and both archive
+hashes from upstream's `releases/vX.Y.Z/SHA256SUMS`. The shared overlay in
+`pkgs/overlay.nix` exposes the package on both platforms.
+
+The package keeps the Python runtime assets beside the executable. Its
+package-local uv adapter uses Nix Python to create the kernel environment
+on first use. This avoids generic Python downloads that cannot run on NixOS.
+The Rust daemon uses a separate socket from older TypeScript installations.
 
 Global settings are tracked in `prime/settings.json`; home-manager symlinks it
 to `~/.prime/agent/settings.json` (`mkOutOfStoreSymlink` in
