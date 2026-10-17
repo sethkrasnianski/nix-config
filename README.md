@@ -215,8 +215,9 @@ Linux client); on macOS it's the official `whatsapp-for-mac`. The Homebrew
 casks (`parsec`, `steam`, `mullvad-vpn`, `gimp`) are declared in
 `modules/darwin.nix`.
 
-The Mac rebuild also upgrades Claude Desktop through Homebrew. Its cask declares
-`auto_updates`, so activation uses `brew upgrade --cask --greedy claude`.
+The Mac rebuild also upgrades Claude Desktop through a separate Homebrew Bundle
+pass. It compares the installed app's version and preserves newer self-updated
+versions.
 
 Synergy 3's release and per-platform installer hashes are pinned in
 `pkgs/synergy3/pinned.nix`. The weekly
