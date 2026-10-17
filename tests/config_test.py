@@ -95,6 +95,41 @@ class ContextTests(unittest.TestCase):
             with self.assertRaises(cli.ConfigError):
                 self.config.context(path)
 
+    def test_snapshot_declares_shallow_history_to_nix(self):
+        for shallow in (True, False):
+            with self.subTest(shallow=shallow):
+                path = self.home / "Work Space/config"
+                uri = "git+" + path.as_uri() + ("?shallow=1" if shallow else "")
+
+                def fetch(args, *, shallow=shallow, uri=uri, **kwargs):
+                    if args[0] == "git":
+                        self.assertEqual(
+                            args[-2:], ["rev-parse", "--is-shallow-repository"]
+                        )
+                        return subprocess.CompletedProcess(
+                            args, 0, stdout=str(shallow).lower()
+                        )
+                    self.assertEqual(args, ["nix", "flake", "prefetch", "--json", uri])
+                    return subprocess.CompletedProcess(
+                        args,
+                        0,
+                        stdout=json.dumps(
+                            {
+                                "storePath": "/nix/store/fixture-source",
+                                "hash": "fixture-hash",
+                                "locked": {"rev": "fixture-revision"},
+                            }
+                        ),
+                    )
+
+                with (
+                    patch.object(cli.Config, "validate_repo"),
+                    patch.object(cli, "run", side_effect=fetch),
+                ):
+                    source, metadata = self.config.snapshot_source(path)
+                self.assertEqual(source, "/nix/store/fixture-source")
+                self.assertEqual(metadata["revision"], "fixture-revision")
+
     def test_invalid_registry_does_not_get_overwritten(self):
         self.config.registry.parent.mkdir(parents=True)
         self.config.registry.write_text("not json")
@@ -227,6 +262,41 @@ class ContextTests(unittest.TestCase):
         )
         self.assertTrue((snapshot / "flake/flake.lock").is_file())
         self.assertTrue(any((snapshot / "sources").iterdir()))
+
+    @unittest.skipUnless(
+        os.environ.get("NIX_CONFIG_INTEGRATION") == "1", "real Nix evaluation is opt-in"
+    )
+    def test_real_locked_composition_from_shallow_checkout(self):
+        checkout = self.home / "Shallow base/config"
+        subprocess.run(
+            ["git", "clone", "--depth", "1", ROOT.as_uri(), str(checkout)], check=True
+        )
+        subprocess.run(["git", "-C", str(checkout), "checkout", "--detach"], check=True)
+
+        def is_shallow():
+            return subprocess.check_output(
+                ["git", "-C", str(checkout), "rev-parse", "--is-shallow-repository"],
+                text=True,
+            ).strip()
+
+        self.assertEqual(is_shallow(), "true")
+        revision = subprocess.check_output(
+            ["git", "-C", str(checkout), "rev-parse", "HEAD"], text=True
+        ).strip()
+        self.config.repo = checkout
+        self.create()
+        snapshot = self.config.build("nixos-headless", evaluate=True)
+        manifest = json.loads((snapshot / "manifest.json").read_text())
+        self.assertEqual(manifest["baseRevision"], revision)
+        self.assertFalse(manifest["baseDirty"])
+
+        flake = checkout / "flake.nix"
+        flake.write_text(flake.read_text() + "\n# Modified shallow checkout\n")
+        source, modified = self.config.snapshot_source(checkout)
+        self.assertTrue(Path(source).is_dir())
+        self.assertTrue(modified["dirty"])
+        self.assertNotEqual(modified["sourceHash"], manifest["baseSourceHash"])
+        self.assertEqual(is_shallow(), "true")
 
     @unittest.skipUnless(
         os.environ.get("NIX_CONFIG_INTEGRATION") == "1" and shutil.which("direnv"),
