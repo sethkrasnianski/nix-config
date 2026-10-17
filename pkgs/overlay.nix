@@ -90,29 +90,21 @@ final: prev: {
       };
   };
 
-  # Keep the nixpkgs sandbox wrapper, daemon patch, completions, and code-mode host.
-  # This release still uses V8 150.4.0 from the pinned package.
-  codex = prev.codex.overrideAttrs (
-    finalAttrs: _: {
-      version = "0.161.0";
-      src = final.fetchFromGitHub {
-        owner = "openai";
-        repo = "codex";
-        tag = "rust-v${finalAttrs.version}";
-        hash = "sha256-a6cNz/rKb2L4pFOTBSutNbR7aNyzTI3wF0X7gwidj6g=";
-      };
-      cargoHash = "sha256-y9TVxrqMQvPUbIhTkfrSCnH/NMp/Liz3rpwSK4AjoMA=";
-      cargoDeps = final.rustPlatform.fetchCargoVendor {
-        inherit (finalAttrs)
-          pname
-          version
-          src
-          sourceRoot
-          ;
-        hash = finalAttrs.cargoHash;
-      };
-    }
-  );
+  # Use the Codex 0.162.1 package from the nixpkgs-unstable registry channel.
+  # Its pinned package set keeps the daemon, voice, and V8 runtimes compatible.
+  codex =
+    let
+      codexPkgs =
+        import
+          (builtins.fetchTarball {
+            url = "https://releases.nixos.org/nixpkgs/nixpkgs-26.11pre1093421.f20cd90e28fe/nixexprs.tar.zst";
+            sha256 = "sha256-MTJCMrhDFb+GRbLxBPTp8kB4dDlO+egmQ5qsJgYuaWw=";
+          })
+          {
+            inherit (prev.stdenv.hostPlatform) system;
+          };
+    in
+    codexPkgs.codex;
 
   # Use nixpkgs-unstable f20cd90's release and hashes ahead of our system pin.
   # Keep the Bun packaging fix and match node_modules to this release's lockfile.
