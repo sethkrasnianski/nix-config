@@ -2,7 +2,7 @@
 
 Tool-agnostic guidance applied across every project. Source of truth lives in
 this repo's `agents/AGENTS.md`; each agent CLI reads it through an alias into
-`~/.agents` (see `home/default.nix`).
+`~/.agents`.
 
 ## General guidelines
 
