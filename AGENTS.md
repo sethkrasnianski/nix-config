@@ -59,9 +59,14 @@ darwin module and nix-homebrew for the GUI apps nixpkgs can't build on darwin).
 - Synergy 3's installer version and hashes live in `pkgs/synergy3/pinned.nix`;
   `.github/scripts/update-synergy3.sh` refreshes both platform artifacts using
   short-lived guest tokens, and the weekly workflow opens a reviewable PR.
-- When adding, removing, or moving files under `modules/`, `home/`, or `hosts/`,
-  update the Layout tree in `README.md` in the same commit — it duplicates this
-  section's file listing and drifts silently otherwise.
+- When you add, remove, move, or change the role of repository files, update
+  `docs/layout.md` in the same commit. This includes configuration, packages,
+  scripts, workflows, agent files, and documentation.
+- When application declarations change, update `docs/applications.md` in the same
+  commit. Check package names, platforms, installation methods, and enablement
+  conditions against `home/`, `modules/`, `pkgs/`, and host wiring.
+- When documentation moves, repair relative links and heading anchors in both
+  directions. Check the links from `README.md` before committing.
 
 ## Agent skills
 
