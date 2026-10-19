@@ -3,7 +3,7 @@
 # discovery and hash refresh into the rebuild helper before Nix evaluates.
 # Nix cannot fetch an unpinned “latest” installer reproducibly.
 {
-  version = "3.7.2";
-  linuxX86_64Hash = "sha256-gq+MnUUC/Vx4mTGrQXDn6/90JdMzEt0rjzf/UdRF09s=";
-  macosAarch64Hash = "sha256-O8D7zB7YtkbIMKtLAq0MZrNkR9NIgxKkIkO7HnqCKp8=";
+  version = "3.8.4";
+  linuxX86_64Hash = "sha256-GHJh2Sj48D5ZLMVDYIoNszrxbsDxajr/x7oxG/OSRRw=";
+  macosAarch64Hash = "sha256-31/WXMjzeUX72n76JlEceH2/IajxCN3/xWKvA2b/EJc=";
 }
