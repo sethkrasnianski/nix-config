@@ -9,6 +9,9 @@ result-*
 # direnv's machine-local environment and cached flake state
 .direnv/
 
+# Python bytecode caches, e.g. from running agents/skills/ste-writing/scripts/ste-lint.py
+__pycache__/
+
 # Claude Code local project state (worktrees, local settings); the rest of
 # .claude/ (commands, agents, skills) is shareable and stays trackable
 .claude/settings.local.json
