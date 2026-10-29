@@ -71,7 +71,7 @@ Flake-based NixOS configuration with four outputs:
 │   └── rebuild-local.sh              # rebuild helper with optional host override
 └── agents/                         # tool-agnostic agent config (~/.agents links here)
     ├── mcp.json                    # shared MCP servers (Claude picks up via --mcp-config alias)
-    ├── .skill-lock.json            # source and hash of skills installed from upstream repos
+    ├── .skill-lock.json            # source and hash of upstream skills (written by gh skill)
     └── skills/
         ├── code-search/SKILL.md    # skill: semantic and literal code search
         ├── new-project/SKILL.md    # skill: bootstrap a new project (flake, direnv, AGENTS.md, docs)

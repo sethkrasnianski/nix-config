@@ -71,6 +71,16 @@ darwin module and nix-homebrew for the GUI apps nixpkgs can't build on darwin).
   for matching), followed by the instructions.
 - Adding or editing a skill needs no rebuild (the directory is live-symlinked);
   only creating the two links required the one initial `rebuild`.
+- Third-party skills (now only `gh-stack`) are installed from upstream with
+  `gh skill install <owner/repo> <skill> --scope user`. `gh skill` puts source
+  metadata in each `SKILL.md` frontmatter and records the source and tree hash
+  in `agents/.skill-lock.json`. Both are tool-written: do not edit them by
+  hand. OpenCode reads `~/.config/opencode/skills` (= `opencode/skills/`), not
+  `~/.agents`, so a skill installed for OpenCode as well has a second copy
+  there. Update with `gh skill update <skill>` (`--dry-run` only reports).
+  It finds and updates both copies, and it overwrites local edits, so change a
+  vendored skill upstream, not here. Commit the two copies and the lock file
+  together.
 - OpenCode-specific auto-agent changes belong under `opencode/`. Improve the
   smallest relevant agent, command, or skill, preserve the approval/TDD/review
   boundaries, and run `opencode/tests/` before evaluating the flake outputs.
