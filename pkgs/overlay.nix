@@ -89,15 +89,15 @@ final: prev: {
       };
   };
 
-  # Use the Codex 0.162.1 package from the nixpkgs-unstable registry channel.
+  # Use the Codex 0.165.0 package from the nixpkgs-unstable registry channel.
   # Its pinned package set keeps the daemon, voice, and V8 runtimes compatible.
   codex =
     let
       codexPkgs =
         import
           (builtins.fetchTarball {
-            url = "https://releases.nixos.org/nixpkgs/nixpkgs-26.11pre1093421.f20cd90e28fe/nixexprs.tar.zst";
-            sha256 = "sha256-MTJCMrhDFb+GRbLxBPTp8kB4dDlO+egmQ5qsJgYuaWw=";
+            url = "https://releases.nixos.org/nixpkgs/nixpkgs-26.11pre1104102.e62746b0b472/nixexprs.tar.zst";
+            sha256 = "sha256-GYpArmwi/iMuX2ov31oCBhAXRMJdNX9kOl2LZHCuR6M=";
           })
           {
             inherit (prev.stdenv.hostPlatform) system;
