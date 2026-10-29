@@ -10,25 +10,24 @@ final: prev: {
   # just the manifest is equivalent to taking the newer package without fetching
   # another nixpkgs tree. Values are from Anthropic's compressed release manifest
   # (the plain manifest has different checksums):
-  # nixpkgs-unstable f20cd90 packages this release with the same manifest.
-  # https://downloads.claude.ai/claude-code-releases/2.1.300/manifest.zst.json.
-  # Drop this override once a routine `nix flake update` reaches claude-code 2.1.300.
+  # https://downloads.claude.ai/claude-code-releases/2.1.312/manifest.zst.json.
+  # Drop this override once a routine `nix flake update` reaches claude-code 2.1.312.
   claude-code = prev.claude-code.override {
     manifest = {
-      version = "2.1.300";
+      version = "2.1.312";
       platforms = {
         # keys are "${hostPlatform.node.platform}-${hostPlatform.node.arch}"
         linux-x64 = {
           binary = "claude.zst";
-          checksum = "ca1608ae4e85017c5408c85a3778410add7dd796324acfd0eef3ad707268d5d6";
+          checksum = "6fb9e329947c003740be888f98db1aecaa238d6c7d9ceef8581eb71d5a59480b";
         };
         linux-arm64 = {
           binary = "claude.zst";
-          checksum = "1f87b1a7838056aaf69c2b819c0b6b118ac713e0e2ba6c0a768aa531c7c5e8d0";
+          checksum = "863ee1d2a91a39ee22fa13322582e4c3fb45bfb4739b22ec7e396dde694d8581";
         };
         darwin-arm64 = {
           binary = "claude.zst";
-          checksum = "5f19cc8fef7b1387f4b71691213b5aadc62d9157a78014287f3002ce8642cc23";
+          checksum = "7d759495d011057b6e8b8ee911c5be3cd36e9491c71a4ab194a425cdb1418073";
         };
       };
     };
