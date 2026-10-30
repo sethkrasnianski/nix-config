@@ -104,26 +104,4 @@ final: prev: {
           };
     in
     codexPkgs.codex;
-
-  # Use nixpkgs-unstable f20cd90's release and hashes ahead of our system pin.
-  # Keep the Bun packaging fix and match node_modules to this release's lockfile.
-  opencode =
-    let
-      version = "1.19.0";
-      src = final.fetchFromGitHub {
-        owner = "anomalyco";
-        repo = "opencode";
-        tag = "v${version}";
-        hash = "sha256-XL76Qpm4GEFEn7Pt7g84sx+djEKnlpTTZXRgXJF3NRs=";
-      };
-    in
-    prev.opencode.overrideAttrs (old: {
-      inherit version src;
-      passthru = old.passthru // {
-        node_modules = old.passthru.node_modules.overrideAttrs (_: {
-          inherit version src;
-          outputHash = "sha256-RLHrfyBM6fMglKyEkdkW+Mmfzzr6q/U7R38goaQcIhA=";
-        });
-      };
-    });
 }
