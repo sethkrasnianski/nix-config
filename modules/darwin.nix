@@ -80,6 +80,9 @@
     fi
   '';
 
+  # Opt out of Homebrew analytics for shells and the Claude-only Bundle pass below.
+  environment.variables.HOMEBREW_NO_ANALYTICS = "1";
+
   nix-homebrew.enable = true;
   homebrew = {
     enable = true;
@@ -110,7 +113,7 @@
     lib.mkAfter ''
       echo "upgrading Claude Desktop..."
       /usr/bin/sudo --user=${lib.escapeShellArg config.homebrew.user} --set-home \
-        /usr/bin/env HOMEBREW_AUTO_UPDATE_SECS=0 \
+        /usr/bin/env HOMEBREW_AUTO_UPDATE_SECS=0 HOMEBREW_NO_ANALYTICS=1 \
         ${lib.escapeShellArg "${config.homebrew.prefix}/bin/brew"} bundle install --upgrade --file=- <<'CLAUDE_BREWFILE'
       cask "claude", greedy: false
       CLAUDE_BREWFILE
