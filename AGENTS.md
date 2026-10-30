@@ -8,29 +8,36 @@ darwin module and nix-homebrew for the GUI apps nixpkgs can't build on darwin).
 
 ## Layout
 
-- `flake.nix` — inputs: nixpkgs (nixos-unstable), nixos-wsl, home-manager, nix-darwin, nix-homebrew (all pinned by `flake.lock`)
-- `.github/workflows/update-flake-lock.yml` — weekly `flake.lock` update PR; evaluates all four outputs before opening it
-- `.github/workflows/update-synergy3.yml` — weekly Synergy 3 version/hash PR; validates both installers and evaluates all four outputs
-- `hosts/` — per-host: hostname/`hostPlatform`, `system.stateVersion`, home-manager user wiring (`macbook.nix` is the nix-darwin host)
-- `pkgs/` — packages not in nixpkgs: `prime-agent/` (pinned native Rust releases for Linux and Apple Silicon) and `synergy3/` (version-pinned Linux Flatpak and Apple Silicon DMG); `overlay.nix` is imported by both `modules/common.nix` and `modules/darwin.nix` so it's never duplicated
-- `modules/` — system-level shared config: NixOS (`common.nix`, `desktop.nix`, `synergy3.nix`, `wsl.nix`) and darwin (`synergy3-darwin.nix`, `primary-user.nix` (the macOS `local.primaryUser` option, default `sethkrasnianski`, overridable from `~/.config/nix/local.nix`), `darwin.nix` — the macOS counterpart to `common.nix`: nix settings, overlays, unfree allowlist, fonts, base CLI tools, Homebrew; never imported by a NixOS host, and vice versa)
-- `home/` — per-user home-manager config (git, ssh, shell, direnv, neovim, emacs);
-  `default.nix` is the shared core, `linux.nix`/`darwin.nix` the per-platform
-  entrypoints (NixOS hosts import `linux.nix`; `hosts/macbook.nix` imports
-  `darwin.nix`). Both carry only `home.stateVersion`; username, unfree, and the
-  system layer moved to `hosts/macbook.nix` + `modules/darwin.nix`. Two unfree
-  allowlists — `modules/common.nix` (NixOS) and `modules/darwin.nix` (macOS) —
-  must be kept in sync.
-- `doom/`, `claude/settings.json`, `prime/settings.json`, `agents/`, `opencode/`
-  — Doom Emacs, Claude Code, Prime Agent, tool-agnostic agent config, and
-  OpenCode-specific agents/commands/skills, live-symlinked into `$HOME`
-  (`home/default.nix`); edits apply without a rebuild
+See [Repository layout](docs/layout.md) for the authoritative directory tree and
+file roles. See [Applications](docs/applications.md) for the platform matrix and
+installation notes.
+
+## Architecture
+
+- `lib/mk-host.nix` composes the base, host, context modules, and local settings.
+  Context repositories stay separate from this public repository.
+- Hosts own platform selection, accounts, graphical mode, state versions, and
+  Home Manager user wiring. The `nixos-default` template has no Home Manager user
+  by default.
+- NixOS system modules and nix-darwin system modules stay separate.
+  `modules/common.nix` serves NixOS. `modules/darwin.nix` serves macOS.
+  Both import `pkgs/overlay.nix` for custom packages and pinned overrides.
+  Keep their unfree allowlists in sync.
+- `home/default.nix` defines shared per-user configuration.
+  `home/linux.nix` and `home/darwin.nix` add platform packages and
+  `home.stateVersion`. Hosts supply the user identity.
+- Home Manager links Doom configuration, agent settings, and shared agent files
+  to this checkout. Edit their repository sources so changes apply without a
+  rebuild.
 
 ## Working in this repo
 
-- Apply changes: `rebuild` (= `sudo nixos-rebuild switch --flake ~/oss/nix-config#nixos`);
-  `rebuild-headless` for the headless variant. On the Mac, `rebuild` =
-  `sudo darwin-rebuild switch --flake path:/Users/sethkrasnianski/oss/nix-config#macbook`.
+- Apply changes with `config rebuild` or `rebuild`; use `rebuild-headless` for
+  headless WSL. These compose registered contexts and local.nix before activation.
+  Bootstrap the command with `./scripts/rebuild-local.sh <target>`.
+- Context repositories stay separate from this public repository. Register them
+  with `config contexts add <path>`. New files must be staged before evaluation.
+  A missing registered context stops a build. Use `config check` before rebuilding.
 - Check without switching — all four outputs must evaluate:
   `nix eval .#nixosConfigurations.<name>.config.system.build.toplevel.drvPath --raw`
   and `nix eval .#darwinConfigurations.macbook.system.drvPath --raw`
@@ -52,9 +59,19 @@ darwin module and nix-homebrew for the GUI apps nixpkgs can't build on darwin).
 - Synergy 3's installer version and hashes live in `pkgs/synergy3/pinned.nix`;
   `.github/scripts/update-synergy3.sh` refreshes both platform artifacts using
   short-lived guest tokens, and the weekly workflow opens a reviewable PR.
-- When adding, removing, or moving files under `modules/`, `home/`, or `hosts/`,
-  update the Layout tree in `README.md` in the same commit — it duplicates this
-  section's file listing and drifts silently otherwise.
+- When you add, remove, move, or change the role of repository files, update
+  `docs/layout.md` in the same commit. This includes configuration, packages,
+  scripts, workflows, agent files, and documentation.
+  Keep the tree selective, and compare documented paths with `git ls-files --cached`.
+- Align all tree comments in one column, with at least two spaces after the
+  longest commented path.
+  Keep four-column tree indentation and use spaces for padding.
+  If a longer commented path needs room, move all comments to a later column together.
+- When application declarations change, update `docs/applications.md` in the same
+  commit. Check package names, platforms, installation methods, and enablement
+  conditions against `home/`, `modules/`, `pkgs/`, and host wiring.
+- When documentation moves, repair relative links and heading anchors in both
+  directions. Check the links from `README.md` before committing.
 
 ## Agent skills
 

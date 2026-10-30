@@ -1,0 +1,19 @@
+# Exercise the public context contract without access to private context repos.
+name: Check configuration
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: DeterminateSystems/nix-installer-action@v16
+      - name: Test contexts and evaluate all hosts
+        run: bash tests/check.sh

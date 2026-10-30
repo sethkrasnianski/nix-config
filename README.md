@@ -11,88 +11,9 @@ Flake-based NixOS configuration with four outputs:
 
 ## Layout
 
-```
-.
-├── .github/
-│   ├── scripts/
-│   │   └── update-synergy3.sh      # discovers latest release, fetches guest tokens, hashes Linux + macOS installers
-│   └── workflows/
-│       ├── update-flake-lock.yml   # weekly lock-update PR, validated by evaluating all four outputs
-│       └── update-synergy3.yml     # weekly pinned version/hash PR, validates both installers + all outputs
-├── flake.nix                       # inputs + nixosConfigurations.{nixos,nixos-headless,nixos-default} + darwinConfigurations.macbook
-├── flake.lock                      # pinned input revisions — the reproducibility guarantee
-├── pkgs/
-│   ├── overlay.nix                 # packages not in nixpkgs (imported by modules/common.nix + modules/darwin.nix)
-│   ├── prime-agent/                # pinned native Rust releases for Linux and Apple Silicon
-│   └── synergy3/                   # pinned Flatpak/DMG installers with hash-verified guest-token fetching
-├── modules/
-│   ├── common.nix                  # shared (NixOS): nix settings, overlays, packages, unfree, zsh, fonts
-│   ├── desktop.nix                 # GNOME + Steam (shared by both NixOS hosts)
-│   ├── synergy3.nix                # system Flatpak install/update (all NixOS hosts, including hosts without Home Manager users)
-│   ├── synergy3-darwin.nix         # macOS: copies the pinned Synergy.app to /Applications (path is hardcoded upstream)
-│   ├── wsl.nix                     # WSL-only: wsl.enable, opencode overlay, rebuild aliases (imported by the nixos host)
-│   ├── git-ignores.nix             # shared global git ignore list (data, used by common.nix + home/git.nix)
-│   ├── darwin.nix                  # macOS system layer: nix settings, unfree, fonts, CLI tools, Homebrew (nix-darwin)
-│   ├── primary-user.nix            # local.primaryUser option: macOS account name, overridable from ~/.config/nix/local.nix
-│   ├── local-agents.nix             # typed host-local OpenCode agent inference overrides
-│   ├── local-llm.nix               # optional host-local Ollama and OpenCode routing
-│   ├── local-llm-nixos.nix         # NixOS Ollama service wiring
-│   └── local-llm-darwin.nix        # nix-darwin launchd wiring
-├── hosts/
-│   ├── nixos-wsl.nix               # WSL host  = common + desktop + synergy3 + wsl (nixos / nixos-headless outputs)
-│   ├── nixos-default.nix           # non-WSL host = common + desktop + synergy3 + nixos-default-hardware
-│   ├── nixos-default-hardware.nix  # PLACEHOLDER — replace via nixos-generate-config
-│   └── macbook.nix                 # macOS host = darwin.nix + home-manager module (darwinConfigurations.macbook)
-├── home/                           # per-user home-manager config
-│   ├── default.nix                 # shared core: imports, user packages, managed config symlinks
-│   ├── linux.nix                   # NixOS entrypoint (wired in by hosts/*.nix), carries home.stateVersion
-│   ├── darwin.nix                  # macOS home entrypoint (nix-darwin module), carries home.stateVersion
-│   ├── git.nix / ssh.nix / shell.nix / direnv.nix
-│   ├── neovim.nix / emacs.nix      # editor config
-│   ├── ghostty.nix                 # Ghostty terminal (WSLg Wayland on Linux, ghostty-bin on macOS)
-│   └── photogimp.nix               # seeds GIMP's config dir from a pinned PhotoGIMP release
-├── doom/                           # private Doom Emacs config (~/.config/doom links here)
-├── claude/
-│   └── settings.json               # global Claude Code settings (~/.claude/settings.json links here)
-├── prime/
-│   └── settings.json               # global Prime Agent settings (~/.prime/agent/settings.json links here)
-├── opencode/
-│   ├── opencode.jsonc              # global OpenCode settings
-│   ├── local-profile.nix            # startup evaluator for ~/.config/nix/local.nix
-│   ├── tui.json                     # global OpenCode UI theme
-│   ├── agents/                      # OpenCode auto-agent definitions
-│   ├── commands/                    # /auto, /research, /plan, and related commands
-│   ├── skills/                      # OpenCode auto-agent skills
-│   ├── plugins/                     # OpenCode runtime plugins
-│   ├── scripts/                     # PR watcher and history finalizer helpers
-│   ├── tests/                       # auto-agent contract tests
-│   └── README.md                    # auto-agent usage and maintenance guide
-├── scripts/
-│   └── rebuild-local.sh              # rebuild helper with optional host override
-└── agents/                         # tool-agnostic agent config (~/.agents links here)
-    ├── mcp.json                    # shared MCP servers (Claude picks up via --mcp-config alias)
-    ├── .skill-lock.json            # source and hash of upstream skills (written by gh skill)
-    └── skills/
-        ├── code-search/SKILL.md    # skill: semantic and literal code search
-        ├── new-project/SKILL.md    # skill: bootstrap a new project (flake, direnv, AGENTS.md, docs)
-        ├── handoff/SKILL.md        # skill: compact the conversation into a handoff doc for another agent
-        ├── explain-diff/SKILL.md   # skill: rich HTML explanation of a diff, branch, or PR
-        ├── gh-stack/                # skill: stacked PRs with gh-stack (vendored from github/gh-stack)
-        │   ├── SKILL.md
-        │   └── references/          # command reference, stack design, troubleshooting
-        ├── please-continue/SKILL.md # skill: resume interrupted work after sleep or a stalled session
-        ├── ste-writing/             # skill: write prose in Simplified Technical English to remove AI slop
-        │   ├── SKILL.md
-        │   └── scripts/ste-lint.py  # mechanical STE checker (run via nix shell nixpkgs#python3)
-        └── tickets/                 # skill: GitHub Projects V2 Kanban ticket workflow
-            ├── SKILL.md
-            ├── contracts/kanban-v1.json
-            ├── fixtures/             # sanitized contract-verification fixtures
-            ├── scripts/project-contract.sh
-            └── tests/project-contract-test.sh
-```
+See [Repository layout](docs/layout.md) for the directory tree and file roles.
 
-### OpenCode Models And Profiles
+## OpenCode Models And Profiles
 
 OpenCode agent inference uses the repository's `github-copilot` profile by
 default. To select or override a profile, or to choose models for OpenCode's
@@ -182,91 +103,217 @@ Ollama's data directory).
 (The WSL host has no `hardware-configuration.nix` — `nixos-wsl` provides the
 root filesystem. Generate one only for a real non-WSL machine.)
 
-### How WSL is kept optional
+## How WSL is kept optional
 
 The `nixos-wsl` flake module and `modules/wsl.nix` are only referenced by the
 `nixos` host. The `nixos-default` host imports neither, so it builds on non-WSL
 hardware without any WSL assumptions.
 
+## Contexts across hosts
+
+The `config` command combines this shared base, the selected host, registered
+context repositories, and `~/.config/nix/local.nix`. A context is a separate
+repository, such as `~/Work/config`. Register it only on machines that need it.
+
+| Layer | Owns |
+| --- | --- |
+| This repository | Shared tools, shell, editors, and agent configuration |
+| `hosts/` | Hardware, platform, user accounts, graphical mode, and state versions |
+| A context repository | Work or client tools, Git profiles, and platform additions |
+| `~/.config/nix/local.nix` | Machine-local settings such as Ollama and model routing |
+| A project repository | Its dependencies and project-specific agent instructions |
+
+Contexts support both `x86_64-linux` and `aarch64-darwin`. They export
+`homeManagerModules.default`, optional `nixosModules.default` and
+`darwinModules.default`, and optional `devShells.<system>.default`.
+
+**Module packages and settings apply across the machine.** Git profiles and
+dev shells apply within the context directory. Contexts do not isolate processes.
+Nix merges module options, rather than giving the last context automatic priority.
+Lists usually combine. Conflicting scalar settings require an explicit override.
+
+### Commands
+
+| Command | Action |
+| --- | --- |
+| `config` | Show the host, base revision, local settings status, and context status |
+| `config contexts` | Show registered contexts and applied revisions |
+| `config context new ~/Work/config` | Scaffold, stage, and register a separate context repository |
+| `config contexts add ~/Work/config` | Register an existing context repository |
+| `config contexts remove ~/Work/config` | Unregister a context for the next rebuild |
+| `config check` | Build the composition without activation |
+| `config check --eval` | Evaluate the composition without building |
+| `config rebuild` | Build as the user, then activate through the platform rebuild tool |
+| `config rebuild --target nixos-headless` | Select a different host output explicitly |
+| `config help` | Show command help |
+
+The active generation supplies the default target. WSL graphical and headless
+outputs share the same registry. `rebuild` selects graphical WSL and
+`rebuild-headless` selects headless WSL. On macOS, `rebuild` selects `macbook`.
+Use `--target` to override the target for a check or rebuild.
+
+Registrations live in `~/.config/nix/contexts.json`. Missing registered
+repositories stop the build. Restore the repository or explicitly unregister it.
+This prevents an absent context from silently removing its Homebrew casks.
+Context paths must be inside a directory under your home. Spaces are supported.
+
+### Set up a work context
+
+First install the command with the bootstrap helper from this checkout:
+
+```sh
+./scripts/rebuild-local.sh nixos          # graphical WSL
+# ./scripts/rebuild-local.sh nixos-headless
+# ./scripts/rebuild-local.sh macbook     # existing nix-darwin installation
+```
+
+Open a new shell after activation. Then create the work repository:
+
+```sh
+config context new ~/Work/config
+```
+
+Edit `~/Work/config/home.nix` to declare your work identity:
+
+```nix
+{ pkgs, ... }:
+{
+  workspace.gitProfiles.work = {
+    directory = "Work";
+    name = "Your Name";
+    email = "your-work-account@users.noreply.github.com";
+  };
+
+  # Packages here are available everywhere on this machine.
+  home.packages = with pkgs; [ ];
+}
+```
+
+Use your work account's actual approved address. The base noreply identity stays
+active outside `~/Work`. Nested profiles override parent profiles. Git selects
+profiles by its Git-directory path. A linked worktree retains its source
+repository's profile, even when the worktree sits outside that directory.
+
+Add folder-only tools to the `packages` list in `~/Work/config/flake.nix`.
+For a simple test, add `hello`. Leave `nixos.nix` and `darwin.nix` empty until
+you need system settings. macOS-only casks belong in `darwin.nix`.
+
+```sh
+git -C ~/Work/config add flake.nix home.nix nixos.nix darwin.nix
+config check --eval
+config check
+config rebuild
+config contexts
+```
+
+After activation, test the identity and folder tool:
+
+```sh
+git -C ~/Work/config config --show-origin user.email
+git -C ~/oss/nix-config config --show-origin user.email
+direnv exec ~/Work hello
+```
+
+The first identity should be your work address. The second should remain the
+base noreply address. The last command should print Hello, world! from the work
+shell. Home Manager creates and approves `~/Work/.envrc` during activation.
+Checks and activation refuse to replace an existing user-owned `.envrc`.
+
+For a project with its own `.envrc`, load the parent context before its tools:
+
+```sh
+source_up_if_exists
+use flake
+```
+
+Run `direnv allow` in that project after editing its `.envrc`.
+The new-project skill generates this inheritance by default.
+
+Commit the context files in the work repository. Then rebuild once more to record
+the clean commit as applied. Create a private remote for that repository:
+
+```sh
+git -C ~/Work/config commit -m "Configure work context"
+gh repo create work-config --private --source="$HOME/Work/config" --remote=origin
+git -C ~/Work/config push -u origin main
+config rebuild
+```
+
+On another configured machine, clone and register that same repository:
+
+```sh
+git clone git@github.com:YOUR-ACCOUNT/work-config.git ~/Work/config
+config contexts add ~/Work/config
+config check
+config rebuild
+```
+
+Each host selects its matching platform modules and shell. Use the same base
+lock and work-repository commit when you want matching dependency versions.
+The `nixos-default` template needs a real user, a Home Manager entry, and
+`contexts.user` before it can apply a Home Manager context.
+
+### Snapshots, credentials, and removal
+
+Each check or rebuild snapshots the tracked repository contents. New files must
+be staged. Modified tracked files are supported and marked as dirty. A separate
+repository commit is required to reproduce those changes on another machine.
+
+Snapshots live in `~/.local/state/nix-config/builds/`. Each snapshot retains an
+immutable `flake/` composition, its lock, a manifest, and source GC roots.
+Build results stay outside `flake/`. Context shells load that exact composition,
+so later checkout edits do not change an applied shell. A rebuild applies them.
+The running generation records provenance in `/etc/nix-config/manifest.json`.
+Keep snapshots used by current or rollback generations. Retired snapshots can be
+removed to release their GC roots.
+
+Private repositories keep work configuration out of this public repository.
+Their sources and generated configuration still enter the Nix store.
+Keep credentials in external files or runtime credential providers.
+Agent instructions remain live-linked. OpenCode model overrides still use
+machine-local `local.nix`, which OpenCode evaluates at startup.
+
+To remove a context from a machine:
+
+```sh
+config contexts remove ~/Work/config
+config check
+config rebuild
+```
+
+This removes its declarations and unchanged generated `.envrc` files. It preserves
+the context repository and user-modified environment files.
+
+### Verify context changes
+
+Run the Linux verification suite before merging context infrastructure changes:
+
+```sh
+bash tests/check.sh
+```
+
+It checks registration, local overrides, source snapshots, real Nix/direnv shells,
+environment ownership and restoration, Git profiles, and linked worktrees.
+It also evaluates all four outputs and portable context fixtures.
+Activation still needs a check on each target platform.
+
 ## Applications
 
-The rule: **any app nixpkgs can build is managed by nix**, per platform; only
-the GUI apps nixpkgs can't build on macOS are installed as Homebrew casks
-through nix-darwin (`modules/darwin.nix`). Steam and Mullvad are system-level
-on NixOS (a `programs.*` / `services.*` module rather than home-manager).
-
-| App | Linux | macOS | How it's managed |
-| --- | --- | --- | --- |
-| Spotify | ✅ | ✅ | nix, global — `home/default.nix` |
-| Obsidian | ✅ | ✅ | nix, global — `home/default.nix` |
-| Claude Desktop | — | ✅ | Homebrew cask, upgraded during Mac rebuilds — `modules/darwin.nix` |
-| doctl | ✅ | ✅ | nix, global — `home/default.nix` |
-| Pi coding agent | ✅ `pi-coding-agent` | ✅ `pi-coding-agent` | nix, global — `home/default.nix` |
-| Signal | ✅ `signal-desktop` | ✅ `signal-desktop` | nix, global — `home/default.nix` |
-| Synergy 3 | ✅ Flatpak bundle | ✅ Apple Silicon DMG | pinned custom package; NixOS activation (`modules/synergy3.nix`) / darwin activation (`modules/synergy3-darwin.nix`) |
-| VLC | ✅ `vlc` | ✅ `vlc-bin` | nix, per-platform entrypoint |
-| WhatsApp | ✅ `karere` (GTK4) | ✅ `whatsapp-for-mac` | nix, per-platform entrypoint |
-| Firefox | ✅ `firefox` | ✅ `firefox-bin` | nix, per-platform entrypoint |
-| UTM | — | ✅ `utm` | nix — `home/darwin.nix` |
-| Parsec | ✅ `parsec-bin` | ✅ | Linux: nix; macOS: Homebrew cask |
-| Steam | ✅ | ✅ | Linux: `programs.steam` (NixOS); macOS: Homebrew cask |
-| Mullvad VPN | ✅ | ✅ | Linux: `services.mullvad-vpn` (NixOS); macOS: Homebrew cask |
-| GIMP (PhotoGIMP) | ✅ `gimp` | ✅ | Linux: nix (`home/linux.nix`); macOS: Homebrew cask |
-| Xcode | — | ⚙️ | not nix-installable — see [Xcode](#xcode) |
-
-WhatsApp on Linux is the third-party `karere` GTK4 client (there is no official
-Linux client); on macOS it's the official `whatsapp-for-mac`. The Homebrew
-casks (`parsec`, `steam`, `mullvad-vpn`, `gimp`) are declared in
-`modules/darwin.nix`.
-
-The Mac rebuild also upgrades Claude Desktop through a separate Homebrew Bundle
-pass. It compares the installed app's version and preserves newer self-updated
-versions.
-
-Synergy 3's release and per-platform installer hashes are pinned in
-`pkgs/synergy3/pinned.nix`. The weekly
-`.github/workflows/update-synergy3.yml` workflow obtains fresh guest download
-tokens, hashes the Linux Flatpak bundle and Apple Silicon DMG, validates both
-installers, evaluates all four outputs, and opens a review PR. After merging,
-the next rebuild updates the installed app. On NixOS, the system Flatpak module
-installs the bundle and its runtime and exposes its desktop entry; on macOS,
-darwin activation copies `Synergy.app` to `/Applications/`. Synergy hardcodes
-that path for its background service, so a Home Manager or Nix Apps link won't
-work; the copy is only replaced when the pinned build changes, and Synergy needs
-a relaunch afterwards to re-register its service.
-macOS will still ask for the user's Accessibility permission after the first
-launch; approve Synergy in System Settings → Privacy & Security → Accessibility.
-
-The NixOS-WSL build installs Synergy inside the Linux guest. To control the
-Windows desktop itself, install Synergy on Windows as well: the WSL app cannot
-inject input into its Windows host.
-
-### GIMP (PhotoGIMP)
-
-GIMP is skinned with [PhotoGIMP](https://github.com/Diolinux/PhotoGIMP) — a
-Photoshop-like layout, shortcuts, and tool config. PhotoGIMP isn't a package;
-it's a set of files overlaid onto GIMP's user config dir. Because GIMP rewrites
-most of those files at runtime (window layout, shortcuts, session state), they
-can't be a read-only store symlink without fighting GIMP on every save.
-Instead, `home/photogimp.nix` pins a PhotoGIMP release by tag + sha256 via
-`fetchzip` and seeds `~/.config/GIMP/3.2` (`~/Library/Application
-Support/GIMP/3.2` on macOS) from it **once** — a version marker file skips
-re-seeding on later rebuilds, so your in-app customizations persist. To pull a
-newer PhotoGIMP release, bump `version` in that file and refresh the
-platform's hash (the rebuild's hash-mismatch error reports the correct one).
+See [Applications](docs/applications.md) for the platform matrix, installation
+policy, and application-specific notes.
 
 ## Rebuild (this WSL machine)
 
 Graphical (GNOME desktop) — the default:
 
 ```sh
-sudo nixos-rebuild switch --flake ~/oss/nix-config#nixos
+config rebuild --target nixos
 ```
 
 Headless (no desktop; GUI apps like Ghostty still work via WSLg):
 
 ```sh
-sudo nixos-rebuild switch --flake ~/oss/nix-config#nixos-headless
+config rebuild --target nixos-headless
 ```
 
 Switch between them on demand by rebuilding with the other attribute — both are
@@ -274,23 +321,21 @@ the same host, differing only in `local.graphical.enable`.
 
 ### Aliases
 
-The WSL host defines shell aliases (in `modules/wsl.nix`) so you don't type the
+Home Manager defines shell aliases (in `home/config.nix`) so you do not type the
 full flake path:
 
 | Alias              | Runs                                              |
 | ------------------ | ------------------------------------------------- |
-| `rebuild`          | `nixos-rebuild switch --flake …#nixos` (graphical) |
-| `rebuild-headless` | `nixos-rebuild switch --flake …#nixos-headless`    |
+| `rebuild`          | `config rebuild --target nixos` (graphical) |
+| `rebuild-headless` | `config rebuild --target nixos-headless`    |
 
 Both aliases are present in either mode, so `rebuild` will take you back to
 graphical while headless (and vice versa).
 
-**First-time bootstrap:** the aliases don't exist on a system that hasn't been
-built from this config yet (including right now). Run the full command once to
-install them:
+**First-time bootstrap:** use the helper before the command and aliases exist:
 
 ```sh
-sudo nixos-rebuild switch --flake ~/oss/nix-config#nixos
+./scripts/rebuild-local.sh nixos
 ```
 
 After that, open a new shell and `rebuild` / `rebuild-headless` are available.
@@ -300,9 +345,10 @@ After that, open a new shell and `rebuild` / `rebuild-headless` are available.
 The `macbook` output is a full nix-darwin system: home-manager runs as a
 darwin module (like the NixOS hosts) and **nix-homebrew** manages Homebrew for
 the handful of GUI apps nixpkgs can't build on darwin (see
-[Applications](#applications)). Per-machine facts live in `hosts/macbook.nix`
-(the username — **edit it there** if the account isn't `seth` — plus
-`hostPlatform` and `stateVersion`); shared darwin system config
+[Applications](docs/applications.md)). Per-machine facts live in `hosts/macbook.nix`
+(the primary user, `hostPlatform`, and `stateVersion`); set
+`local.primaryUser` in `~/.config/nix/local.nix` for a different account.
+Shared darwin system config
 (nix settings, unfree allowlist, fonts, base CLI tools, Homebrew) lives in
 `modules/darwin.nix`. `home/darwin.nix` is the home entrypoint.
 
@@ -330,8 +376,7 @@ the handful of GUI apps nixpkgs can't build on darwin (see
 
    Pre-existing dotfiles (macOS ships a default `.zshrc`) are moved aside via
    `backupFileExtension = "hm-bak"` (`hosts/macbook.nix`).
-4. Thereafter just `rebuild` (aliased in `home/darwin.nix`), or the full
-   `sudo darwin-rebuild switch --flake "path:$HOME/oss/nix-config#macbook"`.
+4. Thereafter use `config rebuild` or `rebuild` (aliased in `home/config.nix`).
 
 Apple's `/bin/zsh` stays the login shell and sources the home-manager rc
 files — no `chsh` needed. Doom Emacs bootstraps the same way as on Linux
@@ -526,8 +571,8 @@ repo, and no other process inherits it.
 ## Update pinned inputs
 
 Flake input updates arrive as a weekly PR: `.github/workflows/update-flake-lock.yml` runs
-`nix flake update` every Monday, evaluates all three outputs against the new
-lock, and opens/refreshes a PR on the `flake-updates` branch only if they
+`nix flake update` every Monday, tests contexts and evaluates all four outputs
+against the new lock, and opens/refreshes a PR on the `flake-updates` branch only if they
 pass. Review, merge, then `rebuild` — nothing lands on the machine
 unattended. Security fixes in pinned inputs only reach the system through
 this loop, so don't let the PRs pile up. The workflow needs the repo setting
@@ -543,7 +588,7 @@ Manual update, when you don't want to wait for Monday:
 ```sh
 nix flake update                 # all inputs
 nix flake update nixpkgs         # just one
-sudo nixos-rebuild switch --flake ~/oss/nix-config#nixos
+config rebuild
 ```
 
 Commit `flake.lock` after updating.
