@@ -50,8 +50,11 @@ in
   # be declared here. This is reset to exactly the below on every
   # `darwin-rebuild switch`, so manual reordering won't persist.
   #
-  # Paths: nix-installed GUI apps (firefox-bin-unwrapped, ghostty, signal-desktop,
-  # spotify) are linked into ~/Applications/Home Manager Apps/; Homebrew casks
+  # The base pins only the apps it installs. A context pins the apps it adds,
+  # in front of these, with `lib.mkBefore` on this same list.
+  #
+  # Paths: nix-installed GUI apps (ghostty, signal-desktop, spotify) are linked
+  # into ~/Applications/Home Manager Apps/; Homebrew casks and apps from MDM
   # install into /Applications; Messages is an Apple app under
   # /System/Applications. Confirm the exact .app leaf names on the Mac — a
   # wrong name shows a "?" tile.
@@ -60,7 +63,6 @@ in
     show-recents = true;
 
     persistent-apps = [
-      { app = "/Users/${username}/Applications/Home Manager Apps/Firefox.app"; }
       { app = "/Users/${username}/Applications/Home Manager Apps/Ghostty.app"; }
       { app = "/Users/${username}/Applications/Home Manager Apps/Signal.app"; }
       { app = "/System/Applications/Messages.app"; }

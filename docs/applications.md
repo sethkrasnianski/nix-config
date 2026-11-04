@@ -27,8 +27,8 @@ with the desktop.
 | Signal | ✅ `signal-desktop` | ✅ `signal-desktop` | Nix, shared per-user configuration — `home/default.nix` |
 | Synergy 3 | ✅ Flatpak bundle | ✅ Apple Silicon DMG | Pinned custom package — `modules/synergy3.nix` / `modules/synergy3-darwin.nix` |
 | VLC | ✅ `vlc` | ✅ `vlc-bin` | Nix — `home/linux.nix` / `home/darwin.nix` |
-| WhatsApp | ✅ `karere` (GTK4) | ✅ `whatsapp-for-mac` | Nix — `home/linux.nix` / `home/darwin.nix` |
-| Firefox | ✅ `firefox` | ✅ `firefox-bin-unwrapped` | Nix — `home/linux.nix` / `home/darwin.nix` |
+| WhatsApp | ✅ `karere` (GTK4) | — | Nix — `home/linux.nix`. On macOS, a context installs `whatsapp-for-mac` |
+| Firefox | ✅ `firefox` | — | Nix — `home/linux.nix`. On macOS, a context installs `firefox-bin-unwrapped` |
 | UTM | — | ✅ `utm` | Nix — `home/darwin.nix` |
 | Parsec | ✅ `parsec-bin` | ✅ | Linux: Nix (`home/linux.nix`). macOS: Homebrew cask |
 | Steam | ✅ Graphical only | ✅ | Linux: `programs.steam` (`modules/desktop.nix`). macOS: Homebrew cask |
@@ -36,8 +36,9 @@ with the desktop.
 | GIMP (PhotoGIMP) | ✅ `gimp` | ✅ | Linux: Nix (`home/linux.nix`). macOS: Homebrew cask |
 | Xcode | — | ⚙️ Manual | Nix installs the `xcodes` CLI — see [Xcode](../README.md#xcode) |
 
-WhatsApp uses the third-party `karere` GTK4 client on Linux and the official
-`whatsapp-for-mac` client on macOS. The Homebrew casks (`chatgpt`, `parsec`, `steam`,
+WhatsApp uses the third-party `karere` GTK4 client on Linux. On macOS, a context can
+install the official `whatsapp-for-mac` client. A context can also install the
+prebuilt `firefox-bin-unwrapped`. `pkgs/overlay.nix` pins its version. The Homebrew casks (`chatgpt`, `parsec`, `steam`,
 `mullvad-vpn`, and `gimp`) live in `modules/darwin.nix`.
 
 The base does not install Claude Desktop. A context installs it, or the organization
