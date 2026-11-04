@@ -493,6 +493,14 @@ settings in the repo file: changes made through `/config` write through the
 symlink, but if a rewrite replaces the link with a plain file, home-manager
 restores it (discarding those changes) on the next rebuild.
 
+A context can layer extra settings over this file. If the environment variable
+`CLAUDE_EXTRA_SETTINGS` names a readable JSON file, the `claude` shell function
+passes it as `--settings`. Claude Code ranks that file above the user settings
+and never writes to it. A context sets the variable in its `home.nix`, so
+settings that belong to one machine stay out of this repo. Changes that you
+make through `/config`, `/model`, or `/plugin install` still write to the
+shared file.
+
 ## OpenCode
 
 Global opencode settings and TUI preferences are tracked in
