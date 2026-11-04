@@ -3,7 +3,6 @@
 # must NOT be imported here. Per-machine facts (username, hostPlatform,
 # stateVersion) live in hosts/macbook.nix.
 {
-  config,
   lib,
   pkgs,
   ...
@@ -60,11 +59,12 @@
   ];
 
   # Declarative Homebrew for the macOS GUI apps nixpkgs can't build on darwin
-  # (Claude, ChatGPT, Parsec, Steam, Mullvad, GIMP — see homebrew.casks below). nix-homebrew
+  # (ChatGPT, Parsec, Steam, Mullvad, GIMP — see homebrew.casks below). nix-homebrew
   # manages the Homebrew installation itself; the owning `user` is set in
   # hosts/macbook.nix. The homebrew module declares the casks and reconciles
   # them on `darwin-rebuild switch` — cleanup = "uninstall" removes any cask no
-  # longer listed here, making this file the source of truth.
+  # longer listed here, making this file the source of truth. Contexts add
+  # their own casks to this list; the base installs no Claude Desktop.
   # Auto-install the Xcode Command Line Tools (git, clang, make, headers) on
   # the first activation if they're absent, so the Mac is self-contained — no
   # separate manual step in the bootstrap docs. `xcode-select --install`
@@ -80,21 +80,20 @@
     fi
   '';
 
-  # Opt out of Homebrew analytics for shells and the Claude-only Bundle pass below.
+  # Opt out of Homebrew analytics for all shells.
   environment.variables.HOMEBREW_NO_ANALYTICS = "1";
 
   nix-homebrew.enable = true;
   homebrew = {
     enable = true;
-    # The GUI apps nixpkgs can't build on darwin. This list installs Claude
-    # Desktop and ChatGPT only on this Mac. Nix manages the other apps on Linux:
+    # The GUI apps nixpkgs can't build on darwin. This list installs ChatGPT
+    # only on this Mac. Nix manages the other apps on Linux:
     # parsec-bin (home/linux.nix), programs.steam and
     # services.mullvad-vpn (modules/desktop.nix, modules/common.nix), gimp
     # (home/linux.nix — nixpkgs' gimp has no darwin build). The PhotoGIMP
     # overlay (home/photogimp.nix) applies to this cask the same as to the
     # Linux package.
     casks = [
-      "claude"
       "chatgpt"
       "parsec"
       "steam"
@@ -106,17 +105,4 @@
       autoUpdate = false;
     };
   };
-
-  # Use a Claude-only Bundle pass to compare the installed app's version.
-  # This preserves a newer version from Claude's own updater.
-  system.activationScripts.homebrew.text = lib.mkIf config.homebrew.enable (
-    lib.mkAfter ''
-      echo "upgrading Claude Desktop..."
-      /usr/bin/sudo --user=${lib.escapeShellArg config.homebrew.user} --set-home \
-        /usr/bin/env HOMEBREW_AUTO_UPDATE_SECS=0 HOMEBREW_NO_ANALYTICS=1 \
-        ${lib.escapeShellArg "${config.homebrew.prefix}/bin/brew"} bundle install --upgrade --file=- <<'CLAUDE_BREWFILE'
-      cask "claude", greedy: false
-      CLAUDE_BREWFILE
-    ''
-  );
 }
