@@ -69,7 +69,7 @@ Paths are relative to the repository root. Follow the
 │   ├── darwin.nix                       # macOS packages, Docker plugin links, and home.stateVersion
 │   ├── git.nix                          # user Git settings and global ignore file
 │   ├── ssh.nix                          # SSH settings, agent, and per-machine key helper
-│   ├── shell.nix                        # Bash, Zsh, and agent shell wrappers
+│   ├── shell.nix                        # Bash, Zsh, and agent shell wrappers, with an optional Claude settings layer
 │   ├── direnv.nix                       # direnv hooks and Nix project environments
 │   ├── neovim.nix                       # Neovim configuration
 │   ├── emacs.nix                        # Emacs package and Doom CLI path
