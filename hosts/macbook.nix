@@ -52,7 +52,7 @@ in
   #
   # Paths: nix-installed GUI apps (firefox-bin-unwrapped, ghostty, signal-desktop,
   # spotify) are linked into ~/Applications/Home Manager Apps/; Homebrew casks
-  # such as Claude install into /Applications; Messages is an Apple app under
+  # install into /Applications; Messages is an Apple app under
   # /System/Applications. Confirm the exact .app leaf names on the Mac — a
   # wrong name shows a "?" tile.
   system.defaults.dock = {
@@ -61,7 +61,6 @@ in
 
     persistent-apps = [
       { app = "/Users/${username}/Applications/Home Manager Apps/Firefox.app"; }
-      { app = "/Applications/Claude.app"; }
       { app = "/Users/${username}/Applications/Home Manager Apps/Ghostty.app"; }
       { app = "/Users/${username}/Applications/Home Manager Apps/Signal.app"; }
       { app = "/System/Applications/Messages.app"; }

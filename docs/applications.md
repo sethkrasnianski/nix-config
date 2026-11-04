@@ -22,7 +22,6 @@ with the desktop.
 | --- | --- | --- | --- |
 | Spotify | ✅ | ✅ | Nix, shared per-user configuration — `home/default.nix` |
 | Obsidian | ✅ | ✅ | Nix, shared per-user configuration — `home/default.nix` |
-| Claude Desktop | — | ✅ | Homebrew cask, upgraded during Mac rebuilds — `modules/darwin.nix` |
 | doctl | ✅ | ✅ | Nix, shared per-user configuration — `home/default.nix` |
 | Pi coding agent | ✅ `pi-coding-agent` | ✅ `pi-coding-agent` | Nix, shared per-user configuration — `home/default.nix` |
 | Signal | ✅ `signal-desktop` | ✅ `signal-desktop` | Nix, shared per-user configuration — `home/default.nix` |
@@ -38,11 +37,11 @@ with the desktop.
 | Xcode | — | ⚙️ Manual | Nix installs the `xcodes` CLI — see [Xcode](../README.md#xcode) |
 
 WhatsApp uses the third-party `karere` GTK4 client on Linux and the official
-`whatsapp-for-mac` client on macOS. The Homebrew casks (`claude`, `parsec`, `steam`,
+`whatsapp-for-mac` client on macOS. The Homebrew casks (`chatgpt`, `parsec`, `steam`,
 `mullvad-vpn`, and `gimp`) live in `modules/darwin.nix`.
 
-The Mac rebuild upgrades Claude Desktop through a separate Homebrew Bundle pass.
-It compares the installed version and preserves newer versions from its own updater.
+The base does not install Claude Desktop. A context installs it, or the organization
+supplies it. The base also does not pin it in the Dock. Each context pins the apps it adds.
 
 ## Synergy 3
 
