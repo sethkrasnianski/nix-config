@@ -7,6 +7,10 @@
 # home-manager activation script. After seeding, GIMP owns the directory and
 # your in-app tweaks persist across rebuilds.
 #
+# Opt-in: set `programs.photogimp.enable = true` where GIMP is installed
+# (home/linux.nix does; a context enables it where it adds the macOS cask).
+# Without GIMP the module does nothing.
+#
 # To pull a newer PhotoGIMP release: bump `version` to the new release tag,
 # then refresh both hashes — set one to lib.fakeHash, run `rebuild`, and copy
 # the "got:" hash from the mismatch error (repeat for the other platform's
@@ -47,14 +51,18 @@ let
   gimpUserDir = if isDarwin then "Library/Application Support/GIMP/3.2" else ".config/GIMP/3.2";
 in
 {
-  home.activation.photogimp = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    photogimpDir="${config.home.homeDirectory}/${gimpUserDir}"
-    marker="$photogimpDir/.photogimp-version"
-    if [ ! -e "$marker" ] || [ "$(cat "$marker")" != "${version}" ]; then
-      run mkdir -p "$photogimpDir"
-      run cp -r "${photogimpSrc}/." "$photogimpDir/"
-      run chmod -R u+w "$photogimpDir"
-      run --quiet sh -c "printf '%s\n' '${version}' > \"$marker\""
-    fi
-  '';
+  options.programs.photogimp.enable = lib.mkEnableOption "seeding GIMP's user config with PhotoGIMP";
+
+  config = lib.mkIf config.programs.photogimp.enable {
+    home.activation.photogimp = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      photogimpDir="${config.home.homeDirectory}/${gimpUserDir}"
+      marker="$photogimpDir/.photogimp-version"
+      if [ ! -e "$marker" ] || [ "$(cat "$marker")" != "${version}" ]; then
+        run mkdir -p "$photogimpDir"
+        run cp -r "${photogimpSrc}/." "$photogimpDir/"
+        run chmod -R u+w "$photogimpDir"
+        run --quiet sh -c "printf '%s\n' '${version}' > \"$marker\""
+      fi
+    '';
+  };
 }

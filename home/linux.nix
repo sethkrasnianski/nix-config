@@ -15,9 +15,8 @@
   # the Parsec client (a Homebrew cask on macOS); vlc is the full Qt build
   # (macOS uses vlc-bin); karere is the third-party GTK4 WhatsApp client (there
   # is no official Linux client — macOS uses whatsapp-for-mac); gimp is
-  # Linux-only in nixpkgs (macOS gets it via the Homebrew cask in
-  # modules/darwin.nix). The PhotoGIMP overlay (home/photogimp.nix) seeds
-  # GIMP's config dir on both platforms. Global apps live in home/default.nix.
+  # Linux-only in nixpkgs (macOS gets it from a context's Homebrew cask).
+  # Global apps live in home/default.nix.
   home.packages = with pkgs; [
     firefox
     parsec-bin
@@ -25,4 +24,7 @@
     karere
     gimp
   ];
+
+  # Seed GIMP's config dir with PhotoGIMP (home/photogimp.nix).
+  programs.photogimp.enable = true;
 }

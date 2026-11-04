@@ -74,7 +74,7 @@ Paths are relative to the repository root. Follow the
 │   ├── neovim.nix                       # Neovim configuration
 │   ├── emacs.nix                        # Emacs package and Doom CLI path
 │   ├── ghostty.nix                      # Ghostty package selection and shared keybindings
-│   └── photogimp.nix                    # seeds writable GIMP configuration from a pinned PhotoGIMP release
+│   └── photogimp.nix                    # opt-in: seeds writable GIMP configuration from a pinned PhotoGIMP release
 ├── doom/                                # Doom user configuration, linked from ~/.config/doom
 ├── claude/
 │   └── settings.json                    # global Claude Code settings, linked from ~/.claude/settings.json

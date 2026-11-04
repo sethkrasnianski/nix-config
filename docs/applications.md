@@ -74,6 +74,10 @@ Windows host.
 shortcuts, and tool configuration. It supplies configuration files rather than an
 application package.
 
+PhotoGIMP is opt-in. The option `programs.photogimp.enable` is off by default.
+`home/linux.nix` turns it on. A context turns it on for macOS when it installs GIMP.
+Without the option, activation does not copy any files.
+
 GIMP rewrites these files at runtime, including window layouts, shortcuts, and
 session state. A read-only store symlink would prevent those changes.
 Instead, `home/photogimp.nix` pins a PhotoGIMP release by tag and SHA-256 hash through
