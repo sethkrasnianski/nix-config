@@ -27,13 +27,10 @@
     pkg:
     builtins.elem (lib.getName pkg) [
       "claude-code"
-      "firefox-bin"
-      "firefox-bin-unwrapped"
       "ngrok"
       "obsidian"
       "spotify"
       "synergy3"
-      "whatsapp-for-mac"
     ];
 
   # Icon font used by Doom Emacs' UI (modeline, treemacs, dashboard). nix-darwin

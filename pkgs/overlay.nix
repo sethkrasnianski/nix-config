@@ -61,6 +61,11 @@ final: prev: {
 
   # Read the pinned Mozilla checksums to preserve every platform and locale choice.
   # The inherited macOS package keeps the unwrapped, signed application bundle.
+  # No base package uses this on macOS. A context installs it. Use the unwrapped
+  # build, not firefox-bin: the firefox-bin wrapper's CFBundleExecutable is a
+  # bash script that execs the binary in a different store bundle, so the
+  # open-URL Apple Events LaunchServices sends never reach the process and every
+  # link opens a blank window.
   firefox-bin-unwrapped = prev.firefox-bin-unwrapped.override {
     generated =
       let

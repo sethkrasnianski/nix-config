@@ -16,22 +16,16 @@
   # bump on upgrades.
   home.stateVersion = "26.05";
 
-  # macOS builds of apps that nixpkgs makes for darwin. firefox-bin-unwrapped is
-  # the prebuilt Firefox (avoids a source compile on darwin). It is the
-  # unwrapped build on purpose: the firefox-bin wrapper's CFBundleExecutable is
-  # a bash script that execs the binary in a different store bundle, so the
-  # open-URL Apple Events LaunchServices sends never reach the process and every
-  # link opens a blank window. UTM is Mac-only;
+  # macOS builds of apps that nixpkgs makes for darwin. UTM is Mac-only;
   # xcodes is the CLI that installs/switches
   # full Xcode versions — Xcode itself is not nix-installable (see README
-  # "Xcode"). vlc-bin and whatsapp-for-mac are the darwin equivalents of vlc /
-  # karere in home/linux.nix. Global apps live in home/default.nix.
+  # "Xcode"). vlc-bin is the darwin equivalent of vlc in home/linux.nix.
+  # Firefox and WhatsApp are not in the base on macOS; a context adds them
+  # (see docs/applications.md). Global apps live in home/default.nix.
   home.packages = with pkgs; [
-    firefox-bin-unwrapped
     utm
     xcodes
     vlc-bin
-    whatsapp-for-mac
     # Container runtime for macOS: colima runs the Linux VM (start it with
     # `colima start`; not autostarted), docker is the CLI that talks to it.
     # Needed by the sonarqube MCP server and the Makefile image builds in
