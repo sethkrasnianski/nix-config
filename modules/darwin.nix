@@ -43,10 +43,10 @@
 
   # Base CLI tools kept system-wide — the darwin stand-in for the tools
   # modules/common.nix installs on NixOS. User-facing apps live in home/.
+  # Teleport is not here: a context installs it where it is needed.
   environment.systemPackages = with pkgs; [
     nixfmt
     awscli2
-    teleport
     gws
     wget
     fd
