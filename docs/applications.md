@@ -31,15 +31,15 @@ with the desktop.
 | Firefox | ✅ `firefox` | — | Nix — `home/linux.nix`. On macOS, a context installs `firefox-bin-unwrapped` |
 | UTM | — | ✅ `utm` | Nix — `home/darwin.nix` |
 | Parsec | ✅ `parsec-bin` | ✅ | Linux: Nix (`home/linux.nix`). macOS: Homebrew cask |
-| Steam | ✅ Graphical only | ✅ | Linux: `programs.steam` (`modules/desktop.nix`). macOS: Homebrew cask |
+| Steam | ✅ Graphical only | — | `programs.steam` (`modules/desktop.nix`). On macOS, a context installs the Homebrew cask |
 | Mullvad VPN | ✅ | ✅ | Linux: `services.mullvad-vpn` (`modules/common.nix`). macOS: Homebrew cask |
-| GIMP (PhotoGIMP) | ✅ `gimp` | ✅ | Linux: Nix (`home/linux.nix`). macOS: Homebrew cask |
+| GIMP (PhotoGIMP) | ✅ `gimp` | — | Nix (`home/linux.nix`). On macOS, a context installs the Homebrew cask |
 | Xcode | — | ⚙️ Manual | Nix installs the `xcodes` CLI — see [Xcode](../README.md#xcode) |
 
 WhatsApp uses the third-party `karere` GTK4 client on Linux. On macOS, a context can
 install the official `whatsapp-for-mac` client. A context can also install the
-prebuilt `firefox-bin-unwrapped`. `pkgs/overlay.nix` pins its version. The Homebrew casks (`chatgpt`, `parsec`, `steam`,
-`mullvad-vpn`, and `gimp`) live in `modules/darwin.nix`.
+prebuilt `firefox-bin-unwrapped`. `pkgs/overlay.nix` pins its version. The Homebrew casks (`chatgpt`, `parsec`, and
+`mullvad-vpn`) live in `modules/darwin.nix`. A context can add casks to that list.
 
 The base does not install Claude Desktop. A context installs it, or the organization
 supplies it. The base also does not pin it in the Dock. Each context pins the apps it adds.

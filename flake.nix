@@ -25,7 +25,7 @@
     };
 
     # Declarative Homebrew for the macOS GUI apps nixpkgs can't build on darwin
-    # (Parsec, Steam, Mullvad). Manages the Homebrew install itself; the cask
+    # (ChatGPT, Parsec, Mullvad). Manages the Homebrew install itself; the cask
     # list lives in modules/darwin.nix.
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
 
